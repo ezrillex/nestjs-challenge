@@ -4,6 +4,7 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// npx prisma migrate dev --name the_name
 generator client {
   provider = "prisma-client-js"
 }
@@ -18,8 +19,22 @@ model Testing {
   test String
 }
 
+enum roles {
+  customer
+  manager
+  admin
+  anonymous // public
+}
+
 model Users {
-  id       String @id @default(uuid())
-  email    String @unique
-  password String @db.Char(32) // hashed and salted password
+  id                               String     @id @default(uuid())
+  first_name                       String     @db.VarChar(60)
+  last_name                        String     @db.VarChar(120)
+  email                            String     @unique
+  password                         String     @db.Char(60) // hashed and salted password
+  created_at                       DateTime   @default(now())
+  role                             roles      @default(customer)
+  failed_login_attempts            Int        @default(0)
+  failed_login_attempts_timestamps DateTime[] @default([])
+  last_login_at                    DateTime?
 }
