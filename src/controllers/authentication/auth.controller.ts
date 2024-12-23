@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   HttpException,
   HttpStatus,
   Post,
@@ -42,6 +43,7 @@ export class AuthController {
     };
   }
 
+  @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() data: LoginUserDto) {
     const user = await this.authService.findOneByEmail(data.email);
