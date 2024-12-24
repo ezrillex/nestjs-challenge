@@ -2,11 +2,11 @@ import { IsEmail, IsString, Length } from 'class-validator';
 
 export class SignupUserDto {
   @IsString()
-  @Length(1,60)
+  @Length(1, 60)
   first_name: string;
 
   @IsString()
-  @Length(1,120)
+  @Length(1, 120)
   last_name: string;
 
   @IsString()
@@ -14,11 +14,10 @@ export class SignupUserDto {
   email: string;
 
   @IsString()
-  @Length(8,128)
+  @Length(8, 128)
   password: string;
 
   @IsString()
-  @Length(8,128)
+  @Length(8, 128)
   repeat_password: string;
 }
-
