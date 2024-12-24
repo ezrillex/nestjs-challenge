@@ -36,7 +36,9 @@ model Users {
   role                               roles      @default(customer)
   failed_login_attempts              Int        @default(0)
   failed_login_attempts_timestamps   DateTime[] @default([])
-  last_login_at                      DateTime?
+  session_token                      String? // hash and salt accepted other tokens due to hash collision, just using string because of time constraints. If hackers get the DB then by that point just wipe it.
+  login_at                           DateTime?
+  logout_at                          DateTime?
   password_reset_requests            Int        @default(0)
   password_reset_requests_timestamps DateTime[] @default([])
   password_reset_token               String?

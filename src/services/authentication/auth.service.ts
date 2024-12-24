@@ -73,14 +73,14 @@ export class AuthService {
     });
   }
 
-  async loginAttemptSuccess(id: string) {
+  async loginAttemptSuccess(id: string, token: string) {
     const now = new Date().toISOString();
     // truly I don't need to store the token in the db.
     // I only need to check if login timestamp is older than last logout timestamp to determine if token is not valid anymore
     // thus only need to update this:
     return this.prisma.users.update({
       where: { id: id },
-      data: { last_login_at: now },
+      data: { login_at: now, session_token: token },
     });
   }
 
@@ -122,6 +122,17 @@ export class AuthService {
         // unlocks account
         failed_login_attempts: 0,
         failed_login_attempts_timestamps: [],
+      },
+    });
+  }
+
+  async logoutUser(id: string) {
+    const now = new Date().toISOString();
+    return this.prisma.users.update({
+      where: { id: id },
+      data: {
+        session_token: null,
+        logout_at: now,
       },
     });
   }

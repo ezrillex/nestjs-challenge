@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  Request,
 } from '@nestjs/common';
 import { SignupUserDto } from '../../DTOs/signup-user-dto/signup-user-dto';
 import { AuthService } from '../../services/authentication/auth.service';
@@ -16,6 +17,7 @@ import { DateTime } from 'luxon';
 import { ForgotPasswordDto } from '../../DTOs/forgot-password-dto/forgot-password-dto';
 import { ResetPasswordDto } from '../../DTOs/reset-password-dto/reset-password-dto';
 import { Public } from '../../decorators/public/public.decorator';
+import { setTimeout } from 'timers/promises';
 
 @Controller('auth')
 export class AuthController {
@@ -59,9 +61,22 @@ export class AuthController {
   @Public()
   @Get('test')
   async test() {
-    const now = DateTime.now();
+    const tokenA = await this.jwtService.signAsync({
+      somedata: 'that is the same?',
+    });
+    console.log(tokenA);
 
-    console.log(now);
+    const hashA = await bcrypt.hash(tokenA, 10);
+
+    await setTimeout(5000);
+
+    const tokenB = await this.jwtService.signAsync({
+      somedata: 'that is the same?',
+    });
+    console.log(tokenB);
+
+    const result = await bcrypt.compare(tokenB, hashA);
+    console.log(result);
     return 'ok';
   }
 
@@ -96,11 +111,12 @@ export class AuthController {
       user.password,
     );
     if (isCorrectPassword) {
-      const token = this.jwtService.sign({
+      const token = await this.jwtService.signAsync({
         user: user.id,
         role: user.role,
       });
-      await this.authService.loginAttemptSuccess(user.id);
+
+      await this.authService.loginAttemptSuccess(user.id, token);
       return { token };
     } else {
       await this.authService.loginAttemptFailed(
@@ -113,6 +129,13 @@ export class AuthController {
         HttpStatus.UNAUTHORIZED,
       );
     }
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('logout')
+  async logout(@Body() data, @Request() request: Request) {
+    const userId = request['user'].id;
+    return this.authService.logoutUser(userId);
   }
 
   @Public()
