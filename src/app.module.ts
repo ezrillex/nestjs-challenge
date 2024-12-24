@@ -6,6 +6,9 @@ import { AuthService } from './services/authentication/auth.service';
 import { PrismaService } from './services/prisma/prisma.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersController } from './controllers/users/users.controller';
+import { ProductsModule } from './modules/products/products.module';
+import { ProductsController } from './controllers/products/products.controller';
+import { ProductsService } from './services/products/products.service';
 
 @Module({
   imports: [
@@ -13,8 +16,9 @@ import { UsersController } from './controllers/users/users.controller';
       isGlobal: true,
     }),
     AuthModule,
+    ProductsModule,
   ],
-  controllers: [AppController, UsersController],
-  providers: [AppService, AuthService, PrismaService],
+  controllers: [AppController, UsersController, ProductsController],
+  providers: [AppService, AuthService, PrismaService, ProductsService],
 })
 export class AppModule {}

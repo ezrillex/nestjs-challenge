@@ -9,6 +9,7 @@ import { IS_PUBLIC_KEY } from '../../decorators/public/public.decorator';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '../../services/authentication/auth.service';
 import { DateTime } from 'luxon';
+import { IS_PUBLIC_PRIVATE_KEY } from '../../decorators/public_and_private/public_and_private.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -29,6 +30,17 @@ export class AuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
+    const isPublicPrivate = this.reflector.getAllAndOverride<boolean>(
+      IS_PUBLIC_PRIVATE_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+    // if you are sending any token info on a semi public api then it means you meant to use the
+    // auth version of it. To access the public side then do not send any token headers.
+    if (!token && isPublicPrivate) {
+      request['public_private_mode'] = 'public';
+      return true;
+    }
+
     if (!token || token.length <= 7) {
       throw new UnauthorizedException('Bearer token is missing or is invalid.');
     }
@@ -62,6 +74,7 @@ export class AuthGuard implements CanActivate {
     // 💡 We're assigning the payload to the request object here
     // so that we can access it in our route handlers
     request['user'] = user;
+    request['public_private_mode'] = 'private';
     return true;
   }
 }

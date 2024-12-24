@@ -37,10 +37,32 @@ model Users {
   failed_login_attempts              Int        @default(0)
   failed_login_attempts_timestamps   DateTime[] @default([])
   session_token                      String? // hash and salt accepted other tokens due to hash collision, just using string because of time constraints. If hackers get the DB then by that point just wipe it.
-  login_at                           DateTime?
-  logout_at                          DateTime?
+  login_at                           DateTime?  @db.Timestamp()
+  logout_at                          DateTime?  @db.Timestamp()
   password_reset_requests            Int        @default(0)
   password_reset_requests_timestamps DateTime[] @default([])
   password_reset_token               String?
   password_last_updated              DateTime   @default(now())
+}
+
+model Products {
+  id              String    @id @default(uuid())
+  is_published    Boolean   @default(false)
+  is_deleted      Boolean   @default(false)
+  name            String
+  description     String
+  created_by      String    @db.Uuid
+  created_at      DateTime  @default(now())
+  last_updated_by String?   @db.Uuid
+  last_updated_at DateTime? @db.Timestamp()
+}
+
+model ProductVariations {
+  id           String  @id @default(uuid())
+  title        String
+  price        Decimal @db.Money
+  stock        Int     @db.Integer
+  // images to be done
+  is_published Boolean @db.Boolean
+  is_deleted   Boolean @db.Boolean
 }
