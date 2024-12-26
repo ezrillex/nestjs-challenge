@@ -23,7 +23,6 @@ enum roles {
   customer
   manager
   admin
-  anonymous // public
 }
 
 model Users {
@@ -51,6 +50,7 @@ model Products {
   is_deleted      Boolean   @default(false)
   name            String
   description     String
+  variations      String[]  @db.Uuid
   created_by      String    @db.Uuid
   created_at      DateTime  @default(now())
   last_updated_by String?   @db.Uuid
@@ -58,11 +58,11 @@ model Products {
 }
 
 model ProductVariations {
-  id           String  @id @default(uuid())
+  id           String   @id @default(uuid())
   title        String
-  price        Decimal @db.Money
-  stock        Int     @db.Integer
-  // images to be done
-  is_published Boolean @db.Boolean
-  is_deleted   Boolean @db.Boolean
+  price        Decimal  @db.Money
+  stock        Int      @db.Integer
+  images       String[] @db.Uuid
+  is_published Boolean  @db.Boolean
+  is_deleted   Boolean  @db.Boolean
 }

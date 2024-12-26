@@ -6,15 +6,21 @@ import { AuthService } from '../../services/authentication/auth.service';
 import { PrismaService } from '../../services/prisma/prisma.service';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from '../../guards/auth/auth.guard';
+import { RolesGuard } from '../../guards/roles/roles.guard';
 
 @Module({
   controllers: [AuthController],
   providers: [
     AuthService,
     PrismaService,
+    // order matters here.
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
   imports: [
