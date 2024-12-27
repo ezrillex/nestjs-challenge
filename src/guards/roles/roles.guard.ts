@@ -7,6 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 import { ROLE_REQUIRED } from '../../decorators/requires-role/requires-role.decorator';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -24,7 +25,14 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    let request;
+    //@ts-expect-error graphql is a value that is returned by this.
+    if (context.getType() === 'graphql') {
+      const gql_context = GqlExecutionContext.create(context);
+      request = gql_context.getContext().req;
+    } else {
+      request = context.switchToHttp().getRequest();
+    }
 
     if (request.user && request.user.role === rolesRequired) {
       return true;

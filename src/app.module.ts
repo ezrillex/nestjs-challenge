@@ -10,6 +10,8 @@ import { join } from 'path';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { GraphqlModule } from './gql/graphql.module';
+import { PaymentsController } from './controllers/payments/payments.controller';
 
 @Module({
   imports: [
@@ -20,10 +22,16 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
     ProductsModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      typePaths: ['src/gql/schema.graphql'],
+      //typePaths: ['src/gql/schema.graphql'],
       playground: false,
+      autoSchemaFile: join(process.cwd(), 'src/gql/schema.gql'),
       // subscriptions: {
       //   'graphql-ws': true,
+      // },
+      // definitions: {
+      //   path: join(process.cwd(), 'src/gql/graphql.ts'),
+      //   outputAs: 'class',
+      //   emitTypenameField: true,
       // },
       definitions: {
         path: join(process.cwd(), 'src/gql/graphql.ts'),
@@ -32,8 +40,9 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
       },
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
+    GraphqlModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, PaymentsController],
   providers: [AppService, AuthService, PrismaService],
 })
 export class AppModule {}
