@@ -21,6 +21,7 @@ export class GetProductsInput {
 export class CreateProductInput {
     name: string;
     description: string;
+    categories?: Nullable<string[]>;
     variations: CreateVariationInput[];
 }
 
@@ -28,7 +29,25 @@ export class CreateVariationInput {
     title: string;
     price: number;
     stock: number;
-    images?: Nullable<string[]>;
+}
+
+export class CreateCategoryInput {
+    name: string;
+}
+
+export class UpdateProductInput {
+    id: string;
+    name?: Nullable<string>;
+    description?: Nullable<string>;
+    categories?: Nullable<string[]>;
+    is_published?: Nullable<boolean>;
+}
+
+export class UpdateProductVariationInput {
+    id: string;
+    title?: Nullable<string>;
+    price?: Nullable<number>;
+    stock?: Nullable<number>;
 }
 
 export class Images {
@@ -48,6 +67,13 @@ export class ProductVariations {
     images?: Nullable<Images[]>;
 }
 
+export class Categories {
+    __typename?: 'Categories';
+    id: string;
+    name: string;
+    products: Products[];
+}
+
 export class Products {
     __typename?: 'Products';
     id: string;
@@ -56,6 +82,7 @@ export class Products {
     name: string;
     description: string;
     variations: ProductVariations[];
+    categories: Categories[];
     created_by: string;
     created_at: DateTime;
     last_updated_by?: Nullable<string>;
@@ -66,12 +93,20 @@ export abstract class IQuery {
     __typename?: 'IQuery';
 
     abstract getProducts(GetProductsInput: GetProductsInput): Nullable<Products[]> | Promise<Nullable<Products[]>>;
+
+    abstract getProductById(id: string): Nullable<Products> | Promise<Nullable<Products>>;
 }
 
 export abstract class IMutation {
     __typename?: 'IMutation';
 
     abstract createProduct(CreateProductInput: CreateProductInput): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract createCategory(CreateCategoryInput: CreateCategoryInput): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract updateProduct(UpdateProductInput: UpdateProductInput): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput): Nullable<string> | Promise<Nullable<string>>;
 }
 
 export type DateTime = any;

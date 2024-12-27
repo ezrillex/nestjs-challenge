@@ -17,6 +17,12 @@ type ProductVariations {
   images: [Images!]
 }
 
+type Categories {
+  id: String!
+  name: String!
+  products: [Products!]!
+}
+
 type Products {
   id: String!
   is_published: Boolean!
@@ -24,6 +30,7 @@ type Products {
   name: String!
   description: String!
   variations: [ProductVariations!]!
+  categories: [Categories!]!
   created_by: String!
   created_at: DateTime!
   last_updated_by: String
@@ -37,6 +44,7 @@ scalar DateTime
 
 type Query {
   getProducts(GetProductsInput: GetProductsInput!): [Products!]
+  getProductById(id: String!): Products
 }
 
 input GetProductsInput {
@@ -51,11 +59,15 @@ input GetProductsInput {
 
 type Mutation {
   createProduct(CreateProductInput: CreateProductInput!): String
+  createCategory(CreateCategoryInput: CreateCategoryInput!): String
+  updateProduct(UpdateProductInput: UpdateProductInput!): String
+  updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput!): String
 }
 
 input CreateProductInput {
   name: String!
   description: String!
+  categories: [ID!]
   variations: [CreateVariationInput!]!
 }
 
@@ -63,5 +75,23 @@ input CreateVariationInput {
   title: String!
   price: Float!
   stock: Float!
-  images: [String!]
+}
+
+input CreateCategoryInput {
+  name: String!
+}
+
+input UpdateProductInput {
+  id: ID!
+  name: String
+  description: String
+  categories: [ID!]
+  is_published: Boolean
+}
+
+input UpdateProductVariationInput {
+  id: ID!
+  title: String
+  price: Float
+  stock: Int
 }

@@ -2,11 +2,12 @@ import {
   ArrayMinSize,
   IsArray,
   IsString,
+  IsUUID,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { CreateVariationInput } from './createVariation.input';
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, ID, InputType } from '@nestjs/graphql';
 
 @InputType()
 export class CreateProductInput {
@@ -17,6 +18,11 @@ export class CreateProductInput {
   @IsString()
   @Field()
   description: string;
+
+  @Field(() => [ID], { nullable: true })
+  @IsArray()
+  @IsUUID('all', { each: true })
+  categories: string[];
 
   @Field(() => [CreateVariationInput])
   @IsArray()

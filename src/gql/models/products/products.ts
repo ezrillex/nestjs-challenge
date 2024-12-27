@@ -1,6 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { IsUUID } from 'class-validator';
 import { ProductVariations } from './product-variations/product-variations';
+import { Categories } from './categories/categories';
 
 @ObjectType()
 export class Products {
@@ -21,6 +22,9 @@ export class Products {
 
   @Field(() => [ProductVariations])
   variations: ProductVariations[];
+
+  @Field(() => [Categories])
+  categories: Categories[];
 
   @Field(() => String)
   created_by: string;

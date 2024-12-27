@@ -1,6 +1,5 @@
-import { IsArray, IsInt, IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsInt, IsNumber, IsString } from 'class-validator';
 import { Field, InputType } from '@nestjs/graphql';
-import { Images } from './images/images';
 
 @InputType()
 export class CreateVariationInput {
@@ -16,8 +15,6 @@ export class CreateVariationInput {
   @IsInt()
   stock: number;
 
-  @Field(() => [String], { nullable: true })
-  // @IsArray()
-  // @IsUUID('all', { each: true })
-  images: string[];
+  // Images should be uploaded and deleted from the /files rest api. GQL is only a way to query them.
+  // As per IDK who mentioned that fabio said that files could be rest.
 }
