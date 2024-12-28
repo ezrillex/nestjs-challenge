@@ -12,6 +12,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { GraphqlModule } from './gql/graphql.module';
 import { PaymentsController } from './controllers/payments/payments.controller';
+import { ImagesModule } from './modules/images/images.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { PaymentsController } from './controllers/payments/payments.controller';
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     GraphqlModule,
+    ImagesModule,
   ],
   controllers: [AppController, PaymentsController],
   providers: [AppService, AuthService, PrismaService],

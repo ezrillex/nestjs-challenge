@@ -9,6 +9,7 @@ import { GetProductsInput } from '../../models/products/get-products.input/get-p
 import { CreateCategoryInput } from '../../models/products/create-category-input/create-category-input';
 import { UpdateProductInput } from '../../models/products/product/update-product-input/update-product-input';
 import { UpdateProductVariationInput } from '../../models/products/product/update-product-variation-input/update-product-variation-input';
+import { ParseUUIDPipe } from '@nestjs/common';
 
 @Resolver()
 export class ProductsResolver {
@@ -32,7 +33,7 @@ export class ProductsResolver {
   //@RequiresRole(roles.manager)
   @Query(() => Products, { nullable: true })
   async getProductById(
-    @Args('id', { type: () => String }) id: string,
+    @Args('id', { type: () => String }, ParseUUIDPipe) id: string,
     @Context('req') request: Request,
   ) {
     let role: roles = roles.public;
@@ -87,6 +88,22 @@ export class ProductsResolver {
   ) {
     const result = await this.productsService.UpdateProductVariation(
       updateProductVariationInput,
+      request['user'].id,
+    );
+    return result.id;
+  }
+
+  @RequiresRole(roles.manager)
+  @Mutation(() => String, { nullable: true })
+  async deleteProduct(
+    @Args('product_id', { type: () => String }, ParseUUIDPipe)
+    product_id: string,
+    @Context('req') request: Request,
+  ) {
+    // TODO because the db will cascade when we do the actual delete, we need to first delete the images fron CDN.
+
+    const result = await this.productsService.DeleteProduct(
+      product_id,
       request['user'].id,
     );
     return result.id;

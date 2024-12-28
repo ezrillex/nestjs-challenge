@@ -107,6 +107,8 @@ export abstract class IMutation {
     abstract updateProduct(UpdateProductInput: UpdateProductInput): Nullable<string> | Promise<Nullable<string>>;
 
     abstract updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract deleteProduct(product_id: string): Nullable<string> | Promise<Nullable<string>>;
 }
 
 export type DateTime = any;

@@ -74,7 +74,7 @@ model ProductVariations {
   //is_published Boolean   @default(false) @db.Boolean
   //is_deleted   Boolean   @default(false) @db.Boolean
   test            String    @default("123")
-  product         Products? @relation(fields: [product_id], references: [id])
+  product         Products? @relation(fields: [product_id], references: [id], onDelete: Cascade)
   product_id      String?   @db.Uuid
   last_updated_by String?   @db.Uuid
   last_updated_at DateTime? @db.Timestamp()
@@ -82,8 +82,9 @@ model ProductVariations {
 
 model Images {
   id                   String             @id @default(uuid()) @db.Uuid
+  cdn_id               String
   url                  String
   created_at           DateTime           @default(now()) @db.Timestamp()
-  product_variation    ProductVariations? @relation(fields: [product_variation_id], references: [id])
+  product_variation    ProductVariations? @relation(fields: [product_variation_id], references: [id], onDelete: Cascade)
   product_variation_id String?            @db.Uuid
 }

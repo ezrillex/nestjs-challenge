@@ -62,6 +62,7 @@ type Mutation {
   createCategory(CreateCategoryInput: CreateCategoryInput!): String
   updateProduct(UpdateProductInput: UpdateProductInput!): String
   updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput!): String
+  deleteProduct(product_id: String!): String
 }
 
 input CreateProductInput {

@@ -31,6 +31,8 @@ export class ProductsService {
   }
 
   async UpdateProduct(data: UpdateProductInput, userId: string) {
+    // todo you could in theory update a deleted product if you have the uuid...
+
     if (
       !(data.name || data.description || data.categories || data.is_published)
     ) {
@@ -109,7 +111,7 @@ export class ProductsService {
     if (params.search && params.search.length > 0) {
       filter['name'] = { contains: params.search };
     }
-    console.log({ filter, pagination });
+    //console.log({ filter, pagination });
     return this.prisma.products.findMany({
       include: {
         variations: {
@@ -144,10 +146,22 @@ export class ProductsService {
     });
   }
 
+  async GetProductVariationById(id: string) {
+    const filter = { id: id };
+
+    return this.prisma.productVariations.findUnique({
+      include: {
+        images: true,
+      },
+      where: filter,
+    });
+  }
+
   async UpdateProductVariation(
     data: UpdateProductVariationInput,
     userId: string,
   ) {
+    // todo you could in theory update a deleted product variation if you have the uuid...
     if (!(data.title || data.stock || data.price)) {
       throw new BadRequestException('Must have at least one field to update!');
     }
@@ -168,6 +182,17 @@ export class ProductsService {
       data: {
         ...toUpdate,
         last_updated_by: userId,
+        last_updated_at: new Date().toISOString(),
+      },
+    });
+  }
+
+  async DeleteProduct(product_id: string, user_id: string) {
+    return this.prisma.products.update({
+      where: { id: product_id },
+      data: {
+        is_deleted: true,
+        last_updated_by: user_id,
         last_updated_at: new Date().toISOString(),
       },
     });

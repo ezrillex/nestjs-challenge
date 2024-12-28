@@ -21,10 +21,10 @@ You can choose the target of your business, be creative!.
 5. As a Manager I can:
     * DONE Create products
     * DONE Update products
-    * Delete products
+    * DONE Delete products
     * DONE Disable products // By updating the field is_published
     * Show clients orders 
-    * Upload images per product.
+    * DONE Upload images per product.
 6. As a Client I can:
     * DONE See products
     * DONE See the product details
