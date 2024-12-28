@@ -24,11 +24,12 @@ type Categories {
 }
 
 type Products {
-  id: String!
+  id: ID!
   is_published: Boolean!
   is_deleted: Boolean!
   name: String!
   description: String!
+  likes: [ProductVariations!]!
   variations: [ProductVariations!]!
   categories: [Categories!]!
   created_by: String!
@@ -42,9 +43,25 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Users {
+  id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
+  likes_products: [LikesOfProducts!]!
+}
+
+type LikesOfProducts {
+  id: ID!
+  liked_by: Users!
+  likes_product_variation: ProductVariations!
+}
+
 type Query {
   getProducts(GetProductsInput: GetProductsInput!): [Products!]
   getProductById(id: String!): Products
+  getLikes: [LikesOfProducts!]
+  getCartItems: [LikesOfProducts!]
 }
 
 input GetProductsInput {
@@ -59,10 +76,14 @@ input GetProductsInput {
 
 type Mutation {
   createProduct(CreateProductInput: CreateProductInput!): String
-  createCategory(CreateCategoryInput: CreateCategoryInput!): String
   updateProduct(UpdateProductInput: UpdateProductInput!): String
   updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput!): String
   deleteProduct(product_id: String!): String
+  createCategory(CreateCategoryInput: CreateCategoryInput!): String
+  likeProduct(variation_id: String!): String
+  removeLikeProduct(like_id: String!): String
+  addToCart(variation_id: String!): String
+  removeFromCart(cart_item_id: String!): String
 }
 
 input CreateProductInput {
@@ -78,10 +99,6 @@ input CreateVariationInput {
   stock: Float!
 }
 
-input CreateCategoryInput {
-  name: String!
-}
-
 input UpdateProductInput {
   id: ID!
   name: String
@@ -95,4 +112,8 @@ input UpdateProductVariationInput {
   title: String
   price: Float
   stock: Int
+}
+
+input CreateCategoryInput {
+  name: String!
 }

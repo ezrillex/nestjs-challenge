@@ -4,9 +4,8 @@ import { roles } from '@prisma/client';
 import { RequiresRole } from '../../../decorators/requires-role/requires-role.decorator';
 import { CreateProductInput } from '../../models/products/createProduct.input';
 import { ProductsService } from '../../../services/products/products.service';
-import { Products } from '../../models/products/products';
+import { Products } from '../../models/products/products.model';
 import { GetProductsInput } from '../../models/products/get-products.input/get-products.input';
-import { CreateCategoryInput } from '../../models/products/create-category-input/create-category-input';
 import { UpdateProductInput } from '../../models/products/product/update-product-input/update-product-input';
 import { UpdateProductVariationInput } from '../../models/products/product/update-product-variation-input/update-product-variation-input';
 import { ParseUUIDPipe } from '@nestjs/common';
@@ -16,7 +15,6 @@ export class ProductsResolver {
   constructor(private productsService: ProductsService) {}
 
   @Public()
-  //@RequiresRole(roles.manager)
   @Query(() => [Products], { nullable: true })
   async getProducts(
     @Args('GetProductsInput') getProductsInput: GetProductsInput,
@@ -30,7 +28,6 @@ export class ProductsResolver {
   }
 
   @Public()
-  //@RequiresRole(roles.manager)
   @Query(() => Products, { nullable: true })
   async getProductById(
     @Args('id', { type: () => String }, ParseUUIDPipe) id: string,
@@ -53,16 +50,6 @@ export class ProductsResolver {
       createProductInput,
       request['user'].id,
     );
-    return result.id;
-  }
-
-  @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
-  async createCategory(
-    @Args('CreateCategoryInput') createCategoryInput: CreateCategoryInput,
-  ) {
-    const result =
-      await this.productsService.CreateCategory(createCategoryInput);
     return result.id;
   }
 

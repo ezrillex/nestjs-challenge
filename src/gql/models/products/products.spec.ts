@@ -1,4 +1,4 @@
-import { Products } from './products';
+import { Products } from './products.model';
 
 describe('Products', () => {
   it('should be defined', () => {

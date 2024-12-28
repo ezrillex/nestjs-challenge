@@ -27,22 +27,24 @@ enum roles {
 }
 
 model Users {
-  id                                 String     @id @default(uuid())
-  first_name                         String     @db.VarChar(60)
-  last_name                          String     @db.VarChar(120)
-  email                              String     @unique
-  password                           String     @db.Char(60) // hashed and salted password
-  created_at                         DateTime   @default(now())
-  role                               roles      @default(customer)
-  failed_login_attempts              Int        @default(0)
-  failed_login_attempts_timestamps   DateTime[] @default([])
+  id                                 String            @id @default(uuid()) @db.Uuid
+  first_name                         String            @db.VarChar(60)
+  last_name                          String            @db.VarChar(120)
+  email                              String            @unique
+  password                           String            @db.Char(60) // hashed and salted password
+  created_at                         DateTime          @default(now())
+  role                               roles             @default(customer)
+  failed_login_attempts              Int               @default(0)
+  failed_login_attempts_timestamps   DateTime[]        @default([])
   session_token                      String? // hash and salt accepted other tokens due to hash collision, just using string because of time constraints. If hackers get the DB then by that point just wipe it.
-  login_at                           DateTime?  @db.Timestamp()
-  logout_at                          DateTime?  @db.Timestamp()
-  password_reset_requests            Int        @default(0)
-  password_reset_requests_timestamps DateTime[] @default([])
+  login_at                           DateTime?         @db.Timestamp()
+  logout_at                          DateTime?         @db.Timestamp()
+  password_reset_requests            Int               @default(0)
+  password_reset_requests_timestamps DateTime[]        @default([])
   password_reset_token               String?
-  password_last_updated              DateTime   @default(now())
+  password_last_updated              DateTime          @default(now())
+  likes_products                     LikesOfProducts[]
+  CartItems                          CartItems[]
 }
 
 model Categories {
@@ -66,18 +68,29 @@ model Products {
 }
 
 model ProductVariations {
-  id              String    @id @default(uuid()) @db.Uuid
+  id              String            @id @default(uuid()) @db.Uuid
   title           String
-  price           Decimal   @db.Money
-  stock           Int       @db.Integer
+  price           Decimal           @db.Money
+  stock           Int               @db.Integer
   images          Images[]
   //is_published Boolean   @default(false) @db.Boolean
   //is_deleted   Boolean   @default(false) @db.Boolean
-  test            String    @default("123")
-  product         Products? @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  product_id      String?   @db.Uuid
-  last_updated_by String?   @db.Uuid
-  last_updated_at DateTime? @db.Timestamp()
+  product         Products?         @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  product_id      String?           @db.Uuid
+  last_updated_by String?           @db.Uuid
+  last_updated_at DateTime?         @db.Timestamp()
+  LikesOfProducts LikesOfProducts[]
+  CartItems       CartItems[]
+}
+
+model LikesOfProducts {
+  id                      String             @id @default(uuid()) @db.Uuid
+  liked_by                Users?             @relation(fields: [user_id], references: [id])
+  user_id                 String?            @db.Uuid
+  likes_product_variation ProductVariations? @relation(fields: [product_variation_id], references: [id])
+  product_variation_id    String?            @db.Uuid
+
+  @@unique([user_id, product_variation_id])
 }
 
 model Images {
@@ -87,4 +100,15 @@ model Images {
   created_at           DateTime           @default(now()) @db.Timestamp()
   product_variation    ProductVariations? @relation(fields: [product_variation_id], references: [id], onDelete: Cascade)
   product_variation_id String?            @db.Uuid
+}
+
+model CartItems {
+  id                   String             @id @default(uuid()) @db.Uuid
+  cart_owner           Users?             @relation(fields: [user_id], references: [id])
+  user_id              String?            @db.Uuid
+  product_variation    ProductVariations? @relation(fields: [product_variation_id], references: [id])
+  product_variation_id String?            @db.Uuid
+  quantity             Int                @db.Integer
+
+  @@unique([user_id, product_variation_id])
 }

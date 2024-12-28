@@ -1,5 +1,5 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Products } from '../products';
+import { Products } from '../products.model';
 
 @ObjectType()
 export class Categories {

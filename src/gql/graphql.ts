@@ -31,10 +31,6 @@ export class CreateVariationInput {
     stock: number;
 }
 
-export class CreateCategoryInput {
-    name: string;
-}
-
 export class UpdateProductInput {
     id: string;
     name?: Nullable<string>;
@@ -48,6 +44,10 @@ export class UpdateProductVariationInput {
     title?: Nullable<string>;
     price?: Nullable<number>;
     stock?: Nullable<number>;
+}
+
+export class CreateCategoryInput {
+    name: string;
 }
 
 export class Images {
@@ -81,6 +81,7 @@ export class Products {
     is_deleted: boolean;
     name: string;
     description: string;
+    likes: ProductVariations[];
     variations: ProductVariations[];
     categories: Categories[];
     created_by: string;
@@ -89,12 +90,32 @@ export class Products {
     last_updated_at?: Nullable<string>;
 }
 
+export class Users {
+    __typename?: 'Users';
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    likes_products: LikesOfProducts[];
+}
+
+export class LikesOfProducts {
+    __typename?: 'LikesOfProducts';
+    id: string;
+    liked_by: Users;
+    likes_product_variation: ProductVariations;
+}
+
 export abstract class IQuery {
     __typename?: 'IQuery';
 
     abstract getProducts(GetProductsInput: GetProductsInput): Nullable<Products[]> | Promise<Nullable<Products[]>>;
 
     abstract getProductById(id: string): Nullable<Products> | Promise<Nullable<Products>>;
+
+    abstract getLikes(): Nullable<LikesOfProducts[]> | Promise<Nullable<LikesOfProducts[]>>;
+
+    abstract getCartItems(): Nullable<LikesOfProducts[]> | Promise<Nullable<LikesOfProducts[]>>;
 }
 
 export abstract class IMutation {
@@ -102,13 +123,21 @@ export abstract class IMutation {
 
     abstract createProduct(CreateProductInput: CreateProductInput): Nullable<string> | Promise<Nullable<string>>;
 
-    abstract createCategory(CreateCategoryInput: CreateCategoryInput): Nullable<string> | Promise<Nullable<string>>;
-
     abstract updateProduct(UpdateProductInput: UpdateProductInput): Nullable<string> | Promise<Nullable<string>>;
 
     abstract updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput): Nullable<string> | Promise<Nullable<string>>;
 
     abstract deleteProduct(product_id: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract createCategory(CreateCategoryInput: CreateCategoryInput): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract likeProduct(variation_id: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract removeLikeProduct(like_id: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract addToCart(variation_id: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract removeFromCart(cart_item_id: string): Nullable<string> | Promise<Nullable<string>>;
 }
 
 export type DateTime = any;
