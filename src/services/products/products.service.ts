@@ -112,6 +112,8 @@ export class ProductsService {
       filter['name'] = { contains: params.search };
     }
     //console.log({ filter, pagination });
+    // todo so maybe do some role based controls for what can the user get in return?
+    // how should I go about implementing this?, maybe a select with different set for different roles?
     return this.prisma.products.findMany({
       include: {
         variations: {

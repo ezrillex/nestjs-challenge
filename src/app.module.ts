@@ -13,11 +13,19 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { GraphqlModule } from './gql/graphql.module';
 import { PaymentsController } from './controllers/payments/payments.controller';
 import { ImagesModule } from './modules/images/images.module';
+import Joi from 'joi';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validationSchema: Joi.object({
+        DATABASE_URL: Joi.string().required(),
+        JWTCONSTANT: Joi.string().required(),
+        CLOUDINARY_CLOUD_NAME: Joi.string().required(),
+        CLOUDINARY_API_KEY: Joi.string().required(),
+        CLOUDINARY_API_SECRET: Joi.string().required(),
+      }),
     }),
     AuthModule,
     ProductsModule,

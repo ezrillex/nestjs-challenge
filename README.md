@@ -36,7 +36,7 @@ You can choose the target of your business, be creative!.
 8. Stripe Integration for payment (including webhooks management)
 
 ## Mandatory Implementations
-- Schema validation for environment variables
+- DONE Schema validation for environment variables
 - Usage of global exception filter
 - DONE Usage of guards, pipes (validation) (assumed stuff like gql field => String counts as part of the validation.)
 - DONE Usage of custom decorators
