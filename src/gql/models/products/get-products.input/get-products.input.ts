@@ -1,5 +1,4 @@
-import { IsUUID } from 'class-validator';
-import { Field, InputType, Int } from '@nestjs/graphql';
+import { Field, ID, InputType, Int } from '@nestjs/graphql';
 
 @InputType()
 export class GetProductsInput {
@@ -9,8 +8,7 @@ export class GetProductsInput {
   @Field(() => Int, { nullable: true })
   offset: number;
 
-  @IsUUID('all', { each: true })
-  @Field(() => [String], { nullable: true })
+  @Field(() => [ID], { nullable: true })
   categoryFilter: string[];
 
   @Field(() => String, { nullable: true })

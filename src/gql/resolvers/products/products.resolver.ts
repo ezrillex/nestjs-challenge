@@ -21,6 +21,7 @@ export class ProductsResolver {
     @Args('GetProductsInput') getProductsInput: GetProductsInput,
     @Context('req') request: Request,
   ) {
+    // todo on auth guard we set a value to know what mode we are in...
     let role: roles = roles.public;
     if (request['user'] && request['user'].role) {
       role = request['user'].role;

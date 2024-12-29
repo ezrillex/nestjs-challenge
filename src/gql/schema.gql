@@ -92,7 +92,7 @@ type Query {
 input GetProductsInput {
   first: Int
   offset: Int
-  categoryFilter: [String!]
+  categoryFilter: [ID!]
   search: String
   likedOnly: Boolean
   omitImages: Boolean

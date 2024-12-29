@@ -32,7 +32,6 @@ export class AuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-
     let token;
     let gql_request;
     //@ts-expect-error graphql is a value that is returned by this.
@@ -51,7 +50,12 @@ export class AuthGuard implements CanActivate {
     // if you are sending any token info on a semi public api then it means you meant to use the
     // auth version of it. To access the public side then do not send any token headers.
     if (!token && isPublicPrivate) {
-      request['public_private_mode'] = 'public';
+      // @ts-expect-error the value IS graphql
+      if (context.getType() === 'graphql') {
+        gql_request['public_private_mode'] = 'public';
+      } else {
+        request['public_private_mode'] = 'public';
+      }
       return true;
     }
 
