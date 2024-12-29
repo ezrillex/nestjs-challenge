@@ -387,14 +387,14 @@ export class ProductsService {
 
     const order_result = await this.prisma.orders.create({
       include: {
-        OrderItems: true,
+        order_items: true,
         user: true,
       },
       data: {
         user: {
           connect: { id: user_id },
         },
-        OrderItems: {
+        order_items: {
           createMany: {
             data: order_items,
           },
@@ -421,6 +421,7 @@ export class ProductsService {
     }
   }
 
+  // todo this is needed once we get to payments maybe.
   async UPDATE_ORDER(cart_id: string) {
     const record = await this.prisma.cartItems.findUnique({
       where: { id: cart_id },
@@ -440,35 +441,48 @@ export class ProductsService {
     }
   }
 
-  async GET_ORDERS(user_id: string) {
+  async GetOrders(user_id: string, role: roles, client_id: string = null) {
     // TODO A resolve field can take care of a lot of this include stuff
-    return this.prisma.cartItems.findMany({
+    const find_parameters = {
       include: {
-        cart_owner: {
-          include: {
-            CartItems: {
-              include: {
-                product_variation: true,
-              },
-            },
-            likes_products: {
-              include: {
-                likes_product_variation: true,
-              },
-            },
-          },
+        user: true,
+        order_items: {
+          include: { product_variation: true },
         },
-        product_variation: {
-          include: { images: true },
+      },
+    };
+
+    if (role === roles.customer) {
+      find_parameters['where'] = {
+        user_id: user_id,
+        // don't hide deleted or private items.
+      };
+    } else if (role === roles.manager && client_id) {
+      find_parameters['where'] = {
+        user_id: client_id,
+        // don't hide deleted or private items.
+      };
+    }
+
+    return this.prisma.orders.findMany(find_parameters);
+  }
+
+  async GetOrder(order_id: string, client_id: string) {
+    // TODO A resolve field can take care of a lot of this include stuff
+    const find_parameters = {
+      include: {
+        user: true,
+        order_items: {
+          include: { product_variation: true },
         },
       },
       where: {
-        user_id: user_id,
-        // hide deleted or private items.
-        product_variation: {
-          product: { is_deleted: false, is_published: true },
-        },
+        id: order_id,
+        user_id: client_id,
+        // don't hide deleted or private items.
       },
-    });
+    };
+
+    return this.prisma.orders.findUnique(find_parameters);
   }
 }

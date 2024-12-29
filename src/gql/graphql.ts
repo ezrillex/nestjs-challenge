@@ -114,6 +114,23 @@ export class CartItems {
     quantity: number;
 }
 
+export class OrderItems {
+    __typename?: 'OrderItems';
+    id: string;
+    product_variation: ProductVariations;
+    quantity: number;
+    price_purchased_at: number;
+}
+
+export class Orders {
+    __typename?: 'Orders';
+    id: string;
+    user: Users;
+    paymentStatus: string;
+    orderStatus: string;
+    order_items: OrderItems[];
+}
+
 export abstract class IQuery {
     __typename?: 'IQuery';
 
@@ -124,6 +141,12 @@ export abstract class IQuery {
     abstract getLikes(): Nullable<LikesOfProducts[]> | Promise<Nullable<LikesOfProducts[]>>;
 
     abstract getCartItems(): Nullable<CartItems[]> | Promise<Nullable<CartItems[]>>;
+
+    abstract getOrders(): Nullable<Orders[]> | Promise<Nullable<Orders[]>>;
+
+    abstract getOrder(order_id: string): Nullable<Orders> | Promise<Nullable<Orders>>;
+
+    abstract getClientOrders(client_id?: Nullable<string>): Nullable<Orders[]> | Promise<Nullable<Orders[]>>;
 }
 
 export abstract class IMutation {

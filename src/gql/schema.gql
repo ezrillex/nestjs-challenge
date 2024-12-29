@@ -64,11 +64,29 @@ type CartItems {
   quantity: Int!
 }
 
+type OrderItems {
+  id: ID!
+  product_variation: ProductVariations!
+  quantity: Int!
+  price_purchased_at: Float!
+}
+
+type Orders {
+  id: ID!
+  user: Users!
+  paymentStatus: String!
+  orderStatus: String!
+  order_items: [OrderItems!]!
+}
+
 type Query {
   getProducts(GetProductsInput: GetProductsInput!): [Products!]
   getProductById(id: String!): Products
   getLikes: [LikesOfProducts!]
   getCartItems: [CartItems!]
+  getOrders: [Orders!]
+  getOrder(order_id: String!): Orders
+  getClientOrders(client_id: String): [Orders!]
 }
 
 input GetProductsInput {

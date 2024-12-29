@@ -15,14 +15,14 @@ export class Orders {
   //webhooks: [IncomingPaymentWebhooks!]
   //orderDetails: [OrderDetails!]!
 
-  @Field(() => PaymentStatus)
+  @Field(() => String)
   paymentStatus: PaymentStatus;
 
-  @Field(() => OrderStatus)
+  @Field(() => String)
   orderStatus: OrderStatus;
 
   //orderStatusHistory: [OrderAudit!]!
 
   @Field(() => [OrderItems])
-  OrderItems: OrderItems[];
+  order_items: OrderItems[];
 }
