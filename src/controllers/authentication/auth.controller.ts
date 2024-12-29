@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Post,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { SignupUserDto } from '../../DTOs/signup-user-dto/signup-user-dto';
 import { AuthService } from '../../services/authentication/auth.service';
@@ -18,6 +19,7 @@ import { ForgotPasswordDto } from '../../DTOs/forgot-password-dto/forgot-passwor
 import { ResetPasswordDto } from '../../DTOs/reset-password-dto/reset-password-dto';
 import { Public } from '../../decorators/public/public.decorator';
 import { setTimeout } from 'timers/promises';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -56,28 +58,6 @@ export class AuthController {
 
       return isIn24h;
     }
-  }
-
-  @Public()
-  @Get('test')
-  async test() {
-    const tokenA = await this.jwtService.signAsync({
-      somedata: 'that is the same?',
-    });
-    console.log(tokenA);
-
-    const hashA = await bcrypt.hash(tokenA, 10);
-
-    await setTimeout(5000);
-
-    const tokenB = await this.jwtService.signAsync({
-      somedata: 'that is the same?',
-    });
-    console.log(tokenB);
-
-    const result = await bcrypt.compare(tokenB, hashA);
-    console.log(result);
-    return 'ok';
   }
 
   @Public()
@@ -168,14 +148,23 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.OK)
   @Post('reset')
   async reset(@Body() data: ResetPasswordDto) {
     if (data.password !== data.repeat_password) {
       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
     }
-
-    const payload = await this.jwtService.verifyAsync(data.reset_token);
+    let payload;
+    try {
+      payload = await this.jwtService.verifyAsync(data.reset_token);
+    } catch (error) {
+      throw new HttpException(
+        `An error ocurred when validating reset token: ${error.message}`,
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     const user = await this.authService.findOneByID(payload.user);
 
     if (user.password_reset_token === data.reset_token) {

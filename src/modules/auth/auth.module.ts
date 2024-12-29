@@ -8,6 +8,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from '../../guards/auth/auth.guard';
 import { RolesGuard } from '../../guards/roles/roles.guard';
 import { UsersController } from '../../controllers/users/users.controller';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   controllers: [AuthController, UsersController],
@@ -34,6 +35,7 @@ import { UsersController } from '../../controllers/users/users.controller';
       }),
       inject: [ConfigService],
     }),
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
   ],
 })
 export class AuthModule {}
