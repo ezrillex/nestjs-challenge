@@ -1,9 +1,10 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { RequiresRole } from '../../../decorators/requires-role/requires-role.decorator';
 import { roles } from '@prisma/client';
-import { ParseUUIDPipe } from '@nestjs/common';
+import { ParseIntPipe, ParseUUIDPipe } from '@nestjs/common';
 import { LikesOfProducts } from '../../models/products/likes/likes_of_products/likes_of_products';
 import { ProductsService } from '../../../services/products/products.service';
+import { CartItems } from '../../models/carts/cart-items/cart-items';
 
 @Resolver()
 export class CartItemsResolver {
@@ -15,11 +16,13 @@ export class CartItemsResolver {
   async addToCart(
     @Args('variation_id', { type: () => String }, ParseUUIDPipe)
     variation_id: string,
+    @Args('quantity', { type: () => Int }, ParseIntPipe) quantity: number,
     @Context('req') request: Request,
   ) {
     const result = await this.productsService.AddToCart(
       variation_id,
       request['user'].id,
+      quantity,
     );
 
     return result.id;
@@ -35,7 +38,7 @@ export class CartItemsResolver {
   }
 
   @RequiresRole(roles.customer)
-  @Query(() => [LikesOfProducts], { nullable: true })
+  @Query(() => [CartItems], { nullable: true })
   async getCartItems(@Context('req') request: Request) {
     return this.productsService.GetCartItems(request['user'].id);
   }

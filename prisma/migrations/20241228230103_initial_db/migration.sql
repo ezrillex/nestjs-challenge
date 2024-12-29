@@ -1,6 +1,15 @@
 -- CreateEnum
 CREATE TYPE "roles" AS ENUM ('public', 'customer', 'manager', 'admin');
 
+-- CreateEnum
+CREATE TYPE "PaymentStatus" AS ENUM ('pending_creation', 'requires_payment_method', 'requires_confirmation', 'requires_action', 'processing', 'succeded', 'cancelled');
+
+-- CreateEnum
+CREATE TYPE "OrderStatus" AS ENUM ('awaiting_payment', 'pending_fulfillment', 'fulfillment_in_progress', 'shipped', 'delivered', 'delivery_cancelled', 'returned');
+
+-- CreateEnum
+CREATE TYPE "BackgroundJobStatus" AS ENUM ('pending', 'locked', 'processing', 'success', 'error');
+
 -- CreateTable
 CREATE TABLE "Testing" (
     "id" TEXT NOT NULL,
@@ -88,6 +97,37 @@ CREATE TABLE "Images" (
 );
 
 -- CreateTable
+CREATE TABLE "CartItems" (
+    "id" UUID NOT NULL,
+    "user_id" UUID,
+    "product_variation_id" UUID,
+    "quantity" INTEGER NOT NULL,
+
+    CONSTRAINT "CartItems_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Orders" (
+    "id" UUID NOT NULL,
+    "user_id" UUID,
+    "paymentStatus" "PaymentStatus" NOT NULL DEFAULT 'pending_creation',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Orders_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "OrderItems" (
+    "id" UUID NOT NULL,
+    "order_id" UUID,
+    "product_variation_id" UUID,
+    "quantity" INTEGER NOT NULL,
+    "price_purchased_at" DECIMAL NOT NULL,
+
+    CONSTRAINT "OrderItems_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "_CategoriesToProducts" (
     "A" TEXT NOT NULL,
     "B" UUID NOT NULL,
@@ -100,6 +140,12 @@ CREATE UNIQUE INDEX "Users_email_key" ON "Users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Categories_name_key" ON "Categories"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "LikesOfProducts_user_id_product_variation_id_key" ON "LikesOfProducts"("user_id", "product_variation_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CartItems_user_id_product_variation_id_key" ON "CartItems"("user_id", "product_variation_id");
 
 -- CreateIndex
 CREATE INDEX "_CategoriesToProducts_B_index" ON "_CategoriesToProducts"("B");
@@ -115,6 +161,21 @@ ALTER TABLE "LikesOfProducts" ADD CONSTRAINT "LikesOfProducts_product_variation_
 
 -- AddForeignKey
 ALTER TABLE "Images" ADD CONSTRAINT "Images_product_variation_id_fkey" FOREIGN KEY ("product_variation_id") REFERENCES "ProductVariations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CartItems" ADD CONSTRAINT "CartItems_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CartItems" ADD CONSTRAINT "CartItems_product_variation_id_fkey" FOREIGN KEY ("product_variation_id") REFERENCES "ProductVariations"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Orders" ADD CONSTRAINT "Orders_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderItems" ADD CONSTRAINT "OrderItems_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "Orders"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderItems" ADD CONSTRAINT "OrderItems_product_variation_id_fkey" FOREIGN KEY ("product_variation_id") REFERENCES "ProductVariations"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_CategoriesToProducts" ADD CONSTRAINT "_CategoriesToProducts_A_fkey" FOREIGN KEY ("A") REFERENCES "Categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;

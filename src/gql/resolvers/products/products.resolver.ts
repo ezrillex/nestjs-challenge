@@ -9,25 +9,26 @@ import { GetProductsInput } from '../../models/products/get-products.input/get-p
 import { UpdateProductInput } from '../../models/products/product/update-product-input/update-product-input';
 import { UpdateProductVariationInput } from '../../models/products/product/update-product-variation-input/update-product-variation-input';
 import { ParseUUIDPipe } from '@nestjs/common';
+import { PublicPrivate } from '../../../decorators/public_and_private/public_and_private.decorator';
 
 @Resolver()
 export class ProductsResolver {
   constructor(private productsService: ProductsService) {}
 
-  @Public()
+  @PublicPrivate()
   @Query(() => [Products], { nullable: true })
   async getProducts(
     @Args('GetProductsInput') getProductsInput: GetProductsInput,
     @Context('req') request: Request,
   ) {
     let role: roles = roles.public;
-    if (request['user']) {
+    if (request['user'] && request['user'].role) {
       role = request['user'].role;
     }
     return this.productsService.GetProducts(role, getProductsInput);
   }
 
-  @Public()
+  @PublicPrivate()
   @Query(() => Products, { nullable: true })
   async getProductById(
     @Args('id', { type: () => String }, ParseUUIDPipe) id: string,

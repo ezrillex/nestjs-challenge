@@ -45,6 +45,7 @@ model Users {
   password_last_updated              DateTime          @default(now())
   likes_products                     LikesOfProducts[]
   CartItems                          CartItems[]
+  Orders                             Orders[]
 }
 
 model Categories {
@@ -81,6 +82,7 @@ model ProductVariations {
   last_updated_at DateTime?         @db.Timestamp()
   LikesOfProducts LikesOfProducts[]
   CartItems       CartItems[]
+  OrderItems      OrderItems[]
 }
 
 model LikesOfProducts {
@@ -112,3 +114,57 @@ model CartItems {
 
   @@unique([user_id, product_variation_id])
 }
+
+enum PaymentStatus {
+  pending_creation
+  requires_payment_method
+  requires_confirmation
+  requires_action
+  processing
+  succeded
+  cancelled
+}
+
+enum OrderStatus {
+  awaiting_payment
+  pending_fulfillment
+  fulfillment_in_progress
+  shipped
+  delivered
+  delivery_cancelled
+  returned
+}
+
+enum BackgroundJobStatus {
+  pending
+  locked
+  processing
+  success
+  error
+}
+
+model Orders {
+  id            String        @id @default(uuid()) @db.Uuid
+  user          Users?        @relation(fields: [user_id], references: [id])
+  user_id       String?       @db.Uuid
+  //payments: [PaymentIntents!]
+  //webhooks: [IncomingPaymentWebhooks!]
+  //orderDetails: [OrderDetails!]!
+  paymentStatus PaymentStatus @default(pending_creation)
+  orderStatus   OrderStatus   @default(awaiting_payment)
+  createdAt     DateTime      @default(now())
+  //orderStatusHistory: [OrderAudit!]!
+  OrderItems    OrderItems[]
+}
+
+model OrderItems {
+  id                   String             @id @default(uuid()) @db.Uuid
+  order                Orders?            @relation(fields: [order_id], references: [id])
+  order_id             String?            @db.Uuid
+  product_variation    ProductVariations? @relation(fields: [product_variation_id], references: [id])
+  product_variation_id String?            @db.Uuid
+  quantity             Int                @db.Integer
+  price_purchased_at   Decimal            @db.Decimal()
+}
+
+// TODO check relations delete behaviour?

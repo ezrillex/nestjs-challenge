@@ -57,11 +57,18 @@ type LikesOfProducts {
   likes_product_variation: ProductVariations!
 }
 
+type CartItems {
+  id: ID!
+  cart_owner: Users!
+  product_variation: ProductVariations!
+  quantity: Int!
+}
+
 type Query {
   getProducts(GetProductsInput: GetProductsInput!): [Products!]
   getProductById(id: String!): Products
   getLikes: [LikesOfProducts!]
-  getCartItems: [LikesOfProducts!]
+  getCartItems: [CartItems!]
 }
 
 input GetProductsInput {
@@ -82,8 +89,9 @@ type Mutation {
   createCategory(CreateCategoryInput: CreateCategoryInput!): String
   likeProduct(variation_id: String!): String
   removeLikeProduct(like_id: String!): String
-  addToCart(variation_id: String!): String
+  addToCart(variation_id: String!, quantity: Int!): String
   removeFromCart(cart_item_id: String!): String
+  createOrder: String
 }
 
 input CreateProductInput {

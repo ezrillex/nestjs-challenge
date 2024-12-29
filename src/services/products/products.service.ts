@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { roles } from '@prisma/client';
 import { CreateProductInput } from '../../gql/models/products/createProduct.input';
@@ -91,7 +95,7 @@ export class ProductsService {
     if (params.categoryFilter && params.categoryFilter.length > 0) {
       filter['categories'] = {
         some: {
-          id: '54a4e78e-53c7-4bbf-860e-232c2fd2c0c0',
+          id: params.categoryFilter,
         },
       };
     }
@@ -269,6 +273,202 @@ export class ProductsService {
         },
       },
       where: { user_id: user_id },
+    });
+  }
+
+  // todo refactor into own service
+  async AddToCart(variation_id: string, user_id: string, quantity: number) {
+    const variation = await this.prisma.productVariations.findUnique({
+      where: { id: variation_id },
+    });
+    if (!variation) {
+      throw new BadRequestException('Product Variation not found!');
+    }
+
+    const record = await this.prisma.cartItems.findFirst({
+      where: {
+        product_variation_id: variation_id,
+        user_id: user_id,
+      },
+    });
+    if (record) {
+      return this.prisma.cartItems.update({
+        where: { id: record.id },
+        data: {
+          quantity: quantity,
+        },
+      });
+    } else {
+      return this.prisma.cartItems.create({
+        data: {
+          cart_owner: {
+            connect: { id: user_id },
+          },
+          product_variation: {
+            connect: { id: variation_id },
+          },
+          quantity: quantity,
+        },
+      });
+    }
+  }
+
+  async RemoveCartItem(cart_id: string) {
+    const record = await this.prisma.cartItems.findUnique({
+      where: { id: cart_id },
+    });
+    if (!record) {
+      throw new BadRequestException('Cart Item not found!');
+    }
+
+    const result = await this.prisma.cartItems.delete({
+      where: { id: cart_id },
+    });
+
+    if (result) {
+      return 'Cart Item deleted succesfully.';
+    } else {
+      throw new BadRequestException('Unexpected error when deleting record!');
+    }
+  }
+
+  async GetCartItems(user_id: string) {
+    // TODO A resolve field can take care of a lot of this include stuff
+    return this.prisma.cartItems.findMany({
+      include: {
+        cart_owner: {
+          include: {
+            CartItems: {
+              include: {
+                product_variation: true,
+              },
+            },
+            likes_products: {
+              include: {
+                likes_product_variation: true,
+              },
+            },
+          },
+        },
+        product_variation: {
+          include: { images: true },
+        },
+      },
+      where: {
+        user_id: user_id,
+        // hide deleted or private items.
+        product_variation: {
+          product: { is_deleted: false, is_published: true },
+        },
+      },
+    });
+  }
+
+  // todo refactor into own service
+  async CreateOrder(user_id: string) {
+    const cart_items = await this.prisma.cartItems.findMany({
+      include: { product_variation: true },
+      where: {
+        user_id: user_id,
+        product_variation: {
+          product: { is_deleted: false, is_published: true },
+        },
+      },
+    });
+    if (cart_items.length === 0) {
+      throw new BadRequestException('User has no items in cart!');
+    }
+
+    const order_items = cart_items.map((item) => ({
+      quantity: item.quantity,
+      product_variation_id: item.product_variation_id,
+      price_purchased_at: item.product_variation.price,
+    }));
+
+    const order_result = await this.prisma.orders.create({
+      include: {
+        OrderItems: true,
+        user: true,
+      },
+      data: {
+        user: {
+          connect: { id: user_id },
+        },
+        OrderItems: {
+          createMany: {
+            data: order_items,
+          },
+        },
+      },
+    });
+    if (!order_result) {
+      throw new InternalServerErrorException(
+        'An error occurred when creating the order!',
+      );
+    }
+    const cart_ids = cart_items.map((item) => item.id);
+    const delete_result = await this.prisma.cartItems.deleteMany({
+      where: {
+        id: {
+          in: cart_ids,
+        },
+      },
+    });
+    if (delete_result.count === 0) {
+      throw new InternalServerErrorException('An unexpected error ocurred!');
+    } else {
+      return order_result.id;
+    }
+  }
+
+  async UPDATE_ORDER(cart_id: string) {
+    const record = await this.prisma.cartItems.findUnique({
+      where: { id: cart_id },
+    });
+    if (!record) {
+      throw new BadRequestException('Cart Item not found!');
+    }
+
+    const result = await this.prisma.cartItems.delete({
+      where: { id: cart_id },
+    });
+
+    if (result) {
+      return 'Cart Item deleted succesfully.';
+    } else {
+      throw new BadRequestException('Unexpected error when deleting record!');
+    }
+  }
+
+  async GET_ORDERS(user_id: string) {
+    // TODO A resolve field can take care of a lot of this include stuff
+    return this.prisma.cartItems.findMany({
+      include: {
+        cart_owner: {
+          include: {
+            CartItems: {
+              include: {
+                product_variation: true,
+              },
+            },
+            likes_products: {
+              include: {
+                likes_product_variation: true,
+              },
+            },
+          },
+        },
+        product_variation: {
+          include: { images: true },
+        },
+      },
+      where: {
+        user_id: user_id,
+        // hide deleted or private items.
+        product_variation: {
+          product: { is_deleted: false, is_published: true },
+        },
+      },
     });
   }
 }

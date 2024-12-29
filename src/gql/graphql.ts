@@ -106,6 +106,14 @@ export class LikesOfProducts {
     likes_product_variation: ProductVariations;
 }
 
+export class CartItems {
+    __typename?: 'CartItems';
+    id: string;
+    cart_owner: Users;
+    product_variation: ProductVariations;
+    quantity: number;
+}
+
 export abstract class IQuery {
     __typename?: 'IQuery';
 
@@ -115,7 +123,7 @@ export abstract class IQuery {
 
     abstract getLikes(): Nullable<LikesOfProducts[]> | Promise<Nullable<LikesOfProducts[]>>;
 
-    abstract getCartItems(): Nullable<LikesOfProducts[]> | Promise<Nullable<LikesOfProducts[]>>;
+    abstract getCartItems(): Nullable<CartItems[]> | Promise<Nullable<CartItems[]>>;
 }
 
 export abstract class IMutation {
@@ -135,9 +143,11 @@ export abstract class IMutation {
 
     abstract removeLikeProduct(like_id: string): Nullable<string> | Promise<Nullable<string>>;
 
-    abstract addToCart(variation_id: string): Nullable<string> | Promise<Nullable<string>>;
+    abstract addToCart(variation_id: string, quantity: number): Nullable<string> | Promise<Nullable<string>>;
 
     abstract removeFromCart(cart_item_id: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract createOrder(): Nullable<string> | Promise<Nullable<string>>;
 }
 
 export type DateTime = any;
