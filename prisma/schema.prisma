@@ -144,17 +144,19 @@ enum BackgroundJobStatus {
 }
 
 model Orders {
-  id            String        @id @default(uuid()) @db.Uuid
-  user          Users?        @relation(fields: [user_id], references: [id])
-  user_id       String?       @db.Uuid
+  id                      String                    @id @default(uuid()) @db.Uuid
+  user                    Users?                    @relation(fields: [user_id], references: [id])
+  user_id                 String?                   @db.Uuid
   //payments: [PaymentIntents!]
   //webhooks: [IncomingPaymentWebhooks!]
   //orderDetails: [OrderDetails!]!
-  paymentStatus PaymentStatus @default(pending_creation)
-  orderStatus   OrderStatus   @default(awaiting_payment)
-  createdAt     DateTime      @default(now())
+  paymentStatus           PaymentStatus             @default(pending_creation)
+  orderStatus             OrderStatus               @default(awaiting_payment)
+  createdAt               DateTime                  @default(now())
   //orderStatusHistory: [OrderAudit!]!
-  order_items   OrderItems[]
+  order_items             OrderItems[]
+  PaymentIntents          PaymentIntents[]
+  IncomingPaymentWebhooks IncomingPaymentWebhooks[]
 }
 
 model OrderItems {
@@ -165,6 +167,27 @@ model OrderItems {
   product_variation_id String?            @db.Uuid
   quantity             Int                @db.Integer
   price_purchased_at   Decimal            @db.Decimal()
+}
+
+model PaymentIntents {
+  id                    String        @id @default(uuid()) @db.Uuid
+  order                 Orders?       @relation(fields: [order_id], references: [id])
+  order_id              String?       @db.Uuid
+  closed                Boolean       @default(false) @db.Boolean
+  status                PaymentStatus @default(pending_creation)
+  created_at            DateTime      @default(now())
+  stripe_event_id       String?
+  stripe_payment_intent Json
+}
+
+model IncomingPaymentWebhooks {
+  id           String              @id @default(uuid()) @db.Uuid
+  order        Orders?             @relation(fields: [order_id], references: [id])
+  order_id     String?             @db.Uuid
+  status       BackgroundJobStatus @default(pending)
+  data         Json                @db.Json
+  created_at   DateTime            @default(now()) @db.Timestamp()
+  processed_at DateTime?           @db.Timestamp()
 }
 
 // TODO check relations delete behaviour?

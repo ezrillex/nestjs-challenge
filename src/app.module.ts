@@ -14,6 +14,7 @@ import { GraphqlModule } from './gql/graphql.module';
 import { PaymentsController } from './controllers/payments/payments.controller';
 import { ImagesModule } from './modules/images/images.module';
 import Joi from 'joi';
+import { GraphQLError, GraphQLFormattedError } from 'graphql/error';
 
 @Module({
   imports: [
@@ -46,6 +47,17 @@ import Joi from 'joi';
         path: join(process.cwd(), 'src/gql/graphql.ts'),
         outputAs: 'class',
         emitTypenameField: true,
+      },
+      formatError: (error: GraphQLError): GraphQLFormattedError => {
+        return {
+          message: error.message,
+          extensions: {
+            code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
+            timestamp: new Date().toISOString(),
+            path: error.path,
+            // omit the stack trace
+          },
+        };
       },
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
