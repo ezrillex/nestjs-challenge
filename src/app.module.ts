@@ -52,11 +52,21 @@ import { StripeService } from './services/stripe/stripe/stripe.service';
         outputAs: 'class',
         emitTypenameField: true,
       },
-      formatError: (error: GraphQLError): GraphQLFormattedError => {
+      formatError: (error): GraphQLFormattedError => {
+        let prefix = '';
+        if (
+          error &&
+          error.extensions &&
+          error.extensions.originalError &&
+          error.extensions.originalError['error']
+        ) {
+          prefix = error.extensions.originalError['error'];
+        }
+
         return {
-          message: error.message,
+          message: `${prefix}: ${error.message}`,
           extensions: {
-            code: error.extensions?.code || 'INTERNAL_SERVER_ERROR',
+            code: error.extensions?.status || 500,
             timestamp: new Date().toISOString(),
             path: error.path,
             // omit the stack trace

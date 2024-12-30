@@ -174,12 +174,12 @@ model PaymentIntents {
   id                    String        @id @default(uuid()) @db.Uuid
   order                 Orders?       @relation(fields: [order_id], references: [id])
   order_id              String?       @db.Uuid
-  closed                Boolean       @default(false) @db.Boolean
-  confirmed             Boolean       @default(false) @db.Boolean
+  //closed                Boolean       @default(false) @db.Boolean
+  //confirmed             Boolean       @default(false) @db.Boolean
   status                PaymentStatus @default(pending_creation)
   created_at            DateTime      @default(now())
   stripe_event_id       String?
-  stripe_payment_intent Json
+  stripe_payment_intent Json?
 }
 
 model IncomingPaymentWebhooks {

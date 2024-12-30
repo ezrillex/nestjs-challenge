@@ -162,6 +162,8 @@ export abstract class IMutation {
 
     abstract createCategory(CreateCategoryInput: CreateCategoryInput): Nullable<string> | Promise<Nullable<string>>;
 
+    abstract deleteCategory(id: string): Nullable<string> | Promise<Nullable<string>>;
+
     abstract likeProduct(variation_id: string): Nullable<string> | Promise<Nullable<string>>;
 
     abstract removeLikeProduct(like_id: string): Nullable<string> | Promise<Nullable<string>>;

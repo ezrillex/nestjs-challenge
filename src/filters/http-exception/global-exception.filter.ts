@@ -35,7 +35,15 @@ export class GlobalExceptionFilter extends BaseExceptionFilter {
     let path;
     // @ts-expect-error it does return graphql.
     if (host.getType() === 'graphql') {
-      console.log(exception);
+      console.log('GRAPHQL ERROR');
+      // console.log(exception);
+      if (code) {
+        exception.code = code;
+      }
+      if (message) {
+        exception.message = message;
+      }
+      // console.log(code, message, 'CODE MESSAGE');
       return exception;
       // const gql_host = GqlArgumentsHost.create(host);
       // const gql_context = gql_host.getContext();

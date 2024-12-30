@@ -23,8 +23,8 @@ export class StripeService {
   }
 
   async webhook(signature: string, body, req) {
+    console.log('webhook');
     let event: Stripe.Event;
-    console.log(signature);
     try {
       event = this.stripe.webhooks.constructEvent(
         req,
@@ -37,9 +37,15 @@ export class StripeService {
 
     const payment_intent = event.data.object as Stripe.PaymentIntent;
     const order_id = payment_intent.metadata['order_id'];
+    const payment_id = payment_intent.metadata['payment_id'];
 
     const record = await this.prisma.orders.findUnique({
-      where: { id: order_id },
+      where: {
+        id: order_id,
+        PaymentIntents: {
+          some: { id: payment_id },
+        },
+      },
     });
 
     if (!record) {
@@ -58,7 +64,7 @@ export class StripeService {
         throw new InternalServerErrorException('Unknown event type.');
     }
 
-    this.prisma.orders.update({
+    await this.prisma.orders.update({
       where: { id: order_id },
       data: {
         paymentStatus: new_status,
@@ -67,6 +73,16 @@ export class StripeService {
           create: {
             processed_at: new Date().toISOString(),
             data: JSON.stringify({ signature, body }),
+          },
+        },
+        PaymentIntents: {
+          update: {
+            where: {
+              id: payment_id,
+            },
+            data: {
+              status: new_status,
+            },
           },
         },
       },
@@ -91,6 +107,14 @@ export class StripeService {
       );
     }
 
+    const intent_record = await this.prisma.paymentIntents.create({
+      data: {
+        order: {
+          connect: { id: order_id },
+        },
+      },
+    });
+
     let paymentIntent: Stripe.Response<Stripe.PaymentIntent>;
     try {
       paymentIntent = await this.stripe.paymentIntents.create({
@@ -99,6 +123,7 @@ export class StripeService {
         automatic_payment_methods: { enabled: true, allow_redirects: 'never' },
         metadata: {
           order_id: order_id,
+          payment_id: intent_record.id,
         },
       });
     } catch (err) {
@@ -106,13 +131,11 @@ export class StripeService {
       throw new InternalServerErrorException(err.message);
     }
 
-    const result = await this.prisma.paymentIntents.create({
+    const result = await this.prisma.paymentIntents.update({
+      where: { id: intent_record.id },
       data: {
         status: 'requires_payment_method',
         stripe_payment_intent: JSON.stringify(paymentIntent),
-        order: {
-          connect: { id: order_id },
-        },
         stripe_event_id: paymentIntent.id,
       },
     });
@@ -140,8 +163,6 @@ export class StripeService {
       select: {
         id: true,
         order_id: true,
-        closed: true,
-        confirmed: true,
         status: true,
         created_at: true,
         stripe_event_id: true,

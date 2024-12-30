@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { roles } from '@prisma/client';
@@ -78,6 +79,29 @@ export class ProductsService {
         name: data.name,
       },
     });
+  }
+  async DeleteCategory(id: string) {
+    const record = await this.prisma.categories.findUnique({
+      where: { id: id },
+    });
+
+    if (!record) {
+      throw new NotFoundException('Record not found.');
+    }
+
+    const result = await this.prisma.categories.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    if (result) {
+      return 'Record Deleted';
+    } else {
+      throw new InternalServerErrorException(
+        'An error occurred when deleting the category.',
+      );
+    }
   }
 
   async GetProducts(role: roles, params: GetProductsInput) {

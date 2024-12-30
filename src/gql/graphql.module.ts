@@ -8,7 +8,13 @@ import { CartItemsResolver } from './resolvers/cart_items/cart_items.resolver';
 import { OrdersResolver } from './resolvers/orders/orders.resolver';
 
 @Module({
-  providers: [ProductsResolver, CategoriesResolver, LikesResolver, CartItemsResolver, OrdersResolver],
+  providers: [
+    ProductsResolver,
+    CategoriesResolver,
+    LikesResolver,
+    CartItemsResolver,
+    OrdersResolver,
+  ],
   imports: [AuthModule, ProductsModule],
 })
 export class GraphqlModule {}

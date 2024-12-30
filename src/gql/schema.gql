@@ -105,6 +105,7 @@ type Mutation {
   updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput!): String
   deleteProduct(product_id: String!): String
   createCategory(CreateCategoryInput: CreateCategoryInput!): String
+  deleteCategory(id: ID!): String
   likeProduct(variation_id: String!): String
   removeLikeProduct(like_id: String!): String
   addToCart(variation_id: String!, quantity: Int!): String
