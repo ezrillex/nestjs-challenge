@@ -11,7 +11,8 @@ import { GqlArgumentsHost } from '@nestjs/graphql';
 @Catch()
 export class GlobalExceptionFilter extends BaseExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
-    console.log('custom!');
+    console.log(exception);
+
     //console.log(exception, host);
     //super.catch(exception, host);
 
@@ -50,7 +51,6 @@ export class GlobalExceptionFilter extends BaseExceptionFilter {
       console.log('HTTP REQUEST ');
       path = request.url;
     }
-    //console.log(request);
 
     const responseBody = {
       status_code: code,

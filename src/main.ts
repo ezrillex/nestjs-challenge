@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import { GlobalExceptionFilter } from './filters/http-exception/global-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { rawBody: true });
   app.useGlobalPipes(new ValidationPipe());
 
   const { httpAdapter } = app.get(HttpAdapterHost);

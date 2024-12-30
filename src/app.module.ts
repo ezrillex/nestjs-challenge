@@ -15,6 +15,7 @@ import { PaymentsController } from './controllers/payments/payments.controller';
 import { ImagesModule } from './modules/images/images.module';
 import Joi from 'joi';
 import { GraphQLError, GraphQLFormattedError } from 'graphql/error';
+import { StripeService } from './services/stripe/stripe/stripe.service';
 
 @Module({
   imports: [
@@ -26,6 +27,9 @@ import { GraphQLError, GraphQLFormattedError } from 'graphql/error';
         CLOUDINARY_CLOUD_NAME: Joi.string().required(),
         CLOUDINARY_API_KEY: Joi.string().required(),
         CLOUDINARY_API_SECRET: Joi.string().required(),
+        STRIPE_SHAREABLE_KEY: Joi.string().required(),
+        STRIPE_SECRET_KEY: Joi.string().required(),
+        STRIPE_WEBHOOK_SIGNING_SECRET: Joi.string().required(),
       }),
     }),
     AuthModule,
@@ -65,6 +69,6 @@ import { GraphQLError, GraphQLFormattedError } from 'graphql/error';
     ImagesModule,
   ],
   controllers: [AppController, PaymentsController],
-  providers: [AppService, AuthService, PrismaService],
+  providers: [AppService, AuthService, PrismaService, StripeService],
 })
 export class AppModule {}

@@ -116,13 +116,14 @@ model CartItems {
 }
 
 enum PaymentStatus {
+  requires_capture
   pending_creation
   requires_payment_method
   requires_confirmation
   requires_action
   processing
-  succeded
-  cancelled
+  succeeded
+  canceled
 }
 
 enum OrderStatus {
@@ -174,6 +175,7 @@ model PaymentIntents {
   order                 Orders?       @relation(fields: [order_id], references: [id])
   order_id              String?       @db.Uuid
   closed                Boolean       @default(false) @db.Boolean
+  confirmed             Boolean       @default(false) @db.Boolean
   status                PaymentStatus @default(pending_creation)
   created_at            DateTime      @default(now())
   stripe_event_id       String?
@@ -181,13 +183,13 @@ model PaymentIntents {
 }
 
 model IncomingPaymentWebhooks {
-  id           String              @id @default(uuid()) @db.Uuid
-  order        Orders?             @relation(fields: [order_id], references: [id])
-  order_id     String?             @db.Uuid
-  status       BackgroundJobStatus @default(pending)
-  data         Json                @db.Json
-  created_at   DateTime            @default(now()) @db.Timestamp()
-  processed_at DateTime?           @db.Timestamp()
+  id           String    @id @default(uuid()) @db.Uuid
+  order        Orders    @relation(fields: [order_id], references: [id])
+  order_id     String    @db.Uuid
+  //status       BackgroundJobStatus @default(pending) processing right away, not needed.
+  data         Json      @db.Json
+  created_at   DateTime  @default(now()) @db.Timestamp()
+  processed_at DateTime? @db.Timestamp()
 }
 
 // TODO check relations delete behaviour?
