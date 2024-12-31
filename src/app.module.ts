@@ -1,21 +1,19 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { AuthService } from './services/authentication/auth.service';
-import { PrismaService } from './services/prisma/prisma.service';
-import { AuthModule } from './modules/auth/auth.module';
-import { ProductsModule } from './modules/products/products.module';
+import { AuthModule } from './auth/auth.module';
+import { ProductsModule } from './products/products.module';
 import { join } from 'path';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { GraphqlModule } from './gql/graphql.module';
-import { PaymentsController } from './controllers/payments/payments.controller';
-import { ImagesModule } from './modules/images/images.module';
+import { ImagesModule } from './images/images.module';
 import Joi from 'joi';
-import { GraphQLError, GraphQLFormattedError } from 'graphql/error';
-import { StripeService } from './services/stripe/stripe/stripe.service';
+import { GraphQLFormattedError } from 'graphql/error';
+import { PaymentsModule } from './payments/payments.module';
+import { CategoriesModule } from './categories/categories.module';
+import { CartsModule } from './carts/carts.module';
+import { OrdersModule } from './orders/orders.module';
+import { LikesModule } from './likes/likes.module';
 
 @Module({
   imports: [
@@ -32,23 +30,12 @@ import { StripeService } from './services/stripe/stripe/stripe.service';
         STRIPE_WEBHOOK_SIGNING_SECRET: Joi.string().required(),
       }),
     }),
-    AuthModule,
-    ProductsModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      //typePaths: ['src/gql/schema.graphql'],
       playground: false,
-      autoSchemaFile: join(process.cwd(), 'src/gql/schema.gql'),
-      // subscriptions: {
-      //   'graphql-ws': true,
-      // },
-      // definitions: {
-      //   path: join(process.cwd(), 'src/gql/graphql.ts'),
-      //   outputAs: 'class',
-      //   emitTypenameField: true,
-      // },
+      autoSchemaFile: join(process.cwd(), 'src/graphql/schema.gql'),
       definitions: {
-        path: join(process.cwd(), 'src/gql/graphql.ts'),
+        path: join(process.cwd(), 'src/graphql/graphql.ts'),
         outputAs: 'class',
         emitTypenameField: true,
       },
@@ -75,10 +62,14 @@ import { StripeService } from './services/stripe/stripe/stripe.service';
       },
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
-    GraphqlModule,
+    AuthModule,
+    ProductsModule,
     ImagesModule,
+    PaymentsModule,
+    CategoriesModule,
+    CartsModule,
+    OrdersModule,
+    LikesModule,
   ],
-  controllers: [AppController, PaymentsController],
-  providers: [AppService, AuthService, PrismaService, StripeService],
 })
 export class AppModule {}
