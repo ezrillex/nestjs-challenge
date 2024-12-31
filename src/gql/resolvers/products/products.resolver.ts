@@ -10,6 +10,7 @@ import { UpdateProductInput } from '../../models/products/product/update-product
 import { UpdateProductVariationInput } from '../../models/products/product/update-product-variation-input/update-product-variation-input';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { PublicPrivate } from '../../../decorators/public_and_private/public_and_private.decorator';
+import { CreateProductVariationInput } from '../../models/products/product-variations/create-product-variation-input';
 
 @Resolver()
 export class ProductsResolver {
@@ -77,6 +78,22 @@ export class ProductsResolver {
   ) {
     const result = await this.productsService.UpdateProductVariation(
       updateProductVariationInput,
+      request['user'].id,
+    );
+    return result.id;
+  }
+
+  @RequiresRole(roles.manager)
+  @Mutation(() => String, { nullable: true })
+  async createProductVariation(
+    @Args('CreateProductVariationInput')
+    createProductVariationInput: CreateProductVariationInput,
+    @Context('req') request: Request,
+  ) {
+    // todo check if product exists, or let it fail?
+
+    const result = await this.productsService.CreateProductVariation(
+      createProductVariationInput,
       request['user'].id,
     );
     return result.id;

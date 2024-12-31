@@ -11,6 +11,7 @@ import { GetProductsInput } from '../../gql/models/products/get-products.input/g
 import { CreateCategoryInput } from '../../gql/models/products/create-category-input/create-category-input';
 import { UpdateProductInput } from '../../gql/models/products/product/update-product-input/update-product-input';
 import { UpdateProductVariationInput } from '../../gql/models/products/product/update-product-variation-input/update-product-variation-input';
+import { CreateProductVariationInput } from '../../gql/models/products/product-variations/create-product-variation-input';
 
 @Injectable()
 export class ProductsService {
@@ -211,6 +212,22 @@ export class ProductsService {
       where: { id: data.id },
       data: {
         ...toUpdate,
+        last_updated_by: userId,
+        last_updated_at: new Date().toISOString(),
+      },
+    });
+  }
+
+  async CreateProductVariation(
+    data: CreateProductVariationInput,
+    userId: string,
+  ) {
+    return this.prisma.productVariations.create({
+      data: {
+        product: { connect: { id: data.product_id } },
+        price: data.price,
+        stock: data.stock,
+        title: data.title,
         last_updated_by: userId,
         last_updated_at: new Date().toISOString(),
       },
@@ -442,26 +459,6 @@ export class ProductsService {
       throw new InternalServerErrorException('An unexpected error ocurred!');
     } else {
       return order_result.id;
-    }
-  }
-
-  // todo this is needed once we get to payments maybe.
-  async UPDATE_ORDER(cart_id: string) {
-    const record = await this.prisma.cartItems.findUnique({
-      where: { id: cart_id },
-    });
-    if (!record) {
-      throw new BadRequestException('Cart Item not found!');
-    }
-
-    const result = await this.prisma.cartItems.delete({
-      where: { id: cart_id },
-    });
-
-    if (result) {
-      return 'Cart Item deleted succesfully.';
-    } else {
-      throw new BadRequestException('Unexpected error when deleting record!');
     }
   }
 
