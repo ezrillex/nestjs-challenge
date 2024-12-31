@@ -1,7 +1,7 @@
 # nestjs-challenge
 
 # A detailed readme (with pictures) is in progress.
-### Samples of how each endpoint is fulfilled by the app will be available asap, to check current state see folder-restructure branch.
+### Samples of how each endpoint is fulfilled by the app will be available asap, to check current state see folder-restructure branch [here](https://github.com/ezrillex/nestjs-challenge/tree/folder-structure) .
 
 ### Build your tiny API store.
 You can choose the target of your business, be creative!.
