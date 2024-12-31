@@ -1,7 +1,7 @@
 # nestjs-challenge
 
-# WAIT! A detailed readme is in progress.
-### Samples of how each endpoint is fulfilled by the app and instructions on how to run the app will be available asap.
+# A detailed readme (with pictures) is in progress.
+### Samples of how each endpoint is fulfilled by the app will be available asap, to check current state see folder-restructure branch.
 
 ### Build your tiny API store.
 You can choose the target of your business, be creative!.
