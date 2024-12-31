@@ -1,8 +1,5 @@
 # nestjs-challenge
 
-# WAIT! A detailed readme is in progress.
-### Samples of how each endpoint is fulfilled by the app and instructions on how to run the app will be available asap.
-
 ### Build your tiny API store.
 You can choose the target of your business, be creative!.
 **Examples:** snack store, pet store, drug store.
@@ -28,6 +25,7 @@ You can choose the target of your business, be creative!.
    - STRIPE_WEBHOOK_SIGNING_SECRET
    - AUTO_ROLE (roles can be set by writing (admin/manager) at start of email)
 2. Run prisma migrations.
+3. npm run start:dev
 
 ## Mandatory Features
 1. ✅ Authentication endpoints 
@@ -97,6 +95,7 @@ You can choose the target of your business, be creative!.
       * this is the image coming from that link!  ![image](https://res.cloudinary.com/dw4crytk2/image/upload/v1735659896/gyglautfx1wzikiwnq31.webp)
 6. As a Client I can:
     * ✅ See products
+      * Same as list with pagination. Clients get is_published = false products filtered from this query. 
     * ✅ See the product details
     * ✅ Buy products
     * ✅ Add products to cart
@@ -107,10 +106,27 @@ You can choose the target of your business, be creative!.
 
 ## Mandatory Implementations
 - ✅ Schema validation for environment variables
+  - ![](./pictures/env_validation.png)
 - ✅ Usage of global exception filter
-- ✅ Usage of guards, pipes (validation) (assumed stuff like gql field => String counts as part of the validation.)
+  - On main.ts : app.useGlobalFilters(new GlobalExceptionFilter(httpAdapter));
+  - Filter at: src/common/filters/global-exception.filter.ts
+- ✅ Usage of guards, pipes (validation).
+  - Available at: src/auth/guards/
+  - Usage of pipes in parameters
+  - Usage of class-validator in DTOs. 
+  - In GQL mainly used @Field(()=> ClassToValidate, {nullable: true})
 - ✅ Usage of custom decorators
+  - Available at: src/common/decorators/
 - ✅ Configure helmet, cors, rate limit (this last one for reset password feature)
+  - Cors:
+    - on main.ts: app.enableCors();
+  - Helmet: 
+    - ![](./pictures/helmet.png)
+  - Rate Limit: 
+    - On AuthModule: ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
+    - On Reset Endpoint:   
+      - @Throttle({ default: { limit: 3, ttl: 60000 } })
+      - @UseGuards(ThrottlerGuard)
 
 ## Extra points
 * Implement resolve field in graphQL queries (if apply)

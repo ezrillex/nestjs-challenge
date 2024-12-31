@@ -28,6 +28,7 @@ import { LikesModule } from './likes/likes.module';
         STRIPE_SHAREABLE_KEY: Joi.string().required(),
         STRIPE_SECRET_KEY: Joi.string().required(),
         STRIPE_WEBHOOK_SIGNING_SECRET: Joi.string().required(),
+        AUTO_ROLE: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
