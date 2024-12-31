@@ -2,7 +2,7 @@
 CREATE TYPE "roles" AS ENUM ('public', 'customer', 'manager', 'admin');
 
 -- CreateEnum
-CREATE TYPE "PaymentStatus" AS ENUM ('pending_creation', 'requires_payment_method', 'requires_confirmation', 'requires_action', 'processing', 'succeded', 'cancelled');
+CREATE TYPE "PaymentStatus" AS ENUM ('requires_capture', 'pending_creation', 'requires_payment_method', 'requires_confirmation', 'requires_action', 'processing', 'succeeded', 'canceled');
 
 -- CreateEnum
 CREATE TYPE "OrderStatus" AS ENUM ('awaiting_payment', 'pending_fulfillment', 'fulfillment_in_progress', 'shipped', 'delivered', 'delivery_cancelled', 'returned');
@@ -111,6 +111,7 @@ CREATE TABLE "Orders" (
     "id" UUID NOT NULL,
     "user_id" UUID,
     "paymentStatus" "PaymentStatus" NOT NULL DEFAULT 'pending_creation',
+    "orderStatus" "OrderStatus" NOT NULL DEFAULT 'awaiting_payment',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Orders_pkey" PRIMARY KEY ("id")
@@ -125,6 +126,29 @@ CREATE TABLE "OrderItems" (
     "price_purchased_at" DECIMAL NOT NULL,
 
     CONSTRAINT "OrderItems_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "PaymentIntents" (
+    "id" UUID NOT NULL,
+    "order_id" UUID,
+    "status" "PaymentStatus" NOT NULL DEFAULT 'pending_creation',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "stripe_event_id" TEXT,
+    "stripe_payment_intent" JSON,
+
+    CONSTRAINT "PaymentIntents_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "IncomingPaymentWebhooks" (
+    "id" UUID NOT NULL,
+    "order_id" UUID NOT NULL,
+    "data" JSON NOT NULL,
+    "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "processed_at" TIMESTAMP,
+
+    CONSTRAINT "IncomingPaymentWebhooks_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -176,6 +200,12 @@ ALTER TABLE "OrderItems" ADD CONSTRAINT "OrderItems_order_id_fkey" FOREIGN KEY (
 
 -- AddForeignKey
 ALTER TABLE "OrderItems" ADD CONSTRAINT "OrderItems_product_variation_id_fkey" FOREIGN KEY ("product_variation_id") REFERENCES "ProductVariations"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PaymentIntents" ADD CONSTRAINT "PaymentIntents_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "Orders"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "IncomingPaymentWebhooks" ADD CONSTRAINT "IncomingPaymentWebhooks_order_id_fkey" FOREIGN KEY ("order_id") REFERENCES "Orders"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_CategoriesToProducts" ADD CONSTRAINT "_CategoriesToProducts_A_fkey" FOREIGN KEY ("A") REFERENCES "Categories"("id") ON DELETE CASCADE ON UPDATE CASCADE;
