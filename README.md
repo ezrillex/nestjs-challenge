@@ -48,8 +48,17 @@ You can choose the target of your business, be creative!.
      - To reset provide the token we got in the previous step. With new passwords.
      - ![](./pictures/reset.png)
 2. ✅ List products with pagination
-   - 
+   - Page 1 (specified page size of 3 and fewer fields to fit screenshot)
+   - ![](./pictures/get_products_page_1.png)
+   - Page 2
+   - ![](./pictures/get_products_page_2.png)
 3. ✅ Search products by category
+    - First we want to create a category
+    - ![](./pictures/create_category.png)
+    - With that new id we add it to a product. 
+    - ![](./pictures/add_category_to_product.png)
+    - Now we can use the List product endpoint with the category as a filter to get results of only that category. 
+    - ![](./pictures/filtered_category.png)
 4. ✅ Add 2 kinds of users (Manager, Client)
     - This is an enum.
     - ![](./pictures/roles.png)
@@ -97,11 +106,13 @@ You can choose the target of your business, be creative!.
     * ✅ See products
       * Same as list with pagination. Clients get is_published = false products filtered from this query. 
     * ✅ See the product details
+      * ![](./pictures/get_one_product_a.png)
     * ✅ Buy products
     * ✅ Add products to cart
     * ✅ Like products
     * ✅ Show my order
-7. ✅ The product information(included the images) should be visible for logged and not logged users
+7. ✅ The product information(included the images) should be visible for logged and not logged users. 
+   - The field is available for both, and link is not private check out the image here:  ![image](https://res.cloudinary.com/dw4crytk2/image/upload/v1735659896/gyglautfx1wzikiwnq31.webp) 
 8. ✅ Stripe Integration for payment (including webhooks management)
 
 ## Mandatory Implementations
@@ -128,12 +139,12 @@ You can choose the target of your business, be creative!.
       - @Throttle({ default: { limit: 3, ttl: 60000 } })
       - @UseGuards(ThrottlerGuard)
 
-## Extra points
-* Implement resolve field in graphQL queries (if apply)
-* When the stock of a product reaches 3, notify the last user that liked it and not purchased the product yet with an email.
+## Extra points 😞
+* ❎ Implement resolve field in graphQL queries (if apply)
+* ❎ When the stock of a product reaches 3, notify the last user that liked it and not purchased the product yet with an email.
   Use a background job and make sure to include the product's image in the email.
-* Send an email when the user changes the password
-* Deploy on Heroku
+* ❎ Send an email when the user changes the password
+* ❎ Deploy on Heroku
 
 ## Notes:
 
@@ -141,7 +152,7 @@ Requirements to use Rest:
 * ✅ Authentication endpoints (sign up, sign in, sign out, forgot, reset password)
 * ✅ Stripe Integration for payment (including webhooks management)
 
-  * I understand this implies all payment related apis are REST. This is how I developed it. (Webhook, Create payment intent, and get order payments.) This specially is the way to go because of stripe frontend library not being compatible with graphql. So for simplicity this portion I do believe the instruction is like so. 
+  * I understand this implies all payment related apis are REST. This is how I developed it. (Webhook, Create payment intent, and get order payments.)
   
 - Requirements to use Graph:
 * ✅ The ones not included in the block above

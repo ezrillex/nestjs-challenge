@@ -87,7 +87,9 @@ export class ProductsService {
     if (params.categoryFilter && params.categoryFilter.length > 0) {
       filter['categories'] = {
         some: {
-          id: params.categoryFilter,
+          id: {
+            in: params.categoryFilter,
+          },
         },
       };
     }
@@ -107,9 +109,7 @@ export class ProductsService {
     if (params.search && params.search.length > 0) {
       filter['name'] = { contains: params.search };
     }
-    //console.log({ filter, pagination });
-    // todo so maybe do some role based controls for what can the user get in return?
-    // how should I go about implementing this?, maybe a select with different set for different roles?
+    // todo RBAC of queryable fields.
     return this.prisma.products.findMany({
       include: {
         variations: {
