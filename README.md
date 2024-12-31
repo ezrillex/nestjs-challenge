@@ -1,5 +1,8 @@
 # nestjs-challenge
 
+# STOP! A detailed readme is in progress.
+### Samples of how each endpoint is fulfilled by the app and instructions on how to run the app will be available asap.
+
 ### Build your tiny API store.
 You can choose the target of your business, be creative!.
 **Examples:** snack store, pet store, drug store.
@@ -23,24 +26,24 @@ You can choose the target of your business, be creative!.
     * DONE Update products
     * DONE Delete products
     * DONE Disable products // By updating the field is_published
-    * Show clients orders 
+    * DONE Show clients orders 
     * DONE Upload images per product.
 6. As a Client I can:
     * DONE See products
     * DONE See the product details
-    * Buy products
-    * Add products to cart
-    * Like products
-    * Show my order
+    * DONE Buy products
+    * DONE Add products to cart
+    * DONE Like products
+    * DONE Show my order
 7. DONE The product information(included the images) should be visible for logged and not logged users
-8. Stripe Integration for payment (including webhooks management)
+8. DONE Stripe Integration for payment (including webhooks management)
 
 ## Mandatory Implementations
 - DONE Schema validation for environment variables
-- Usage of global exception filter
+- DONE Usage of global exception filter
 - DONE Usage of guards, pipes (validation) (assumed stuff like gql field => String counts as part of the validation.)
 - DONE Usage of custom decorators
-- Configure helmet, cors, rate limit (this last one for reset password feature)
+- DONE Configure helmet, cors, rate limit (this last one for reset password feature)
 
 ## Extra points
 * Implement resolve field in graphQL queries (if apply)
@@ -52,8 +55,10 @@ You can choose the target of your business, be creative!.
 ## Notes:
 
 Requirements to use Rest:
-* Authentication endpoints (sign up, sign in, sign out, forgot, reset password)
-* Stripe Integration for payment (including webhooks management)
+* DONE Authentication endpoints (sign up, sign in, sign out, forgot, reset password)
+* DONE Stripe Integration for payment (including webhooks management)
 
-Requirements to use Graph:
+  * I understand this implies all payment related apis are REST. This is how I developed it. (Webhook, Create payment intent, and get order payments.) This specially is the way to go because of stripe frontend library not being compatible with graphql. So for simplicity this portion I do believe the instruction is like so. 
+  
+- Requirements to use Graph:
 * The ones not included in the block above
