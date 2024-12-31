@@ -26,6 +26,10 @@ You can choose the target of your business, be creative!.
    - AUTO_ROLE (roles can be set by writing (admin/manager) at start of email)
 2. Run prisma migrations.
 3. npm run start:dev
+4. Stripe CLI to trigger payment confirmation. 
+5. ngrok to route to the webhook. And setup stripe to send event succeeded and fail to there. 
+   - <ngrok link>/payments/webhook
+
 
 ## Mandatory Features
 1. ✅ Authentication endpoints 
@@ -96,6 +100,8 @@ You can choose the target of your business, be creative!.
       * As shown in update simply pass "is_published" = false to toggle it in the customer facing frontend. Managers are allowed to get disabled ones. 
       * ![](./pictures/update_product.png)
     * ✅ Show clients orders 
+      * I have to provide a client id. The endpoint checks for manager role so we sent that token. And we can get the orders a user has. 
+      * ![](./pictures/manager_get_orders.png)
     * ✅ Upload images per product.
       * We need to pass the variation that we are uploading to, and the base 64. 
       * ![](./pictures/upload_image.png)
@@ -108,12 +114,38 @@ You can choose the target of your business, be creative!.
     * ✅ See the product details
       * ![](./pictures/get_one_product_a.png)
     * ✅ Buy products
+      * With a product added below we can do a purchase by creating an order. 
+      * ![](./pictures/create_order.png)
     * ✅ Add products to cart
+      * We pass the product variation we want to add to cart, and the amount of items.
+      * ![](./pictures/add_to_cart.png)
     * ✅ Like products
+      * We pass the variation we want to like. 
+      * ![](./pictures/like_prod_var.png)
+      * We can get what we liked 
+      * ![](./pictures/get%20likes%20of%20self%20user.png)
     * ✅ Show my order
+      * We can see all our orders
+      * ![](./pictures/all_orders.png)
+      * Or a specific one
+      * ![](./pictures/get_order.png)
 7. ✅ The product information(included the images) should be visible for logged and not logged users. 
    - The field is available for both, and link is not private check out the image here:  ![image](https://res.cloudinary.com/dw4crytk2/image/upload/v1735659896/gyglautfx1wzikiwnq31.webp) 
 8. ✅ Stripe Integration for payment (including webhooks management)
+   - Now that we have the order, the frontend can send us the id and the amount we want to charge to build the payment intent. We return some information so that the front can add the payment method. 
+   - ![](./pictures/create_intent.png)
+   - So because we dont have a front we use this endpoint with the admin token to simulate that we add a payment method. As we see now the stripe intent only needs to be confirmed. 
+   - ![](./pictures/add_payment_method.png)
+   - So to do that we need the Stripe CLI, but first make sure to point stripe and start ngrok so that we can receive the hook. 
+   - Now use the stripe cli with the following command to trigger the confirmation. (Here we pass the id we got from the create payment call)
+     - .\stripe.exe payment_intents confirm pi_3QcCSJP0YP2CvfqE0UDqhK5p
+   - ![](./pictures/stripe_hook.png)
+   - This triggers the hook, and we can check in the stripe dashboard our response. 
+   - ![](./pictures/dashboard_stripe.png)
+   - Finally, we go to query the payment information and observe the status has been updated.
+   - ![](./pictures/get_order_payments.png)
+   - We go see the order object and observe the status has also propagated here. 
+   - ![](./pictures/get_order_paid.png)
 
 ## Mandatory Implementations
 - ✅ Schema validation for environment variables
