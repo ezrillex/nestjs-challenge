@@ -1,6 +1,6 @@
 # nestjs-challenge
 
-# STOP! A detailed readme is in progress.
+# WAIT! A detailed readme is in progress.
 ### Samples of how each endpoint is fulfilled by the app and instructions on how to run the app will be available asap.
 
 ### Build your tiny API store.
@@ -15,6 +15,18 @@ You can choose the target of your business, be creative!.
 * DONE Typescript
 * DONE Prettier
 * DONE Eslint
+
+## Requirements to Run
+1. The following constants on the .env file. A sample file is included.
+   - DATABASE_URL
+   - JWTCONSTANT
+   - CLOUDINARY_CLOUD_NAME
+   - CLOUDINARY_API_KEY
+   - CLOUDINARY_API_SECRET
+   - STRIPE_SHAREABLE_KEY
+   - STRIPE_SECRET_KEY
+   - STRIPE_WEBHOOK_SIGNING_SECRET
+2. Run prisma migrations.
 
 ## Mandatory Features
 1. DONE Authentication endpoints (sign up, sign in, sign out, forgot, reset password)
