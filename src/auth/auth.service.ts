@@ -2,12 +2,26 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SignupUserDto } from './dto/signup-user-dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
+import { roles } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async createUser(data: SignupUserDto) {
+    let role: roles = roles.customer;
+    if (this.configService.get<string>('AUTO_ROLE') === 'TRUE') {
+      if (data.email.startsWith('admin')) {
+        role = roles.admin;
+      } else if (data.email.startsWith('manager')) {
+        role = roles.manager;
+      }
+    }
+
     const duplicate = await this.prisma.users.findUnique({
       where: { email: data.email },
     });
@@ -23,6 +37,7 @@ export class AuthService {
         last_name: data.last_name,
         email: data.email,
         password: hashed,
+        role: role,
       },
     });
   }
