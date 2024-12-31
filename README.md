@@ -33,14 +33,14 @@ You can choose the target of your business, be creative!.
 1. ✅ Authentication endpoints 
    - ✅sign up
      - Create an account with emails like: customer@gmail.com, admin@gmail.com, manager@gmail.com.
-     - ![](.\pictures\signup.png)
+     - ![](./pictures/signup.png)
    - ✅sign in
      - Login with the 3 accounts and set the tokens of the parent folder.
-     - ![](.\pictures\login.png)
-     - ![](.\pictures\tokens.png)
+     - ![](./pictures/login.png)
+     - ![](./pictures/tokens.png)
    - ✅sign out
      - To logout specify the bearer token, the guard will make sure its you trying to logout. Make sure to login again if you try this.
-     - ![](.\pictures\logout.png)
+     - ![](./pictures/logout.png)
    - ✅forgot
      - To request a reset provide an email.
      - ![](./pictures/forgot.png)
