@@ -31,13 +31,16 @@ export class GlobalExceptionFilter extends BaseExceptionFilter {
       response = host.switchToHttp().getResponse();
       path = request.url;
     }
-
     const responseBody = {
       status_code: code,
       message: message,
       timestamp: new Date().toISOString(),
       path: path,
     };
+    const details = exception.response.message;
+    if (details) {
+      responseBody['details'] = details;
+    }
 
     this.applicationRef.reply(response, responseBody, code);
   }

@@ -10,7 +10,7 @@ import { CreateProductInput } from './inputs/createProduct.input';
 import { GetProductsInput } from './inputs/get-products.input';
 import { UpdateProductInput } from './inputs/update-product-input';
 import { UpdateProductVariationInput } from './product_variation/update-product-variation-input';
-import { Create_product_variationInput } from './product_variation/create_product_variation.input';
+import { CreateProductVariationInput } from './product_variation/create_product_variation_input';
 
 @Injectable()
 export class ProductsService {
@@ -186,7 +186,7 @@ export class ProductsService {
   }
 
   async CreateProductVariation(
-    data: Create_product_variationInput,
+    data: CreateProductVariationInput,
     userId: string,
   ) {
     return this.prisma.productVariations.create({

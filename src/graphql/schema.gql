@@ -103,7 +103,7 @@ type Mutation {
   createProduct(CreateProductInput: CreateProductInput!): String
   updateProduct(UpdateProductInput: UpdateProductInput!): String
   updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput!): String
-  createProductVariation(CreateProductVariationInput: Create_product_variationInput!): String
+  createProductVariation(CreateProductVariationInput: CreateProductVariationInput!): String
   deleteProductVariation(variation_id: String!): String
   deleteProduct(product_id: String!): String
   createCategory(name: String!): String
@@ -143,7 +143,7 @@ input UpdateProductVariationInput {
   stock: Int
 }
 
-input Create_product_variationInput {
+input CreateProductVariationInput {
   product_id: ID!
   title: String!
   price: Float!

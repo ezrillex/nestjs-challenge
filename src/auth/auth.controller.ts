@@ -96,7 +96,7 @@ export class AuthController {
       });
 
       await this.authService.loginAttemptSuccess(user.id, token);
-      return { token };
+      return { token, role: user.role };
     } else {
       await this.authService.loginAttemptFailed(
         user.id,

@@ -46,7 +46,7 @@ export class UpdateProductVariationInput {
     stock?: Nullable<number>;
 }
 
-export class Create_product_variationInput {
+export class CreateProductVariationInput {
     product_id: string;
     title: string;
     price: number;
@@ -161,7 +161,7 @@ export abstract class IMutation {
 
     abstract updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput): Nullable<string> | Promise<Nullable<string>>;
 
-    abstract createProductVariation(CreateProductVariationInput: Create_product_variationInput): Nullable<string> | Promise<Nullable<string>>;
+    abstract createProductVariation(CreateProductVariationInput: CreateProductVariationInput): Nullable<string> | Promise<Nullable<string>>;
 
     abstract deleteProductVariation(variation_id: string): Nullable<string> | Promise<Nullable<string>>;
 

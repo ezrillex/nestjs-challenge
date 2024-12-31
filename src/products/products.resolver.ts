@@ -9,7 +9,7 @@ import { UpdateProductInput } from './inputs/update-product-input';
 import { UpdateProductVariationInput } from './product_variation/update-product-variation-input';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { PublicPrivate } from '../common/decorators/public_and_private.decorator';
-import { Create_product_variationInput } from './product_variation/create_product_variation.input';
+import { CreateProductVariationInput } from './product_variation/create_product_variation_input';
 
 @Resolver()
 export class ProductsResolver {
@@ -86,7 +86,7 @@ export class ProductsResolver {
   @Mutation(() => String, { nullable: true })
   async createProductVariation(
     @Args('CreateProductVariationInput')
-    createProductVariationInput: Create_product_variationInput,
+    createProductVariationInput: CreateProductVariationInput,
     @Context('req') request: Request,
   ) {
     // todo check if product exists, or let it fail?
