@@ -167,6 +167,8 @@ export abstract class IMutation {
 
     abstract createProductVariation(CreateProductVariationInput: CreateProductVariationInput): Nullable<string> | Promise<Nullable<string>>;
 
+    abstract deleteProductVariation(variation_id: string): Nullable<string> | Promise<Nullable<string>>;
+
     abstract deleteProduct(product_id: string): Nullable<string> | Promise<Nullable<string>>;
 
     abstract createCategory(CreateCategoryInput: CreateCategoryInput): Nullable<string> | Promise<Nullable<string>>;

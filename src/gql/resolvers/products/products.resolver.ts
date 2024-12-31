@@ -101,6 +101,15 @@ export class ProductsResolver {
 
   @RequiresRole(roles.manager)
   @Mutation(() => String, { nullable: true })
+  async deleteProductVariation(
+    @Args('variation_id', { type: () => String }, ParseUUIDPipe)
+    variation_id: string,
+  ) {
+    return this.productsService.DeleteProductVariation(variation_id);
+  }
+
+  @RequiresRole(roles.manager)
+  @Mutation(() => String, { nullable: true })
   async deleteProduct(
     @Args('product_id', { type: () => String }, ParseUUIDPipe)
     product_id: string,

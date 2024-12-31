@@ -234,6 +234,41 @@ export class ProductsService {
     });
   }
 
+  async DeleteProductVariation(id: string) {
+    const record = await this.prisma.productVariations.findUnique({
+      where: { id: id },
+      include: {
+        product: true,
+      },
+    });
+
+    if (!record) {
+      throw new NotFoundException('Product Variation not found.');
+    }
+
+    // todo research how to get the count directly from query.
+    const variations_of_product = await this.prisma.productVariations.findMany({
+      where: { product_id: record.product_id },
+    });
+
+    if (variations_of_product.length === 1) {
+      throw new BadRequestException(
+        'Can not delete the product variation if it is the last one.',
+      );
+    }
+
+    const result = await this.prisma.productVariations.delete({
+      where: { id: id },
+    });
+
+    if (result) {
+      return 'Product Variation deleted.';
+    } else
+      throw new InternalServerErrorException(
+        'Something went wrong when deleting the product variation.',
+      );
+  }
+
   async DeleteProduct(product_id: string, user_id: string) {
     return this.prisma.products.update({
       where: { id: product_id },
