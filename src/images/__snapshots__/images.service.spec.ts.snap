@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ImagesService delete image method should error if cdn failed and response was not successful : CDN result was not successful 1`] = `"An error occurred when deleting the image."`;
+
+exports[`ImagesService delete image method should error if invalid image id: image not found 1`] = `"Image not found"`;
+
+exports[`ImagesService upload image method should accept image mime type: product variation not found 1`] = `"Product Variation not found"`;
+
+exports[`ImagesService upload image method should error if cdn didnt provide a public id for the uploaded image. : CDN didnt provide the required id 1`] = `"There was an issue with the CDN, please try again later."`;
+
+exports[`ImagesService upload image method should error if invalid product id: product variation not found 1`] = `"Product Variation not found"`;
+
+exports[`ImagesService upload image method should error if not image mime type: image must be valid mime type 1`] = `"Image must have a valid image mime type"`;

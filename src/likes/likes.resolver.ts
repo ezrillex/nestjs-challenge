@@ -7,7 +7,6 @@ import { LikesService } from './likes.service';
 
 @Resolver()
 export class LikesResolver {
-  // todo refactor this into its separate service?
   constructor(private readonly likesService: LikesService) {}
 
   @RequiresRole(roles.customer)
@@ -17,12 +16,9 @@ export class LikesResolver {
     variation_id: string,
     @Context('req') request: Request,
   ) {
-    const result = await this.likesService.LikeProduct(
-      variation_id,
-      request['user'].id,
-    );
-
-    return result.id;
+    return (
+      await this.likesService.LikeProduct(variation_id, request['user'].id)
+    ).id;
   }
 
   @RequiresRole(roles.customer)
@@ -31,7 +27,7 @@ export class LikesResolver {
     @Args('like_id', { type: () => String }, ParseUUIDPipe)
     like_id: string,
   ) {
-    return this.likesService.RemoveLike(like_id);
+    return (await this.likesService.RemoveLike(like_id)).result;
   }
 
   @RequiresRole(roles.customer)

@@ -144,15 +144,19 @@ export class ProductsService {
     });
   }
 
-  async GetProductVariationById(id: string) {
-    const filter = { id: id };
-
-    return this.prisma.productVariations.findUnique({
-      include: {
-        images: true,
-      },
-      where: filter,
-    });
+  async GetProductVariationById(id: string, count_only: boolean = false) {
+    if (count_only) {
+      return this.prisma.productVariations.count({
+        where: { id: id },
+      });
+    } else {
+      return this.prisma.productVariations.findUnique({
+        include: {
+          images: true,
+        },
+        where: { id: id },
+      });
+    }
   }
 
   async UpdateProductVariation(
