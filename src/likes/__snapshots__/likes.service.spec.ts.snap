@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`LikesService Behaviour Tests Should error if nonexistent uuid of product variation is passed.: like non existing product variation id 1`] = `"Product Variation not found!"`;
+exports[`LikesService Like a Product Tests Should error if nonexistent uuid of product variation is passed.: like non existing product variation id 1`] = `"Product Variation not found!"`;
 
-exports[`LikesService Behaviour Tests Should error if product variation was already liked by user: user already liked product 1`] = `"Product variation is already liked by the User!"`;
+exports[`LikesService Like a Product Tests Should error if product variation was already liked by user: user already liked product 1`] = `"Product variation is already liked by the User!"`;
+
+exports[`LikesService Remove a Product Like Tests Should error if a like id is invalid: tried to remove non existing like id 1`] = `"Like not found!"`;

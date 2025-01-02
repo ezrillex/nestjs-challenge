@@ -111,4 +111,37 @@ describe('LikesService', () => {
       ).resolves.toBe(mock_creation);
     });
   });
+
+  describe('Remove a Product Like Tests', () => {
+    it('Should error if a like id is invalid', async () => {
+      await expect(
+        service.RemoveLike('2730fc05-6f87-49e5-8a41-559208048ebe'),
+      ).rejects.toThrowErrorMatchingSnapshot(
+        'tried to remove non existing like id',
+      );
+    });
+
+    it('Should return the deleted like if found and deletion successful', async () => {
+      const mock_like_count = 1;
+      jest
+        .spyOn(prismaService.likesOfProducts, 'count')
+        .mockResolvedValue(mock_like_count);
+
+      const mock_delete_result = {
+        id: '2730fc05-6f87-49e5-8a41-559208048ebe',
+        user_id: '2730fc05-6f87-49e5-8a41-559208048ebe',
+        product_variation_id: '2730fc05-6f87-49e5-8a41-559208048ebe',
+      };
+      jest
+        .spyOn(prismaService.likesOfProducts, 'delete')
+        .mockResolvedValue(mock_delete_result);
+
+      await expect(
+        service.RemoveLike('2730fc05-6f87-49e5-8a41-559208048ebe'),
+      ).resolves.toEqual({
+        result: 'Like removed successfully',
+        ...mock_delete_result,
+      });
+    });
+  });
 });
