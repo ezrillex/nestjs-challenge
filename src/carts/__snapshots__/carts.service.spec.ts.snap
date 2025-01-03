@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LikesService Add a Product to cart Tests Should error if nonexistent uuid of product variation is passed.: product variation 404 1`] = `"Product Variation not found!"`;
+
+exports[`LikesService Remove a Product from cart Tests Should error if a cart item id is invalid: tried to remove non existing cart items id 1`] = `"Cart Item not found!"`;
+
+exports[`LikesService Remove a Product from cart Tests Should error if after deletion the object to return is null: delete called to db but deleted obj not returned, something is wrong 1`] = `"Unexpected error when deleting record!"`;

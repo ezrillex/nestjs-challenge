@@ -14,7 +14,6 @@ import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user-dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { DateTime } from 'luxon';
 import { ForgotPasswordDto } from './dto/forgot-password-dto';
 import { ResetPasswordDto } from './dto/reset-password-dto';
 import { Public } from '../common/decorators/public.decorator';
@@ -27,45 +26,9 @@ export class AuthController {
     private jwtService: JwtService,
   ) {}
 
-  /*
-   @description method throws error if timestamps are in 24-hour period.
-   @param timestamps an array of timestamps
-   @param message customize the error message
-   @param status customize the http status code
-   @param throwError disable throwing error
-   @returns a boolean value of true if all timestamps are in last 24 hours
-   */
-  private util_isIn24h(
-    timestamps: Date[],
-    message: string = 'Too many attempts in 24 hour period.',
-    status: HttpStatus = HttpStatus.FORBIDDEN,
-    throwError: boolean = true,
-  ) {
-    // account locked check
-    if (timestamps.length >= 3) {
-      const aDayAgo = DateTime.now().minus({ days: 1 });
-
-      const isIn24h = timestamps.reduce((accumulator, current) => {
-        const value = DateTime.fromISO(current.toISOString());
-        accumulator = accumulator === value >= aDayAgo; // basically an AND of whole array to check if is past 24 hours.
-        return accumulator;
-      }, true);
-
-      if (isIn24h && throwError) {
-        throw new HttpException(message, status);
-      }
-
-      return isIn24h;
-    }
-  }
-
   @Public()
   @Post('signup')
   async signup(@Body() data: SignupUserDto) {
-    if (data.password !== data.repeat_password) {
-      throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
-    }
-
     const created_user = await this.authService.createUser(data);
     console.log('SEND WELCOME EMAIL');
     return {
@@ -80,7 +43,7 @@ export class AuthController {
     const user = await this.authService.findOneByEmail(data.email);
 
     // account locked check
-    this.util_isIn24h(
+    this.authService.util_isIn24h(
       user.failed_login_attempts_timestamps,
       'Too many failed login attempts, account is locked. Try again later.',
     );
@@ -124,7 +87,7 @@ export class AuthController {
     const user = await this.authService.findOneByEmail(data.email);
 
     // too many reset attempts check
-    this.util_isIn24h(
+    this.authService.util_isIn24h(
       user.password_reset_requests_timestamps,
       'Too many password reset requests in a 24 hour period. Try again later.',
     );

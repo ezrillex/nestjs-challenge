@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { roles } from '@prisma/client';
+import { DateTime } from 'luxon';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,38 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
+  /*
+   @description method throws error if timestamps are in 24-hour period.
+   @param timestamps an array of timestamps
+   @param message customize the error message
+   @param status customize the http status code
+   */
+  util_isIn24h(
+    timestamps: Date[],
+    message: string = 'Too many attempts in 24 hour period.',
+    status: HttpStatus = HttpStatus.FORBIDDEN,
+  ) {
+    // account locked check
+    if (timestamps && timestamps.length >= 3) {
+      const aDayAgo = DateTime.now().minus({ days: 1 });
+
+      const isIn24h = timestamps.reduce((accumulator, current) => {
+        const value = DateTime.fromISO(current.toISOString());
+        accumulator = accumulator === value >= aDayAgo; // basically an AND of whole array to check if is past 24 hours.
+        return accumulator;
+      }, true);
+
+      if (isIn24h) {
+        throw new HttpException(message, status);
+      }
+    }
+  }
+
   async createUser(data: SignupUserDto) {
+    if (data.password !== data.repeat_password) {
+      throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
+    }
+
     let role: roles = roles.customer;
     if (this.configService.get<string>('AUTO_ROLE') === 'TRUE') {
       if (data.email.startsWith('admin')) {
@@ -22,15 +54,14 @@ export class AuthService {
       }
     }
 
-    const duplicate = await this.prisma.users.findUnique({
+    const duplicate = await this.prisma.users.count({
       where: { email: data.email },
     });
-    if (duplicate) {
+    if (duplicate > 0) {
       throw new HttpException('Email is already in use', HttpStatus.CONFLICT);
     }
 
     const hashed = await bcrypt.hash(data.password, 10);
-
     return this.prisma.users.create({
       data: {
         first_name: data.first_name,

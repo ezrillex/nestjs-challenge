@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AuthService create user should error if email is already in use: email is already in use 1`] = `"Email is already in use"`;
+
+exports[`AuthService create user should error if password is different: password mismatch 1`] = `"Passwords do not match"`;
+
+exports[`AuthService find one by ID user should error if id was not found: user with ID not found 1`] = `"Couldn't find an account with the associated id ."`;
+
+exports[`AuthService find one by email user should error if email was not found: user with email not found 1`] = `"Couldn't find your account. Make sure this is the right email."`;
+
+exports[`AuthService is in 24 hour period utility Should error if 3 timestamps are in 24 hours: too many in 24 h 1`] = `"Too many attempts in 24 hour period."`;
