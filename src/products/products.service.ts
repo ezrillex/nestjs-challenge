@@ -8,9 +8,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { roles } from '@prisma/client';
 import { CreateProductInput } from './inputs/createProduct.input';
 import { GetProductsInput } from './inputs/get-products.input';
-import { UpdateProductInput } from './inputs/update-product-input';
-import { UpdateProductVariationInput } from './product_variation/update-product-variation-input';
-import { CreateProductVariationInput } from './product_variation/create_product_variation_input';
+import { UpdateProductInput } from './inputs/update-product.input';
+import { UpdateProductVariationInput } from './product_variation/update-product-variation.input';
+import { CreateProductVariationInput } from './product_variation/create_product_variation.input';
 
 @Injectable()
 export class ProductsService {

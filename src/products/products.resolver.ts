@@ -5,11 +5,11 @@ import { CreateProductInput } from './inputs/createProduct.input';
 import { ProductsService } from './products.service';
 import { Products } from './products.model';
 import { GetProductsInput } from './inputs/get-products.input';
-import { UpdateProductInput } from './inputs/update-product-input';
-import { UpdateProductVariationInput } from './product_variation/update-product-variation-input';
+import { UpdateProductInput } from './inputs/update-product.input';
+import { UpdateProductVariationInput } from './product_variation/update-product-variation.input';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { PublicPrivate } from '../common/decorators/public_and_private.decorator';
-import { CreateProductVariationInput } from './product_variation/create_product_variation_input';
+import { CreateProductVariationInput } from './product_variation/create_product_variation.input';
 
 @Resolver()
 export class ProductsResolver {

@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { roles } from '@prisma/client';
-import { CreateImageDto } from './create-image-dto';
+import { CreateImageDto } from './create-image.dto';
 import { ImagesService } from './images.service';
 
 @Controller('images')

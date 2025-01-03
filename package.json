@@ -87,6 +87,15 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/.*\\.module\\.ts$",
+      "<rootDir>/.*\\.controller\\.ts$",
+      "<rootDir>/.*\\.model\\.ts$",
+      "<rootDir>/.*\\.input\\.ts$",
+      "<rootDir>/.*\\.dto\\.ts$",
+      "<rootDir>/main.ts",
+      "<rootDir>/graphql/graphql.ts"
+    ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }
