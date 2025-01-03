@@ -2,7 +2,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { roles } from '@prisma/client';
 import { ParseUUIDPipe } from '@nestjs/common';
-import { LikesOfProducts } from './likes_of_products';
+import { LikesOfProducts } from './likes_of_products.model';
 import { LikesService } from './likes.service';
 
 @Resolver()
