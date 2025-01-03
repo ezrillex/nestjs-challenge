@@ -35,8 +35,9 @@ export class ProductsResolver {
     @Args('id', { type: () => String }, ParseUUIDPipe) id: string,
     @Context('req') request: Request,
   ) {
+    // todo on auth guard we set a value to know what mode we are in...
     let role: roles = roles.public;
-    if (request['user']) {
+    if (request['user'] && request['user'].role) {
       role = request['user'].role;
     }
     return this.productsService.GetProductById(role, id);
@@ -89,8 +90,6 @@ export class ProductsResolver {
     createProductVariationInput: CreateProductVariationInput,
     @Context('req') request: Request,
   ) {
-    // todo check if product exists, or let it fail?
-
     const result = await this.productsService.CreateProductVariation(
       createProductVariationInput,
       request['user'].id,
@@ -114,8 +113,6 @@ export class ProductsResolver {
     product_id: string,
     @Context('req') request: Request,
   ) {
-    // TODO because the db will cascade when we do the actual delete, we need to first delete the images from CDN.
-
     const result = await this.productsService.DeleteProduct(
       product_id,
       request['user'].id,

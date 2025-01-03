@@ -90,6 +90,7 @@
     "coveragePathIgnorePatterns": [
       "<rootDir>/.*\\.module\\.ts$",
       "<rootDir>/.*\\.controller\\.ts$",
+      "<rootDir>/.*\\.resolver\\.ts$",
       "<rootDir>/.*\\.model\\.ts$",
       "<rootDir>/.*\\.input\\.ts$",
       "<rootDir>/.*\\.dto\\.ts$",

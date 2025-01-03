@@ -193,6 +193,7 @@ export class ProductsService {
     data: CreateProductVariationInput,
     userId: string,
   ) {
+    // todo check if product exists, or let it fail?
     return this.prisma.productVariations.create({
       data: {
         product: { connect: { id: data.product_id } },
@@ -241,6 +242,8 @@ export class ProductsService {
   }
 
   async DeleteProduct(product_id: string, user_id: string) {
+    // TODO because the db will cascade when we do the actual delete, we need to first delete the images from CDN.
+
     return this.prisma.products.update({
       where: { id: product_id },
       data: {

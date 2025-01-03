@@ -7,7 +7,6 @@ import { OrdersService } from './orders.service';
 
 @Resolver()
 export class OrdersResolver {
-  // todo refactor this into its separate service?
   constructor(private readonly ordersService: OrdersService) {}
 
   @RequiresRole(roles.customer)
