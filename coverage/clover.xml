@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1736016521170" clover="3.2.0">
-  <project timestamp="1736016521170" name="All files">
-    <metrics statements="395" coveredstatements="199" conditionals="129" coveredconditionals="54" methods="60" coveredmethods="38" elements="584" coveredelements="291" complexity="0" loc="395" ncloc="395" packages="12" files="15" classes="15"/>
+<coverage generated="1736016975621" clover="3.2.0">
+  <project timestamp="1736016975621" name="All files">
+    <metrics statements="395" coveredstatements="200" conditionals="129" coveredconditionals="54" methods="60" coveredmethods="39" elements="584" coveredelements="293" complexity="0" loc="395" ncloc="395" packages="12" files="15" classes="15"/>
     <package name="auth">
       <metrics statements="81" coveredstatements="81" conditionals="23" coveredconditionals="23" methods="14" coveredmethods="14"/>
       <file name="auth.service.ts" path="D:\CODE\nestjs-challenge\src\auth\auth.service.ts">
@@ -396,13 +396,13 @@
       </file>
     </package>
     <package name="prisma">
-      <metrics statements="4" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
       <file name="prisma.service.ts" path="D:\CODE\nestjs-challenge\src\prisma\prisma.service.ts">
-        <metrics statements="4" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <metrics statements="4" coveredstatements="4" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="1" count="7" type="stmt"/>
         <line num="2" count="7" type="stmt"/>
         <line num="5" count="7" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
       </file>
     </package>
     <package name="products">

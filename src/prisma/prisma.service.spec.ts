@@ -24,4 +24,10 @@ describe('PrismaService', () => {
   it('should inherit prisma client', async () => {
     expect(service).toBeInstanceOf(PrismaClient);
   });
+
+  it('connection is called', async () => {
+    const spy = jest.spyOn(service, '$connect');
+    await service.onModuleInit();
+    expect(spy).toHaveBeenCalled();
+  });
 });
