@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1735950009586" clover="3.2.0">
-  <project timestamp="1735950009586" name="All files">
-    <metrics statements="395" coveredstatements="189" conditionals="129" coveredconditionals="54" methods="60" coveredmethods="34" elements="584" coveredelements="277" complexity="0" loc="395" ncloc="395" packages="12" files="15" classes="15"/>
+<coverage generated="1736015789578" clover="3.2.0">
+  <project timestamp="1736015789579" name="All files">
+    <metrics statements="395" coveredstatements="198" conditionals="129" coveredconditionals="54" methods="60" coveredmethods="37" elements="584" coveredelements="289" complexity="0" loc="395" ncloc="395" packages="12" files="15" classes="15"/>
     <package name="auth">
       <metrics statements="81" coveredstatements="81" conditionals="23" coveredconditionals="23" methods="14" coveredmethods="14"/>
       <file name="auth.service.ts" path="D:\CODE\nestjs-challenge\src\auth\auth.service.ts">
@@ -211,24 +211,24 @@
       </file>
     </package>
     <package name="common.decorators">
-      <metrics statements="9" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
+      <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
       <file name="public.decorator.ts" path="D:\CODE\nestjs-challenge\src\common\decorators\public.decorator.ts">
-        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
       </file>
       <file name="public_and_private.decorator.ts" path="D:\CODE\nestjs-challenge\src\common\decorators\public_and_private.decorator.ts">
-        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
       </file>
       <file name="requires-role.decorator.ts" path="D:\CODE\nestjs-challenge\src\common\decorators\requires-role.decorator.ts">
-        <metrics statements="3" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
+        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="19" count="5" type="stmt"/>
       </file>
     </package>
     <package name="common.filters">
