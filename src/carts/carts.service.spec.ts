@@ -116,4 +116,15 @@ describe('Carts Service', () => {
       ).resolves.toEqual('Cart Item deleted successfully.');
     });
   });
+
+  describe('Get Cart Items', () => {
+    it('Should perform a well formed request to prisma', async () => {
+      const spy = jest
+        .spyOn(prismaService.cartItems, 'findMany')
+        .mockResolvedValue(null);
+
+      await service.GetCartItems('2730fc05-6f87-49e5-8a41-559208048ebe');
+      expect(spy.mock.calls).toMatchSnapshot('expected query get cart items');
+    });
+  });
 });
