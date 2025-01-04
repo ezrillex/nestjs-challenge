@@ -1,0 +1,84 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Stripe Service webhook should error if empty body: missing body in request error 1`] = `"Missing Body"`;
+
+exports[`Stripe Service webhook should form an update request to prisma with failed and return received true for stripe: update status payment_failed order 1`] = `
+[
+  [
+    {
+      "data": {
+        "IncomingPaymentWebhooks": {
+          "create": {
+            "data": "{"signature":"some-value","body":{"random":"value"}}",
+            "processed_at": "2021-01-01T16:10:59.000Z",
+          },
+        },
+        "PaymentIntents": {
+          "update": {
+            "data": {
+              "status": undefined,
+            },
+            "where": {
+              "id": "test_payment_id",
+            },
+          },
+        },
+        "paymentStatus": undefined,
+      },
+      "where": {
+        "id": "test_id",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service webhook should form an update request to prisma with success and return received true for stripe: update status ok order 1`] = `
+[
+  [
+    {
+      "data": {
+        "IncomingPaymentWebhooks": {
+          "create": {
+            "data": "{"signature":"some-value","body":{"random":"value"}}",
+            "processed_at": "2021-01-01T16:10:59.000Z",
+          },
+        },
+        "PaymentIntents": {
+          "update": {
+            "data": {
+              "status": "succeeded",
+            },
+            "where": {
+              "id": "test_payment_id",
+            },
+          },
+        },
+        "paymentStatus": "succeeded",
+      },
+      "where": {
+        "id": "test_id",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service webhook should get data from stripe and try to form a request to prisma and throws if prisma returns nothing: prisma find payment query 1`] = `
+[
+  [
+    {
+      "where": {
+        "PaymentIntents": {
+          "some": {
+            "id": "test_payment_id",
+          },
+        },
+        "id": "test_id",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service webhook should throw if no headers for signature: missing signature in header error 1`] = `"Missing Stripe Signature"`;

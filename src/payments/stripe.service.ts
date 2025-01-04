@@ -23,17 +23,25 @@ export class StripeService {
     });
   }
 
-  async webhook(
-    signature: string,
-    body: ReadableStream<Uint8Array<ArrayBufferLike>>,
-    req: string | Buffer<ArrayBufferLike>,
-  ) {
+  async webhook(req: Request, raw: Buffer) {
     console.log('webhook');
+
+    const sig = req.headers['stripe-signature'];
+
+    if (!sig) {
+      throw new BadRequestException('Missing Stripe Signature');
+    }
+
+    const body = req.body;
+    if (!body) {
+      throw new BadRequestException('Missing Body');
+    }
+
     let event: Stripe.Event;
     try {
       event = this.stripe.webhooks.constructEvent(
-        req,
-        signature,
+        raw,
+        sig,
         this.configService.get<string>('STRIPE_WEBHOOK_SIGNING_SECRET'),
       );
     } catch (err) {
@@ -44,7 +52,7 @@ export class StripeService {
     const order_id = payment_intent.metadata['order_id'];
     const payment_id = payment_intent.metadata['payment_id'];
 
-    const record = await this.prisma.orders.findUnique({
+    const record = await this.prisma.orders.count({
       where: {
         id: order_id,
         PaymentIntents: {
@@ -53,7 +61,7 @@ export class StripeService {
       },
     });
 
-    if (!record) {
+    if (record === 0) {
       throw new InternalServerErrorException('Specified order does not exist');
     }
 
@@ -77,7 +85,7 @@ export class StripeService {
         IncomingPaymentWebhooks: {
           create: {
             processed_at: new Date().toISOString(),
-            data: JSON.stringify({ signature, body }),
+            data: JSON.stringify({ signature: sig, body }),
           },
         },
         PaymentIntents: {
@@ -97,6 +105,9 @@ export class StripeService {
   }
 
   async createPaymentIntent(amount: number, order_id: string, user_id: string) {
+    if (amount <= 0) {
+      throw new BadRequestException('Amount cant be negative or zero!');
+    }
     // the frontend can create many intents? my understanding is it will auto clean up on stripe side if no actions
     // meaning they need to go further with the one they specify
     // this scenario is user starts checkout but doesn't finish, so it's not fictional
