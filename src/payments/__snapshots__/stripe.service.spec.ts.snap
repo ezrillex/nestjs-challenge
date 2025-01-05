@@ -1,5 +1,73 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Stripe Service create payment intent should pass request to prisma intents table: query to create intent ok 1`] = `
+[
+  [
+    {
+      "data": {
+        "order": {
+          "connect": {
+            "id": "8b3ae683-0626-44be-b591-9271e288388f",
+          },
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service create payment intent should pass request to stripe service: query to create intent stripe 1`] = `
+[
+  [
+    {
+      "amount": 30,
+      "automatic_payment_methods": {
+        "allow_redirects": "never",
+        "enabled": true,
+      },
+      "currency": "usd",
+      "metadata": {
+        "order_id": "8b3ae683-0626-44be-b591-9271e288388f",
+        "payment_id": "some id",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service create payment intent should throw if amount is not positive: error amount is negative 1`] = `[BadRequestException: Amount cant be negative or zero!]`;
+
+exports[`Stripe Service create payment intent should throw if amount is zero: error amount is zero 1`] = `[BadRequestException: Amount cant be negative or zero!]`;
+
+exports[`Stripe Service create payment intent should throw if order is not found: error order not found 1`] = `[NotFoundException: Order specified not found. Or order does not belong to the logged in user!]`;
+
+exports[`Stripe Service create payment intent should update prisma with response of service and return key data: query to create intent stripe 1`] = `
+[
+  [
+    {
+      "amount": 30,
+      "automatic_payment_methods": {
+        "allow_redirects": "never",
+        "enabled": true,
+      },
+      "currency": "usd",
+      "metadata": {
+        "order_id": "8b3ae683-0626-44be-b591-9271e288388f",
+        "payment_id": "some id",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service create payment intent should update prisma with response of service and return key data: returns ok 1`] = `
+{
+  "client_secret": "test client secret",
+  "payment_id": "updated intent prisma id",
+  "payment_intent_id": "payment intent id",
+}
+`;
+
 exports[`Stripe Service debug method, update payment intent passes a query to update to prisma: sends the update payment method to stripe in query 1`] = `
 [
   [

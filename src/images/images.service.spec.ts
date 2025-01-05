@@ -91,10 +91,40 @@ describe('ImagesService', () => {
         'CDN didnt provide the required id',
       );
     });
+
+    it('should query prisma for creation. ', async () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date(2020, 12, 12, 12, 12));
+      const mock_cdn_response = {
+        public_id: '8b3ae683-0626-44be-b591-9271e288388f',
+        secure_url: 'https://www.cloudinary.com/',
+      } as UploadApiResponse;
+      jest
+        .spyOn(cloudinary.uploader, 'upload')
+        .mockResolvedValue(mock_cdn_response);
+
+      jest
+        .spyOn(productService, 'GetProductVariationById')
+        .mockResolvedValue(1);
+
+      const spy = jest
+        .spyOn(prismaService.images, 'create')
+        .mockResolvedValue(null);
+
+      await expect(
+        service.uploadImage(
+          'the_base_64',
+          'image/jpeg',
+          '2730fc05-6f87-49e5-8a41-559208048ebe',
+        ),
+      ).resolves.not.toThrow();
+      expect(spy.mock.calls).toMatchSnapshot('query all ok');
+    });
   });
 
   describe('delete image method', () => {
     it('should error if invalid image id', async () => {
+      jest.spyOn(prismaService.images, 'findUnique').mockReset();
       await expect(
         service.deleteImageById('2730fc05-6f87-49e5-8a41-559208048ebe'),
       ).rejects.toThrowErrorMatchingSnapshot('image not found');
@@ -122,6 +152,35 @@ describe('ImagesService', () => {
       await expect(
         service.deleteImageById('2730fc05-6f87-49e5-8a41-559208048ebe'),
       ).rejects.toThrowErrorMatchingSnapshot('CDN result was not successful');
+    });
+
+    it('if image creation is ok, should return deleted images like pop', async () => {
+      const mock_cdn_response = {
+        result: 'ok',
+      };
+      jest
+        .spyOn(cloudinary.uploader, 'destroy')
+        .mockResolvedValue(mock_cdn_response);
+
+      const mock_record = {
+        id: 'string',
+        cdn_id: 'string',
+        url: 'string',
+        created_at: new Date(),
+        product_variation_id: null,
+      };
+      jest
+        .spyOn(prismaService.images, 'findUnique')
+        .mockResolvedValue(mock_record);
+
+      const spy = jest
+        .spyOn(prismaService.images, 'delete')
+        .mockResolvedValue(null);
+
+      await expect(
+        service.deleteImageById('2730fc05-6f87-49e5-8a41-559208048ebe'),
+      ).resolves.toEqual(null);
+      expect(spy.mock.calls).toMatchSnapshot('request sent to prisma');
     });
   });
 });

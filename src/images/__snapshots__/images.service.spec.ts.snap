@@ -1,5 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ImagesService delete image method if image creation is ok, should return deleted images like pop: request sent to prisma 1`] = `
+[
+  [
+    {
+      "where": {
+        "id": "string",
+      },
+    },
+  ],
+]
+`;
+
 exports[`ImagesService delete image method should error if cdn failed and response was not successful : CDN result was not successful 1`] = `"An error occurred when deleting the image."`;
 
 exports[`ImagesService delete image method should error if invalid image id: image not found 1`] = `"Image not found"`;
@@ -11,3 +23,26 @@ exports[`ImagesService upload image method should error if cdn didnt provide a p
 exports[`ImagesService upload image method should error if invalid product id: product variation not found 1`] = `"Product Variation not found"`;
 
 exports[`ImagesService upload image method should error if not image mime type: image must be valid mime type 1`] = `"Image must have a valid image mime type"`;
+
+exports[`ImagesService upload image method should query prisma for creation. : query all ok 1`] = `
+[
+  [
+    {
+      "data": {
+        "cdn_id": "8b3ae683-0626-44be-b591-9271e288388f",
+        "created_at": "2021-01-12T18:12:00.000Z",
+        "product_variation": {
+          "connect": {
+            "id": "2730fc05-6f87-49e5-8a41-559208048ebe",
+          },
+        },
+        "url": "https://www.cloudinary.com/",
+      },
+      "select": {
+        "id": true,
+        "url": true,
+      },
+    },
+  ],
+]
+`;

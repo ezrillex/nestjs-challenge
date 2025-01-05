@@ -54,7 +54,6 @@ export class LikesService {
     };
   }
 
-  // TODO add test
   async GetLikes(user_id: string) {
     // TODO A resolve field can take care of a lot of this include stuff
     return this.prisma.likesOfProducts.findMany({

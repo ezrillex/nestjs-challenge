@@ -144,4 +144,15 @@ describe('LikesService', () => {
       });
     });
   });
+
+  describe('get likes', () => {
+    it('should pass a query to prisma', async () => {
+      const spy = jest.spyOn(prismaService.likesOfProducts, 'findMany');
+
+      await expect(
+        service.GetLikes('8b3ae683-0626-44be-b591-9271e288388f'),
+      ).resolves.toEqual([]);
+      expect(spy.mock.calls).toMatchSnapshot('prisma query get likes');
+    });
+  });
 });

@@ -8,7 +8,6 @@ import {
   Orders,
   Prisma,
 } from '@prisma/client';
-import { DefaultArgs } from '@prisma/client/runtime/library';
 
 describe('Orders Service', () => {
   let service: OrdersService;
@@ -49,7 +48,9 @@ describe('Orders Service', () => {
           return null;
         });
 
-      await service.GetOrders('the_user_id', roles.customer, 'client_id');
+      await expect(
+        service.GetOrders('the_user_id', roles.customer),
+      ).resolves.not.toThrow();
 
       expect(data).toMatchSnapshot('role customer result');
     });
@@ -66,6 +67,16 @@ describe('Orders Service', () => {
       await service.GetOrders('the_user_id', roles.manager, 'client_id');
 
       expect(data).toMatchSnapshot('role manager result');
+    });
+
+    it('should throw if the client id is null and  if role manager', async () => {
+      jest.spyOn(prismaService.orders, 'findMany').mockImplementation(() => {
+        return null;
+      });
+
+      await expect(
+        service.GetOrders('the_user_id', roles.manager),
+      ).rejects.toThrowErrorMatchingSnapshot('client id is null');
     });
   });
 

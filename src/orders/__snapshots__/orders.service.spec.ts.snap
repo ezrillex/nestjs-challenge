@@ -103,3 +103,5 @@ exports[`Orders Service Get Orders should query the user id if role customer: ro
   },
 }
 `;
+
+exports[`Orders Service Get Orders should throw if the client id is null and  if role manager: client id is null 1`] = `"No client id for manager specific request!"`;

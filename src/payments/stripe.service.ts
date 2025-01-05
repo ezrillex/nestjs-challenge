@@ -24,8 +24,6 @@ export class StripeService {
   }
 
   async webhook(req: Request, raw: Buffer) {
-    console.log('webhook');
-
     const sig = req.headers['stripe-signature'];
 
     if (!sig) {
@@ -108,16 +106,11 @@ export class StripeService {
     if (amount <= 0) {
       throw new BadRequestException('Amount cant be negative or zero!');
     }
-    // the frontend can create many intents? my understanding is it will auto clean up on stripe side if no actions
-    // meaning they need to go further with the one they specify
-    // this scenario is user starts checkout but doesn't finish, so it's not fictional
-    // as per stripe docs is better to start with a fresh one.
-
-    // todo check if order is already paid?
-    const record = await this.prisma.orders.findUnique({
+    // todo should I check if order is already paid?
+    const record = await this.prisma.orders.count({
       where: { id: order_id, user_id: user_id },
     });
-    if (!record) {
+    if (record === 0) {
       throw new NotFoundException(
         'Order specified not found. Or order does not belong to the logged in user!',
       );
@@ -143,7 +136,6 @@ export class StripeService {
         },
       });
     } catch (err) {
-      console.log(err);
       throw new InternalServerErrorException(err.message);
     }
 
@@ -156,7 +148,6 @@ export class StripeService {
       },
     });
 
-    console.log(paymentIntent);
     return {
       payment_intent_id: paymentIntent.id,
       client_secret: paymentIntent.client_secret,

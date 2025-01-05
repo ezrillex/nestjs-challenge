@@ -51,6 +51,123 @@ describe('Stripe Service', () => {
     );
   });
 
+  describe('create payment intent', () => {
+    it('should throw if amount is not positive', async () => {
+      await expect(
+        service.createPaymentIntent(
+          -1,
+          '8b3ae683-0626-44be-b591-9271e288388f',
+          '8b3ae683-0626-44be-b591-9271e288388f',
+        ),
+      ).rejects.toMatchSnapshot('error amount is negative');
+    });
+    it('should throw if amount is zero', async () => {
+      await expect(
+        service.createPaymentIntent(
+          0,
+          '8b3ae683-0626-44be-b591-9271e288388f',
+          '8b3ae683-0626-44be-b591-9271e288388f',
+        ),
+      ).rejects.toMatchSnapshot('error amount is zero');
+    });
+
+    it('should throw if order is not found', async () => {
+      await expect(
+        service.createPaymentIntent(
+          30,
+          '8b3ae683-0626-44be-b591-9271e288388f',
+          '8b3ae683-0626-44be-b591-9271e288388f',
+        ),
+      ).rejects.toMatchSnapshot('error order not found');
+    });
+
+    it('should pass request to prisma intents table', async () => {
+      const mockEventFunction = jest.fn(() => {
+        throw new Error('mock');
+      });
+      stripeMock.prototype.paymentIntents = {
+        create: mockEventFunction,
+      } as unknown as Stripe.PaymentIntentsResource;
+
+      jest.spyOn(prismaService.orders, 'count').mockResolvedValue(1);
+
+      const spy = jest
+        .spyOn(prismaService.paymentIntents, 'create')
+        .mockResolvedValue({} as PaymentIntents);
+
+      await expect(
+        service.createPaymentIntent(
+          30,
+          '8b3ae683-0626-44be-b591-9271e288388f',
+          '8b3ae683-0626-44be-b591-9271e288388f',
+        ),
+      ).rejects.toThrow('mock');
+
+      expect(spy.mock.calls).toMatchSnapshot('query to create intent ok');
+    });
+
+    it('should pass request to stripe service', async () => {
+      const mockEventFunction = jest.fn(() => {
+        throw new Error('mock');
+      });
+      stripeMock.prototype.paymentIntents = {
+        create: mockEventFunction,
+      } as unknown as Stripe.PaymentIntentsResource;
+
+      jest.spyOn(prismaService.orders, 'count').mockResolvedValue(1);
+
+      jest
+        .spyOn(prismaService.paymentIntents, 'create')
+        .mockResolvedValue({ id: 'some id' } as PaymentIntents);
+
+      await expect(
+        service.createPaymentIntent(
+          30,
+          '8b3ae683-0626-44be-b591-9271e288388f',
+          '8b3ae683-0626-44be-b591-9271e288388f',
+        ),
+      ).rejects.toThrow('mock');
+
+      expect(mockEventFunction.mock.calls).toMatchSnapshot(
+        'query to create intent stripe',
+      );
+    });
+
+    it('should update prisma with response of service and return key data', async () => {
+      const mockEventFunction = jest.fn(() => {
+        return {
+          id: 'payment intent id',
+          client_secret: 'test client secret',
+        };
+      });
+      stripeMock.prototype.paymentIntents = {
+        create: mockEventFunction,
+      } as unknown as Stripe.PaymentIntentsResource;
+
+      jest.spyOn(prismaService.orders, 'count').mockResolvedValue(1);
+
+      jest
+        .spyOn(prismaService.paymentIntents, 'create')
+        .mockResolvedValue({ id: 'some id' } as PaymentIntents);
+
+      jest.spyOn(prismaService.paymentIntents, 'update').mockResolvedValue({
+        id: 'updated intent prisma id',
+      } as PaymentIntents);
+
+      await expect(
+        service.createPaymentIntent(
+          30,
+          '8b3ae683-0626-44be-b591-9271e288388f',
+          '8b3ae683-0626-44be-b591-9271e288388f',
+        ),
+      ).resolves.toMatchSnapshot('returns ok');
+
+      expect(mockEventFunction.mock.calls).toMatchSnapshot(
+        'query to create intent stripe',
+      );
+    });
+  });
+
   describe('webhook', () => {
     it('should throw if no headers for signature', async () => {
       await expect(
