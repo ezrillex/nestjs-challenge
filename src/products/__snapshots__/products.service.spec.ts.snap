@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LikesService create product passes data to prisma query correctly: create product query 1`] = `
+[
+  [
+    {
+      "data": {
+        "categories": {
+          "connect": [
+            {
+              "id": "076b5b00-c719-40c3-a8f2-d1a11c17b75c",
+            },
+          ],
+        },
+        "created_at": "2021-01-12T18:12:00.000Z",
+        "created_by": "076b5b00-c719-40c3-a8f2-d1a11c17b75c",
+        "description": "test description",
+        "name": "test name",
+        "variations": {
+          "createMany": {
+            "data": [
+              {
+                "price": 321.11,
+                "stock": 123,
+                "title": "test var 1",
+              },
+              {
+                "price": 321.22,
+                "stock": 321,
+                "title": "test var 2",
+              },
+            ],
+          },
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`LikesService update product passes values to the update query: prisma query products update 1`] = `
+[
+  [
+    {
+      "data": {
+        "categories": {
+          "set": [
+            {
+              "id": "test category id",
+            },
+          ],
+        },
+        "description": "test description",
+        "last_updated_at": "2021-01-12T18:12:00.000Z",
+        "last_updated_by": "076b5b00-c719-40c3-a8f2-d1a11c17b75c",
+        "name": "test name",
+      },
+      "where": {
+        "id": "076b5b00-c719-40c3-a8f2-d1a11c17b75c",
+      },
+    },
+  ],
+]
+`;
+
+exports[`LikesService update product throws if no values to update are provided: not found error product 1`] = `"At least one property is required for update!"`;
+
+exports[`LikesService update product throws if no values to update are provided: one is required to update 1`] = `"At least one property is required for update!"`;
+
+exports[`LikesService update product throws if product is not found: not found error product 1`] = `"Product not found."`;

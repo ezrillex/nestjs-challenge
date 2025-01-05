@@ -37,6 +37,14 @@ export class ProductsService {
 
   async UpdateProduct(data: UpdateProductInput, userId: string) {
     // todo you could in theory update a deleted product if you have the uuid...
+    const countProducts = await this.prisma.products.count({
+      where: { id: data.id },
+    });
+    if (countProducts === 0) {
+      throw new NotFoundException('Product not found.');
+    }
+
+    // assume user id is correct due to guard. no checks.
 
     if (
       !(data.name || data.description || data.categories || data.is_published)
