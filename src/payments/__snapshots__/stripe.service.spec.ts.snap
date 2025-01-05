@@ -1,5 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Stripe Service debug method, update payment intent passes a query to update to prisma: sends the update payment method to stripe in query 1`] = `
+[
+  [
+    "test_id",
+    {
+      "payment_method": "new payment method",
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service debug method, update payment intent throws if cant find the payment intent: intent not found error 1`] = `"Payment intent specified not found."`;
+
+exports[`Stripe Service debug method, update payment intent throws if status is already completed: intent already completed error 1`] = `"Payment has already succeeded, no further changes are allowed."`;
+
+exports[`Stripe Service get order payments if valid queries for a list with all the payment intents associated: query of payments with select fields 1`] = `
+[
+  [
+    {
+      "select": {
+        "created_at": true,
+        "id": true,
+        "order_id": true,
+        "status": true,
+        "stripe_event_id": true,
+      },
+      "where": {
+        "order_id": "076b5b00-c719-40c3-a8f2-d1a11c17b75c",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service get order payments throws if cant find order with user: order user combo not found 1`] = `"Order specified not found. Or order does not belong to the logged in user!"`;
+
 exports[`Stripe Service webhook should error if empty body: missing body in request error 1`] = `"Missing Body"`;
 
 exports[`Stripe Service webhook should form an update request to prisma with failed and return received true for stripe: update status payment_failed order 1`] = `

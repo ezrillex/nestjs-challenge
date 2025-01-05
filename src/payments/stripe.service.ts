@@ -166,10 +166,10 @@ export class StripeService {
 
   async getOrderPayments(order_id: string, user_id: string) {
     // checks if order exists and because filter of user checks if is of user.
-    const record = await this.prisma.orders.findUnique({
+    const record = await this.prisma.orders.count({
       where: { id: order_id, user_id: user_id },
     });
-    if (!record) {
+    if (record === 0) {
       throw new NotFoundException(
         'Order specified not found. Or order does not belong to the logged in user!',
       );

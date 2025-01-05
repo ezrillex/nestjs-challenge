@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { StripeService } from './stripe.service';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
+import { PaymentIntents } from '@prisma/client';
 
 jest.mock('stripe');
 
@@ -250,6 +251,78 @@ describe('Stripe Service', () => {
 
       expect(spy.mock.calls).toMatchSnapshot(
         'update status payment_failed order',
+      );
+    });
+  });
+
+  describe('debug method, update payment intent', () => {
+    it('throws if cant find the payment intent', async () => {
+      jest
+        .spyOn(prismaService.paymentIntents, 'findUnique')
+        .mockResolvedValue(null);
+
+      await expect(
+        service.updatePaymentIntent('payment id', 'new payment method'),
+      ).rejects.toThrowErrorMatchingSnapshot('intent not found error');
+    });
+
+    it('throws if status is already completed', async () => {
+      jest.spyOn(prismaService.paymentIntents, 'findUnique').mockResolvedValue({
+        status: 'succeeded',
+      } as PaymentIntents);
+
+      await expect(
+        service.updatePaymentIntent('payment id', 'new payment method'),
+      ).rejects.toThrowErrorMatchingSnapshot('intent already completed error');
+    });
+
+    it('passes a query to update to prisma', async () => {
+      jest.spyOn(prismaService.paymentIntents, 'findUnique').mockResolvedValue({
+        stripe_event_id: 'test_id',
+        status: 'requires_payment_method',
+      } as PaymentIntents);
+
+      const mockUpdateFunction = jest.fn();
+      stripeMock.prototype.paymentIntents = {
+        update: mockUpdateFunction,
+      } as unknown as Stripe.PaymentIntentsResource;
+
+      await expect(
+        service.updatePaymentIntent('payment id', 'new payment method'),
+      ).resolves.not.toThrow();
+
+      expect(mockUpdateFunction.mock.calls).toMatchSnapshot(
+        'sends the update payment method to stripe in query',
+      );
+    });
+  });
+
+  describe('get order payments', () => {
+    it('throws if cant find order with user', async () => {
+      await expect(
+        service.getOrderPayments(
+          '076b5b00-c719-40c3-a8f2-d1a11c17b75c',
+          '076b5b00-c719-40c3-a8f2-d1a11c17b75c',
+        ),
+      ).rejects.toThrowErrorMatchingSnapshot('order user combo not found');
+    });
+
+    it('if valid queries for a list with all the payment intents associated', async () => {
+      jest.spyOn(prismaService.orders, 'count').mockResolvedValue(1);
+
+      const spy = jest
+        .spyOn(prismaService.paymentIntents, 'findMany')
+        .mockResolvedValue(null);
+
+      await expect(
+        service.getOrderPayments(
+          '076b5b00-c719-40c3-a8f2-d1a11c17b75c',
+          '076b5b00-c719-40c3-a8f2-d1a11c17b75c',
+        ),
+      ).resolves.not.toThrow();
+
+      expect(spy.mock.calls).toMatchSnapshot(
+        'query of payments with select fields',
       );
     });
   });
