@@ -84,11 +84,11 @@ export class ProductsService {
     const filter = {};
     const pagination = { skip: 0, take: 10 };
 
-    if (params.first) {
+    if (params.first && params.first > 0) {
       pagination.take = params.first;
     }
 
-    if (params.offset) {
+    if (params.offset && params.offset > 0) {
       pagination.skip = params.offset;
     }
 
@@ -141,7 +141,7 @@ export class ProductsService {
       filter['is_deleted'] = false;
     }
 
-    return this.prisma.products.findUnique({
+    const result = await this.prisma.products.findUnique({
       include: {
         variations: {
           include: { images: true },
@@ -150,6 +150,10 @@ export class ProductsService {
       },
       where: filter,
     });
+    if (!result) {
+      throw new NotFoundException('Product not found.');
+    }
+    return result;
   }
 
   async GetProductVariationById(id: string, count_only: boolean = false) {
@@ -158,12 +162,18 @@ export class ProductsService {
         where: { id: id },
       });
     } else {
-      return this.prisma.productVariations.findUnique({
+      const result = this.prisma.productVariations.findUnique({
         include: {
           images: true,
         },
         where: { id: id },
       });
+
+      if (!result) {
+        throw new NotFoundException('Product Variation not found.');
+      } else {
+        return result;
+      }
     }
   }
 

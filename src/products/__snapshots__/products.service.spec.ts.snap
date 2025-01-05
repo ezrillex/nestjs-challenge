@@ -1,6 +1,212 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`LikesService create product passes data to prisma query correctly: create product query 1`] = `
+exports[`Products Service Get one product by id passes data to prisma query role customer.: query omits unpublished 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "where": {
+        "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+        "is_deleted": false,
+        "is_published": true,
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get one product by id passes data to prisma query role manager.: query includes unpublished 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "where": {
+        "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+        "is_deleted": false,
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get one product by id returns if all ok: all ok get one prod by id 1`] = `
+{
+  "id": "testing",
+}
+`;
+
+exports[`Products Service Get one product by id throws if not found: not found error 1`] = `"Product not found."`;
+
+exports[`Products Service Get product variation by id passes a query to prisma find fn: query find prod var 1`] = `
+[
+  [
+    {
+      "include": {
+        "images": true,
+      },
+      "where": {
+        "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get products passes data to prisma query including category query.: query category included 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "skip": 0,
+      "take": 10,
+      "where": {
+        "categories": {
+          "some": {
+            "id": {
+              "in": [
+                "id 1",
+                "id 2",
+              ],
+            },
+          },
+        },
+        "is_deleted": false,
+        "name": {
+          "contains": "test search",
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get products passes data to prisma query including custom pagination query.: query paginatin custom included 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "skip": 20,
+      "take": 10,
+      "where": {
+        "categories": {
+          "some": {
+            "id": {
+              "in": [
+                "id 1",
+                "id 2",
+              ],
+            },
+          },
+        },
+        "is_deleted": false,
+        "name": {
+          "contains": "test search",
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get products passes data to prisma query including search query.: query search included 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "skip": 0,
+      "take": 10,
+      "where": {
+        "is_deleted": false,
+        "name": {
+          "contains": "test search",
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get products passes data to prisma query including unpublished if manager.: query manager unpublished included 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "skip": 0,
+      "take": 10,
+      "where": {
+        "is_deleted": false,
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get products passes data to prisma query with defaults.: minimal parameters, default pagination query 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "skip": 0,
+      "take": 10,
+      "where": {
+        "is_deleted": false,
+        "is_published": true,
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service create product passes data to prisma query correctly: create product query 1`] = `
 [
   [
     {
@@ -38,7 +244,7 @@ exports[`LikesService create product passes data to prisma query correctly: crea
 ]
 `;
 
-exports[`LikesService update product passes values to the update query: prisma query products update 1`] = `
+exports[`Products Service update product passes values to the update query: prisma query products update 1`] = `
 [
   [
     {
@@ -51,6 +257,7 @@ exports[`LikesService update product passes values to the update query: prisma q
           ],
         },
         "description": "test description",
+        "is_published": true,
         "last_updated_at": "2021-01-12T18:12:00.000Z",
         "last_updated_by": "076b5b00-c719-40c3-a8f2-d1a11c17b75c",
         "name": "test name",
@@ -63,8 +270,6 @@ exports[`LikesService update product passes values to the update query: prisma q
 ]
 `;
 
-exports[`LikesService update product throws if no values to update are provided: not found error product 1`] = `"At least one property is required for update!"`;
+exports[`Products Service update product throws if no values to update are provided: one is required to update 1`] = `"At least one property is required for update!"`;
 
-exports[`LikesService update product throws if no values to update are provided: one is required to update 1`] = `"At least one property is required for update!"`;
-
-exports[`LikesService update product throws if product is not found: not found error product 1`] = `"Product not found."`;
+exports[`Products Service update product throws if product is not found: not found error product 1`] = `"Product not found."`;

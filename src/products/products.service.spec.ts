@@ -2,8 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProductsService } from './products.service';
 import { UpdateProductInput } from './inputs/update-product.input';
+import { Products, ProductVariations, roles } from '@prisma/client';
 
-describe('LikesService', () => {
+describe('Products Service', () => {
   let service: ProductsService;
   let prismaService: PrismaService;
 
@@ -115,7 +116,7 @@ describe('LikesService', () => {
           {
             id: '076b5b00-c719-40c3-a8f2-d1a11c17b75c',
             name: 'test name',
-            is_published: false,
+            is_published: true,
             description: 'test description',
             categories: ['test category id'],
           },
@@ -124,6 +125,185 @@ describe('LikesService', () => {
       ).resolves.not.toThrow();
 
       expect(spy.mock.calls).toMatchSnapshot('prisma query products update');
+    });
+  });
+
+  describe('Get products', () => {
+    it('passes data to prisma query with defaults.', async () => {
+      const spy = jest
+        .spyOn(prismaService.products, 'findMany')
+        .mockResolvedValue(null);
+
+      await service.GetProducts(roles.customer, {
+        categoryFilter: [],
+        search: '',
+        first: 0,
+        likedOnly: false,
+        offset: 0,
+        sort: '',
+        omitImages: false,
+      });
+
+      expect(spy.mock.calls).toMatchSnapshot(
+        'minimal parameters, default pagination query',
+      );
+    });
+
+    it('passes data to prisma query including unpublished if manager.', async () => {
+      const spy = jest
+        .spyOn(prismaService.products, 'findMany')
+        .mockResolvedValue(null);
+
+      await service.GetProducts(roles.manager, {
+        categoryFilter: [],
+        search: '',
+        first: 0,
+        likedOnly: false,
+        offset: 0,
+        sort: '',
+        omitImages: false,
+      });
+
+      expect(spy.mock.calls).toMatchSnapshot(
+        'query manager unpublished included',
+      );
+    });
+
+    it('passes data to prisma query including search query.', async () => {
+      const spy = jest
+        .spyOn(prismaService.products, 'findMany')
+        .mockResolvedValue(null);
+
+      await service.GetProducts(roles.manager, {
+        categoryFilter: [],
+        search: 'test search',
+        first: 0,
+        likedOnly: false,
+        offset: 0,
+        sort: '',
+        omitImages: false,
+      });
+
+      expect(spy.mock.calls).toMatchSnapshot('query search included');
+    });
+
+    it('passes data to prisma query including category query.', async () => {
+      const spy = jest
+        .spyOn(prismaService.products, 'findMany')
+        .mockResolvedValue(null);
+
+      await service.GetProducts(roles.manager, {
+        categoryFilter: ['id 1', 'id 2'],
+        search: 'test search',
+        first: 0,
+        likedOnly: false,
+        offset: 0,
+        sort: '',
+        omitImages: false,
+      });
+
+      expect(spy.mock.calls).toMatchSnapshot('query category included');
+    });
+
+    it('passes data to prisma query including custom pagination query.', async () => {
+      const spy = jest
+        .spyOn(prismaService.products, 'findMany')
+        .mockResolvedValue(null);
+
+      await service.GetProducts(roles.manager, {
+        categoryFilter: ['id 1', 'id 2'],
+        search: 'test search',
+        first: 10,
+        likedOnly: false,
+        offset: 20,
+        sort: '',
+        omitImages: false,
+      });
+
+      expect(spy.mock.calls).toMatchSnapshot('query paginatin custom included');
+    });
+  });
+
+  describe('Get one product by id', () => {
+    it('passes data to prisma query role manager.', async () => {
+      const spy = jest
+        .spyOn(prismaService.products, 'findUnique')
+        .mockResolvedValue(null);
+
+      await expect(
+        service.GetProductById(
+          roles.manager,
+          '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+        ),
+      ).rejects.toThrow();
+
+      expect(spy.mock.calls).toMatchSnapshot('query includes unpublished');
+    });
+
+    it('passes data to prisma query role customer.', async () => {
+      const spy = jest
+        .spyOn(prismaService.products, 'findUnique')
+        .mockResolvedValue(null);
+
+      await expect(
+        service.GetProductById(
+          roles.customer,
+          '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+        ),
+      ).rejects.toThrow();
+
+      expect(spy.mock.calls).toMatchSnapshot('query omits unpublished');
+    });
+
+    it('throws if not found', async () => {
+      jest.spyOn(prismaService.products, 'findUnique').mockReset();
+      await expect(
+        service.GetProductById(
+          roles.manager,
+          '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+        ),
+      ).rejects.toThrowErrorMatchingSnapshot('not found error');
+    });
+
+    it('returns if all ok', async () => {
+      jest
+        .spyOn(prismaService.products, 'findUnique')
+        .mockResolvedValue({ id: 'testing' } as Products);
+
+      await expect(
+        service.GetProductById(roles.customer, 'test id'),
+      ).resolves.toMatchSnapshot('all ok get one prod by id');
+    });
+  });
+
+  describe('Get product variation by id', () => {
+    it('count 0 if not found and count mode on', async () => {
+      await expect(
+        service.GetProductVariationById(
+          '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+          true,
+        ),
+      ).resolves.toEqual(0);
+    });
+
+    it('throws if not found and count mode off', async () => {
+      jest.spyOn(prismaService.productVariations, 'findUnique').mockReset();
+
+      await expect(
+        service.GetProductVariationById('5c0532dc-2174-46f5-b97e-b4b297e9e699'),
+      ).rejects.toThrow();
+    });
+
+    it('passes a query to prisma find fn', async () => {
+      const spy = jest
+        .spyOn(prismaService.productVariations, 'findUnique')
+        .mockResolvedValue({ id: 'testing' } as ProductVariations);
+
+      await service.GetProductVariationById(
+        '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+      );
+
+      expect(spy.mock.calls).toMatchSnapshot('query find prod var');
     });
   });
 });
