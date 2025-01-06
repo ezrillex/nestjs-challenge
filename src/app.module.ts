@@ -30,6 +30,7 @@ import { EmailsModule } from './emails/emails.module';
         STRIPE_SECRET_KEY: Joi.string().required(),
         STRIPE_WEBHOOK_SIGNING_SECRET: Joi.string().required(),
         AUTO_ROLE: Joi.string().required(),
+        SENDGRID_API_KEY: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({

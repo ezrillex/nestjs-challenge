@@ -100,7 +100,7 @@ input GetProductsInput {
 }
 
 type Mutation {
-  createProduct(CreateProductInput: CreateProductInput!): String
+  createProduct(CreateProductInput: CreateProductInput!): Products
   updateProduct(UpdateProductInput: UpdateProductInput!): String
   updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput!): String
   createProductVariation(CreateProductVariationInput: CreateProductVariationInput!): String

@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { roles } from '@prisma/client';
+import { Products, roles } from '@prisma/client';
 import { CreateProductInput } from './inputs/createProduct.input';
 import { GetProductsInput } from './inputs/get-products.input';
 import { UpdateProductInput } from './inputs/update-product.input';
@@ -16,8 +16,18 @@ import { CreateProductVariationInput } from './product_variation/create_product_
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  async CreateProduct(data: CreateProductInput, userId: string) {
+  async CreateProduct(
+    data: CreateProductInput,
+    userId: string,
+  ): Promise<Products> {
     return this.prisma.products.create({
+      include: {
+        variations: {
+          include: {
+            images: true,
+          },
+        },
+      },
       data: {
         name: data.name,
         description: data.description,

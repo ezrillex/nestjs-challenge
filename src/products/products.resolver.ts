@@ -44,7 +44,7 @@ export class ProductsResolver {
   }
 
   @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
+  @Mutation(() => Products, { nullable: true })
   async createProduct(
     @Args('CreateProductInput') createProductInput: CreateProductInput,
     @Context('req') request: Request,
@@ -53,7 +53,7 @@ export class ProductsResolver {
       createProductInput,
       request['user'].id,
     );
-    return result.id;
+    return result;
   }
 
   @RequiresRole(roles.manager)

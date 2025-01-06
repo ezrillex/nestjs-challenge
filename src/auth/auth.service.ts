@@ -9,6 +9,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { EMAIL_TEMPLATE, EmailsService } from '../emails/emails.service';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
     private jwtService: JwtService,
+    private readonly emailsService: EmailsService,
   ) {}
 
   /*
@@ -67,7 +69,7 @@ export class AuthService {
     }
 
     const hashed = await bcrypt.hash(data.password, 10);
-    return this.prisma.users.create({
+    const user = this.prisma.users.create({
       data: {
         first_name: data.first_name,
         last_name: data.last_name,
@@ -76,6 +78,12 @@ export class AuthService {
         role: role,
       },
     });
+
+    await this.emailsService.sendEmail(EMAIL_TEMPLATE.WELCOME, {
+      user_first_name: data.first_name,
+    });
+
+    return user;
   }
 
   async findOneByEmail(email: string) {

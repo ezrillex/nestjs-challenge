@@ -1,5 +1,5 @@
 # nestjs-challenge
-
+![](./pictures/ai-generated-logo.jpg)
 ### Build your tiny API store.
 You can choose the target of your business, be creative!.
 **Examples:** snack store, pet store, drug store.

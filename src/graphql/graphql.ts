@@ -155,7 +155,7 @@ export abstract class IQuery {
 export abstract class IMutation {
     __typename?: 'IMutation';
 
-    abstract createProduct(CreateProductInput: CreateProductInput): Nullable<string> | Promise<Nullable<string>>;
+    abstract createProduct(CreateProductInput: CreateProductInput): Nullable<Products> | Promise<Nullable<Products>>;
 
     abstract updateProduct(UpdateProductInput: UpdateProductInput): Nullable<string> | Promise<Nullable<string>>;
 

@@ -17,13 +17,12 @@ import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('signup')
   async signup(@Body() data: SignupUserDto) {
     const created_user = await this.authService.createUser(data);
-    console.log('SEND WELCOME EMAIL');
     return {
       id: created_user.id,
     };
