@@ -7,6 +7,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import { Users } from '@prisma/client';
 
 describe('Auth Guard', () => {
   let guard: AuthGuard;
