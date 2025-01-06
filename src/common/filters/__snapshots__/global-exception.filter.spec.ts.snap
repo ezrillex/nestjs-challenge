@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Global Exception Filter should handle a GraphQL exception: gql error 1`] = `[GraphQLError: Test error message]`;
+
+exports[`Global Exception Filter should handle a formatted GraphQL exception: gql formatted exception 1`] = `
+{
+  "extensions": {
+    "code": 404,
+    "path": [
+      "someTestPath",
+    ],
+    "timestamp": "2021-01-12T18:12:12.000Z",
+  },
+  "message": "NotFoundException: error message for not found error",
+}
+`;
+
+exports[`Global Exception Filter should handle an HTTP exception: http error reply 1`] = `
+[
+  [
+    {
+      "message": "test response",
+    },
+    {
+      "details": "Test message",
+      "message": "Test message",
+      "path": "/test",
+      "status_code": 400,
+      "timestamp": "2021-01-12T18:12:12.000Z",
+    },
+    400,
+  ],
+]
+`;

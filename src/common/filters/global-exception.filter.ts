@@ -9,7 +9,7 @@ import { BaseExceptionFilter } from '@nestjs/core';
 @Catch()
 export class GlobalExceptionFilter extends BaseExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
-    console.log(exception);
+    //console.log(exception);
     let code;
     let message;
     if (exception instanceof HttpException) {
@@ -37,7 +37,7 @@ export class GlobalExceptionFilter extends BaseExceptionFilter {
       timestamp: new Date().toISOString(),
       path: path,
     };
-    const details = exception.response.message;
+    const details = exception.response?.message;
     if (details) {
       responseBody['details'] = details;
     }

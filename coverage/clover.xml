@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1736121436535" clover="3.2.0">
-  <project timestamp="1736121436535" name="All files">
-    <metrics statements="419" coveredstatements="351" conditionals="139" coveredconditionals="118" methods="60" coveredmethods="57" elements="618" coveredelements="526" complexity="0" loc="419" ncloc="419" packages="12" files="15" classes="15"/>
+<coverage generated="1736176705393" clover="3.2.0">
+  <project timestamp="1736176705393" name="All files">
+    <metrics statements="419" coveredstatements="370" conditionals="139" coveredconditionals="123" methods="60" coveredmethods="58" elements="618" coveredelements="551" complexity="0" loc="419" ncloc="419" packages="12" files="15" classes="15"/>
     <package name="auth">
       <metrics statements="81" coveredstatements="81" conditionals="23" coveredconditionals="23" methods="14" coveredmethods="14"/>
       <file name="auth.service.ts" path="D:\CODE\nestjs-challenge\src\auth\auth.service.ts">
@@ -232,28 +232,28 @@
       </file>
     </package>
     <package name="common.filters">
-      <metrics statements="19" coveredstatements="0" conditionals="5" coveredconditionals="0" methods="1" coveredmethods="0"/>
+      <metrics statements="19" coveredstatements="19" conditionals="5" coveredconditionals="5" methods="1" coveredmethods="1"/>
       <file name="global-exception.filter.ts" path="D:\CODE\nestjs-challenge\src\common\filters\global-exception.filter.ts">
-        <metrics statements="19" coveredstatements="0" conditionals="5" coveredconditionals="0" methods="1" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
-        <line num="12" count="0" type="stmt"/>
-        <line num="15" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="17" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
-        <line num="20" count="0" type="stmt"/>
-        <line num="27" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="28" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="31" count="0" type="stmt"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="34" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
-        <line num="41" count="0" type="cond" truecount="0" falsecount="1"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="45" count="0" type="stmt"/>
+        <metrics statements="19" coveredstatements="19" conditionals="5" coveredconditionals="5" methods="1" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="12" count="4" type="stmt"/>
+        <line num="15" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="19" count="3" type="stmt"/>
+        <line num="20" count="3" type="stmt"/>
+        <line num="27" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="28" count="3" type="stmt"/>
+        <line num="30" count="1" type="stmt"/>
+        <line num="31" count="1" type="stmt"/>
+        <line num="32" count="1" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="41" count="1" type="cond" truecount="1" falsecount="0"/>
+        <line num="42" count="1" type="stmt"/>
+        <line num="45" count="1" type="stmt"/>
       </file>
     </package>
     <package name="images">
