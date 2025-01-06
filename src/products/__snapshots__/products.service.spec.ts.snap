@@ -206,6 +206,29 @@ exports[`Products Service Get products passes data to prisma query with defaults
 ]
 `;
 
+exports[`Products Service Update product variation passes the data into the prisma query: data in the query 1`] = `
+[
+  [
+    {
+      "data": {
+        "last_updated_at": "2021-01-12T18:12:12.000Z",
+        "last_updated_by": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+        "price": 30.45,
+        "stock": 9000,
+        "title": "test title",
+      },
+      "where": {
+        "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Update product variation throws if no arguments to update are passed: no arguments to update 1`] = `"Must have at least one field to update!"`;
+
+exports[`Products Service Update product variation throws if not found: not found error update product variation 1`] = `"Product Variation not found."`;
+
 exports[`Products Service create product passes data to prisma query correctly: create product query 1`] = `
 [
   [
@@ -243,6 +266,66 @@ exports[`Products Service create product passes data to prisma query correctly: 
   ],
 ]
 `;
+
+exports[`Products Service create product variation passes a query to create with data of input: data passed to query create product 1`] = `
+[
+  [
+    {
+      "data": {
+        "last_updated_at": "2021-01-12T18:12:00.000Z",
+        "last_updated_by": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+        "price": 88,
+        "product": {
+          "connect": {
+            "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+          },
+        },
+        "stock": 58,
+        "title": "test title",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service create product variation throws if not found: not found product 1`] = `"Product not found."`;
+
+exports[`Products Service delete product throws if not found: not found product error 1`] = `"Product not found."`;
+
+exports[`Products Service delete product updates is deleted field and update fields: query update delete flags 1`] = `
+[
+  [
+    {
+      "data": {
+        "is_deleted": true,
+        "last_updated_at": "2021-01-12T18:12:12.000Z",
+        "last_updated_by": "3d13dcec-6894-4de0-b980-688b897ad7ac",
+      },
+      "where": {
+        "id": "3d13dcec-6894-4de0-b980-688b897ad7ac",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service delete product variation sends the data to query a delete to prisma: deletion query ok 1`] = `
+[
+  [
+    {
+      "where": {
+        "id": "3d13dcec-6894-4de0-b980-688b897ad7ac",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service delete product variation throws if deletion failed: error when deleting no result 1`] = `"Something went wrong when deleting the product variation."`;
+
+exports[`Products Service delete product variation throws if not found: not found product variation 1`] = `"Product Variation not found."`;
+
+exports[`Products Service delete product variation throws if variation is the last one: cant delete last one 1`] = `"Can not delete the product variation if it is the last one."`;
 
 exports[`Products Service update product passes values to the update query: prisma query products update 1`] = `
 [

@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ProductsService } from './products.service';
 import { UpdateProductInput } from './inputs/update-product.input';
 import { Products, ProductVariations, roles } from '@prisma/client';
+import { UpdateProductVariationInput } from './product_variation/update-product-variation.input';
+import { CreateProductVariationInput } from './product_variation/create_product_variation.input';
 
 describe('Products Service', () => {
   let service: ProductsService;
@@ -304,6 +306,178 @@ describe('Products Service', () => {
       );
 
       expect(spy.mock.calls).toMatchSnapshot('query find prod var');
+    });
+  });
+
+  describe('Update product variation', () => {
+    it('throws if not found', async () => {
+      await expect(
+        service.UpdateProductVariation(
+          {
+            id: '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+          } as UpdateProductVariationInput,
+          '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+        ),
+      ).rejects.toThrowErrorMatchingSnapshot(
+        'not found error update product variation',
+      );
+    });
+    it('throws if no arguments to update are passed', async () => {
+      jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(1);
+      await expect(
+        service.UpdateProductVariation(
+          {
+            id: '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+          } as UpdateProductVariationInput,
+          '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+        ),
+      ).rejects.toThrowErrorMatchingSnapshot('no arguments to update');
+    });
+    it('passes the data into the prisma query', async () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date(2020, 12, 12, 12, 12, 12));
+      jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(1);
+      const spy = jest
+        .spyOn(prismaService.productVariations, 'update')
+        .mockResolvedValue(null);
+      await expect(
+        service.UpdateProductVariation(
+          {
+            id: '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+            price: 30.45,
+            title: 'test title',
+            stock: 9000,
+          } as UpdateProductVariationInput,
+          '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+        ),
+      ).resolves.toEqual(null);
+
+      expect(spy.mock.calls).toMatchSnapshot('data in the query');
+    });
+  });
+
+  describe('create product variation', () => {
+    it('throws if not found', async () => {
+      await expect(
+        service.CreateProductVariation(
+          {
+            product_id: '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+          } as CreateProductVariationInput,
+          '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+        ),
+      ).rejects.toThrowErrorMatchingSnapshot('not found product');
+    });
+
+    it('passes a query to create with data of input', async () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date(2020, 12, 12, 12, 12));
+      const spy = jest
+        .spyOn(prismaService.productVariations, 'create')
+        .mockResolvedValue(null);
+
+      jest.spyOn(prismaService.products, 'count').mockResolvedValue(1);
+
+      await expect(
+        service.CreateProductVariation(
+          {
+            product_id: '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+            stock: 58,
+            price: 88,
+            title: 'test title',
+          } as CreateProductVariationInput,
+          '5c0532dc-2174-46f5-b97e-b4b297e9e699',
+        ),
+      ).resolves.toEqual(null);
+      expect(spy.mock.calls).toMatchSnapshot(
+        'data passed to query create product',
+      );
+    });
+  });
+
+  describe('delete product variation', () => {
+    it('throws if not found', async () => {
+      jest.spyOn(prismaService.productVariations, 'findUnique').mockReset();
+      await expect(
+        service.DeleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
+      ).rejects.toThrowErrorMatchingSnapshot('not found product variation');
+    });
+
+    it('throws if variation is the last one', async () => {
+      jest
+        .spyOn(prismaService.productVariations, 'findUnique')
+        .mockResolvedValue({
+          product_id: '3d13dcec-6894-4de0-b980-688b897ad7ac',
+        } as ProductVariations);
+      jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(1);
+
+      await expect(
+        service.DeleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
+      ).rejects.toThrowErrorMatchingSnapshot('cant delete last one');
+    });
+
+    it('throws if deletion failed', async () => {
+      jest
+        .spyOn(prismaService.productVariations, 'findUnique')
+        .mockResolvedValue({
+          product_id: '3d13dcec-6894-4de0-b980-688b897ad7ac',
+        } as ProductVariations);
+      jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(2);
+
+      jest
+        .spyOn(prismaService.productVariations, 'delete')
+        .mockResolvedValue(null);
+
+      await expect(
+        service.DeleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
+      ).rejects.toThrowErrorMatchingSnapshot('error when deleting no result');
+    });
+
+    it('sends the data to query a delete to prisma', async () => {
+      jest
+        .spyOn(prismaService.productVariations, 'findUnique')
+        .mockResolvedValue({
+          product_id: '3d13dcec-6894-4de0-b980-688b897ad7ac',
+        } as ProductVariations);
+      jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(2);
+
+      const spy = jest
+        .spyOn(prismaService.productVariations, 'delete')
+        .mockResolvedValue({
+          id: '3d13dcec-6894-4de0-b980-688b897ad7ac',
+        } as ProductVariations);
+
+      await expect(
+        service.DeleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
+      ).resolves.toEqual('Product Variation deleted.');
+      expect(spy.mock.calls).toMatchSnapshot('deletion query ok');
+    });
+  });
+
+  describe('delete product', () => {
+    it('throws if not found', async () => {
+      await expect(
+        service.DeleteProduct(
+          '3d13dcec-6894-4de0-b980-688b897ad7ac',
+          '3d13dcec-6894-4de0-b980-688b897ad7ac',
+        ),
+      ).rejects.toThrowErrorMatchingSnapshot('not found product error');
+    });
+
+    it('updates is deleted field and update fields', async () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date(2020, 12, 12, 12, 12, 12));
+      jest.spyOn(prismaService.products, 'count').mockResolvedValue(1);
+
+      const spy = jest
+        .spyOn(prismaService.products, 'update')
+        .mockResolvedValue(null);
+      await expect(
+        service.DeleteProduct(
+          '3d13dcec-6894-4de0-b980-688b897ad7ac',
+          '3d13dcec-6894-4de0-b980-688b897ad7ac',
+        ),
+      ).resolves.toEqual(null);
+      expect(spy.mock.calls).toMatchSnapshot('query update delete flags');
     });
   });
 });

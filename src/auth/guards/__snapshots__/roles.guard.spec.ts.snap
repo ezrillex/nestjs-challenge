@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Roles Guard it is able to fetch data for graphql query, throws when insufficient permissions: insufficient permissions graphql 1`] = `"User lacks the necessary role for performing the action."`;
+
+exports[`Roles Guard throws if user lacks the role required: insufficient permissions 1`] = `"User lacks the necessary role for performing the action."`;

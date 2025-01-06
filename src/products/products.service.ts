@@ -110,9 +110,9 @@ export class ProductsService {
       filter['is_deleted'] = false;
     }
 
-    if (params.likedOnly && role === roles.customer) {
-      // todo filter by liked for customers.
-    }
+    // if (params.likedOnly && role === roles.customer) {
+    //   // todo filter by liked for customers.
+    // }
 
     if (params.search && params.search.length > 0) {
       filter['name'] = { contains: params.search };
@@ -182,6 +182,13 @@ export class ProductsService {
     userId: string,
   ) {
     // todo you could in theory update a deleted product variation if you have the uuid...
+    const count = await this.prisma.productVariations.count({
+      where: { id: data.id },
+    });
+    if (count === 0) {
+      throw new NotFoundException('Product Variation not found.');
+    }
+
     if (!(data.title || data.stock || data.price)) {
       throw new BadRequestException('Must have at least one field to update!');
     }
@@ -211,7 +218,12 @@ export class ProductsService {
     data: CreateProductVariationInput,
     userId: string,
   ) {
-    // todo check if product exists, or let it fail?
+    const count = await this.prisma.products.count({
+      where: { id: data.product_id },
+    });
+    if (count === 0) {
+      throw new NotFoundException('Product not found.');
+    }
     return this.prisma.productVariations.create({
       data: {
         product: { connect: { id: data.product_id } },
@@ -231,17 +243,15 @@ export class ProductsService {
         product: true,
       },
     });
-
     if (!record) {
       throw new NotFoundException('Product Variation not found.');
     }
 
-    // todo research how to get the count directly from query.
-    const variations_of_product = await this.prisma.productVariations.findMany({
+    const variations_of_product = await this.prisma.productVariations.count({
       where: { product_id: record.product_id },
     });
 
-    if (variations_of_product.length === 1) {
+    if (variations_of_product === 1) {
       throw new BadRequestException(
         'Can not delete the product variation if it is the last one.',
       );
@@ -260,7 +270,12 @@ export class ProductsService {
   }
 
   async DeleteProduct(product_id: string, user_id: string) {
-    // TODO because the db will cascade when we do the actual delete, we need to first delete the images from CDN.
+    const count = await this.prisma.products.count({
+      where: { id: product_id },
+    });
+    if (count === 0) {
+      throw new NotFoundException('Product not found.');
+    }
 
     return this.prisma.products.update({
       where: { id: product_id },
