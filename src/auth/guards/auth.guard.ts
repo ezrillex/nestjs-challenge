@@ -19,10 +19,7 @@ export class AuthGuard implements CanActivate {
     private jwtService: JwtService,
     private authService: AuthService,
   ) {}
-  // TODO make the 2 code paths gql and regular more clean
   async canActivate(context: ExecutionContext) {
-    console.log('Auth Guard triggered.');
-
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -75,7 +72,6 @@ export class AuthGuard implements CanActivate {
     if (!user.session_token) {
       throw new UnauthorizedException('User has no active sessions.');
     }
-
     if (onlyToken !== user.session_token) {
       throw new UnauthorizedException(
         'The provided token is no longer valid. Make sure to authenticate with your most up-to-date token.',

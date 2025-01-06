@@ -117,7 +117,7 @@ export class ProductsService {
     if (params.search && params.search.length > 0) {
       filter['name'] = { contains: params.search };
     }
-    // todo RBAC of queryable fields.
+    // todo should we do RBAC of queryable fields? like a select for one and a select for the other
     return this.prisma.products.findMany({
       include: {
         variations: {
