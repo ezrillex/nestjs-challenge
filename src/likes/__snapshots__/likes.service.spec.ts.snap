@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LikesService Like a Product Tests Should error if nonexistent uuid of product variation is passed.: like non existing product variation id 1`] = `"Product Variation not found!"`;
+
+exports[`LikesService Like a Product Tests Should error if product variation was already liked by user: user already liked product 1`] = `"Product variation is already liked by the User!"`;
+
+exports[`LikesService Remove a Product Like Tests Should error if a like id is invalid: tried to remove non existing like id 1`] = `"Like not found!"`;
+
+exports[`LikesService get likes should pass a query to prisma: prisma query get likes 1`] = `
+[
+  [
+    {
+      "include": {
+        "liked_by": {
+          "include": {
+            "likes_products": {
+              "include": {
+                "likes_product_variation": true,
+              },
+            },
+          },
+        },
+        "likes_product_variation": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "where": {
+        "user_id": "8b3ae683-0626-44be-b591-9271e288388f",
+      },
+    },
+  ],
+]
+`;

@@ -15,7 +15,6 @@ export class Orders {
   //payments: [PaymentIntents!]
   //webhooks: [IncomingPaymentWebhooks!]
 
-  // todo change to snake case
   @Field(() => String)
   paymentStatus: PaymentStatus;
 

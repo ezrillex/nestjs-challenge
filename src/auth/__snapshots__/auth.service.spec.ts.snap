@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AuthService change password  should throw if password mismatch: mismatch password response 1`] = `"Passwords do not match"`;
+
+exports[`AuthService change password  should throw if payload user token mismatch (requested again, or already used and tried to use link again): token mismatch, invalidated 1`] = `"The token is not valid."`;
+
+exports[`AuthService change password  should throw if token is invalid: token is invalid 1`] = `"An error occurred when validating reset token: invalid signature"`;
+
+exports[`AuthService change password  should throw if token is malformed: token is malformed 1`] = `"An error occurred when validating reset token: jwt malformed"`;
+
+exports[`AuthService create user should error if email is already in use: email is already in use 1`] = `"Email is already in use"`;
+
+exports[`AuthService create user should error if password is different: password mismatch 1`] = `"Passwords do not match"`;
+
+exports[`AuthService find one by ID user should error if id was not found: user with ID not found 1`] = `"Couldn't find an account with the associated id ."`;
+
+exports[`AuthService find one by email user should error if email was not found: user with email not found 1`] = `"Couldn't find your account. Make sure this is the right email."`;
+
+exports[`AuthService forgot password requested should modify the db to append timestamp and shift it to 3: expected database update 1`] = `
+{
+  "data": {
+    "password_reset_requests": 3,
+    "password_reset_requests_timestamps": [
+      1999-03-20T07:50:20.000Z,
+      1999-03-20T07:50:20.000Z,
+      2021-01-30T07:45:50.000Z,
+    ],
+    "password_reset_token": "made up token",
+  },
+  "where": {
+    "id": "some id",
+  },
+}
+`;
+
+exports[`AuthService is in 24 hour period utility Should error if 3 timestamps are in 24 hours: too many in 24 h 1`] = `"Too many attempts in 24 hour period."`;
+
+exports[`AuthService login user should error if credentials email doesnt exist: email not found response 1`] = `"Couldn't find your account. Make sure this is the right email."`;
+
+exports[`AuthService login user should error if password is incorrect: wrong password response 1`] = `"Wrong password. Try again or use the forgot password api to reset it."`;
+
+exports[`AuthService login user should return token and role if all ok: ok response 1`] = `
+{
+  "role": "customer",
+  "token": "my_token",
+}
+`;
+
+exports[`AuthService logout user should update db with valid logout user request: the expected database update 1`] = `
+{
+  "data": {
+    "logout_at": "2021-01-30T07:45:50.000Z",
+    "session_token": null,
+  },
+  "where": {
+    "id": "some id",
+  },
+}
+`;
+
+exports[`AuthService reset password should update the database: the expected database update 1`] = `
+{
+  "data": {
+    "failed_login_attempts": 0,
+    "failed_login_attempts_timestamps": [],
+    "password": Any<String>,
+    "password_last_updated": 2021-01-30T07:45:50.000Z,
+    "password_reset_requests": 0,
+    "password_reset_requests_timestamps": [],
+    "password_reset_token": null,
+  },
+  "where": {
+    "id": "some id",
+  },
+}
+`;

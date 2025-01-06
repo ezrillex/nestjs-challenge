@@ -23,17 +23,23 @@ export class StripeService {
     });
   }
 
-  async webhook(
-    signature: string,
-    body: ReadableStream<Uint8Array<ArrayBufferLike>>,
-    req: string | Buffer<ArrayBufferLike>,
-  ) {
-    console.log('webhook');
+  async webhook(req: Request, raw: Buffer) {
+    const sig = req.headers['stripe-signature'];
+
+    if (!sig) {
+      throw new BadRequestException('Missing Stripe Signature');
+    }
+
+    const body = req.body;
+    if (!body) {
+      throw new BadRequestException('Missing Body');
+    }
+
     let event: Stripe.Event;
     try {
       event = this.stripe.webhooks.constructEvent(
-        req,
-        signature,
+        raw,
+        sig,
         this.configService.get<string>('STRIPE_WEBHOOK_SIGNING_SECRET'),
       );
     } catch (err) {
@@ -44,7 +50,7 @@ export class StripeService {
     const order_id = payment_intent.metadata['order_id'];
     const payment_id = payment_intent.metadata['payment_id'];
 
-    const record = await this.prisma.orders.findUnique({
+    const record = await this.prisma.orders.count({
       where: {
         id: order_id,
         PaymentIntents: {
@@ -53,7 +59,7 @@ export class StripeService {
       },
     });
 
-    if (!record) {
+    if (record === 0) {
       throw new InternalServerErrorException('Specified order does not exist');
     }
 
@@ -77,7 +83,7 @@ export class StripeService {
         IncomingPaymentWebhooks: {
           create: {
             processed_at: new Date().toISOString(),
-            data: JSON.stringify({ signature, body }),
+            data: JSON.stringify({ signature: sig, body }),
           },
         },
         PaymentIntents: {
@@ -97,16 +103,14 @@ export class StripeService {
   }
 
   async createPaymentIntent(amount: number, order_id: string, user_id: string) {
-    // the frontend can create many intents? my understanding is it will auto clean up on stripe side if no actions
-    // meaning they need to go further with the one they specify
-    // this scenario is user starts checkout but doesn't finish, so it's not fictional
-    // as per stripe docs is better to start with a fresh one.
-
-    // todo check if order is already paid?
-    const record = await this.prisma.orders.findUnique({
+    if (amount <= 0) {
+      throw new BadRequestException('Amount cant be negative or zero!');
+    }
+    // todo should I check if order is already paid?
+    const record = await this.prisma.orders.count({
       where: { id: order_id, user_id: user_id },
     });
-    if (!record) {
+    if (record === 0) {
       throw new NotFoundException(
         'Order specified not found. Or order does not belong to the logged in user!',
       );
@@ -132,7 +136,6 @@ export class StripeService {
         },
       });
     } catch (err) {
-      console.log(err);
       throw new InternalServerErrorException(err.message);
     }
 
@@ -145,7 +148,6 @@ export class StripeService {
       },
     });
 
-    console.log(paymentIntent);
     return {
       payment_intent_id: paymentIntent.id,
       client_secret: paymentIntent.client_secret,
@@ -155,10 +157,10 @@ export class StripeService {
 
   async getOrderPayments(order_id: string, user_id: string) {
     // checks if order exists and because filter of user checks if is of user.
-    const record = await this.prisma.orders.findUnique({
+    const record = await this.prisma.orders.count({
       where: { id: order_id, user_id: user_id },
     });
-    if (!record) {
+    if (record === 0) {
       throw new NotFoundException(
         'Order specified not found. Or order does not belong to the logged in user!',
       );

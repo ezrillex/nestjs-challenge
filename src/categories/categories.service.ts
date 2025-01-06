@@ -1,6 +1,7 @@
 import {
   Injectable,
   InternalServerErrorException,
+  NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -10,7 +11,13 @@ export class CategoriesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async CreateCategory(data: string) {
-    // todo format when duplicate error.
+    const exists = await this.prisma.categories.count({
+      where: { name: data },
+    });
+    if (exists > 0) {
+      throw new NotAcceptableException('Category already exists');
+    }
+
     return this.prisma.categories.create({
       data: {
         name: data,
@@ -19,11 +26,11 @@ export class CategoriesService {
   }
 
   async DeleteCategory(id: string) {
-    const record = await this.prisma.categories.findUnique({
+    const record = await this.prisma.categories.count({
       where: { id: id },
     });
 
-    if (!record) {
+    if (record === 0) {
       throw new NotFoundException('Record not found.');
     }
 

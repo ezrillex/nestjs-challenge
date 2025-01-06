@@ -13,6 +13,8 @@ You can choose the target of your business, be creative!.
 * ✅ Prettier
 * ✅ Eslint
 
+![](./pictures/coverage.png)
+
 ## Requirements to Run
 1. The following constants on the .env file. A sample file is included.
    - DATABASE_URL
@@ -29,6 +31,9 @@ You can choose the target of your business, be creative!.
 4. Stripe CLI to trigger payment confirmation. 
 5. ngrok to route to the webhook. And setup stripe to send event succeeded and fail to there. 
    - <ngrok link>/payments/webhook
+   - use command:
+     - ngrok http http://localhost:3000
+   - link looks like https://some-id.ngrok-free.app/
 
 
 ## Mandatory Features

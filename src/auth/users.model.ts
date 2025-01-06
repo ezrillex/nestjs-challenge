@@ -1,5 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { LikesOfProducts } from '../likes/likes_of_products';
+import { LikesOfProducts } from '../likes/likes_of_products.model';
 import { IsEmail } from 'class-validator';
 
 // partial implementation of actual table due to graphql not dealing with auth and roles

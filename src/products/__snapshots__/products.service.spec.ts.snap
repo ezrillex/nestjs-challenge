@@ -1,0 +1,358 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Products Service Get one product by id passes data to prisma query role customer.: query omits unpublished 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "where": {
+        "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+        "is_deleted": false,
+        "is_published": true,
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get one product by id passes data to prisma query role manager.: query includes unpublished 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "where": {
+        "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+        "is_deleted": false,
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get one product by id returns if all ok: all ok get one prod by id 1`] = `
+{
+  "id": "testing",
+}
+`;
+
+exports[`Products Service Get one product by id throws if not found: not found error 1`] = `"Product not found."`;
+
+exports[`Products Service Get product variation by id passes a query to prisma find fn: query find prod var 1`] = `
+[
+  [
+    {
+      "include": {
+        "images": true,
+      },
+      "where": {
+        "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get products passes data to prisma query including category query.: query category included 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "skip": 0,
+      "take": 10,
+      "where": {
+        "categories": {
+          "some": {
+            "id": {
+              "in": [
+                "id 1",
+                "id 2",
+              ],
+            },
+          },
+        },
+        "is_deleted": false,
+        "name": {
+          "contains": "test search",
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get products passes data to prisma query including custom pagination query.: query paginatin custom included 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "skip": 20,
+      "take": 10,
+      "where": {
+        "categories": {
+          "some": {
+            "id": {
+              "in": [
+                "id 1",
+                "id 2",
+              ],
+            },
+          },
+        },
+        "is_deleted": false,
+        "name": {
+          "contains": "test search",
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get products passes data to prisma query including search query.: query search included 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "skip": 0,
+      "take": 10,
+      "where": {
+        "is_deleted": false,
+        "name": {
+          "contains": "test search",
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get products passes data to prisma query including unpublished if manager.: query manager unpublished included 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "skip": 0,
+      "take": 10,
+      "where": {
+        "is_deleted": false,
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Get products passes data to prisma query with defaults.: minimal parameters, default pagination query 1`] = `
+[
+  [
+    {
+      "include": {
+        "categories": true,
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "skip": 0,
+      "take": 10,
+      "where": {
+        "is_deleted": false,
+        "is_published": true,
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Update product variation passes the data into the prisma query: data in the query 1`] = `
+[
+  [
+    {
+      "data": {
+        "last_updated_at": "2021-01-12T18:12:12.000Z",
+        "last_updated_by": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+        "price": 30.45,
+        "stock": 9000,
+        "title": "test title",
+      },
+      "where": {
+        "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service Update product variation throws if no arguments to update are passed: no arguments to update 1`] = `"Must have at least one field to update!"`;
+
+exports[`Products Service Update product variation throws if not found: not found error update product variation 1`] = `"Product Variation not found."`;
+
+exports[`Products Service create product passes data to prisma query correctly: create product query 1`] = `
+[
+  [
+    {
+      "data": {
+        "categories": {
+          "connect": [
+            {
+              "id": "076b5b00-c719-40c3-a8f2-d1a11c17b75c",
+            },
+          ],
+        },
+        "created_at": "2021-01-12T18:12:00.000Z",
+        "created_by": "076b5b00-c719-40c3-a8f2-d1a11c17b75c",
+        "description": "test description",
+        "name": "test name",
+        "variations": {
+          "createMany": {
+            "data": [
+              {
+                "price": 321.11,
+                "stock": 123,
+                "title": "test var 1",
+              },
+              {
+                "price": 321.22,
+                "stock": 321,
+                "title": "test var 2",
+              },
+            ],
+          },
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service create product variation passes a query to create with data of input: data passed to query create product 1`] = `
+[
+  [
+    {
+      "data": {
+        "last_updated_at": "2021-01-12T18:12:00.000Z",
+        "last_updated_by": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+        "price": 88,
+        "product": {
+          "connect": {
+            "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
+          },
+        },
+        "stock": 58,
+        "title": "test title",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service create product variation throws if not found: not found product 1`] = `"Product not found."`;
+
+exports[`Products Service delete product throws if not found: not found product error 1`] = `"Product not found."`;
+
+exports[`Products Service delete product updates is deleted field and update fields: query update delete flags 1`] = `
+[
+  [
+    {
+      "data": {
+        "is_deleted": true,
+        "last_updated_at": "2021-01-12T18:12:12.000Z",
+        "last_updated_by": "3d13dcec-6894-4de0-b980-688b897ad7ac",
+      },
+      "where": {
+        "id": "3d13dcec-6894-4de0-b980-688b897ad7ac",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service delete product variation sends the data to query a delete to prisma: deletion query ok 1`] = `
+[
+  [
+    {
+      "where": {
+        "id": "3d13dcec-6894-4de0-b980-688b897ad7ac",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service delete product variation throws if deletion failed: error when deleting no result 1`] = `"Something went wrong when deleting the product variation."`;
+
+exports[`Products Service delete product variation throws if not found: not found product variation 1`] = `"Product Variation not found."`;
+
+exports[`Products Service delete product variation throws if variation is the last one: cant delete last one 1`] = `"Can not delete the product variation if it is the last one."`;
+
+exports[`Products Service update product passes values to the update query: prisma query products update 1`] = `
+[
+  [
+    {
+      "data": {
+        "categories": {
+          "set": [
+            {
+              "id": "test category id",
+            },
+          ],
+        },
+        "description": "test description",
+        "is_published": true,
+        "last_updated_at": "2021-01-12T18:12:00.000Z",
+        "last_updated_by": "076b5b00-c719-40c3-a8f2-d1a11c17b75c",
+        "name": "test name",
+      },
+      "where": {
+        "id": "076b5b00-c719-40c3-a8f2-d1a11c17b75c",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Products Service update product throws if no values to update are provided: one is required to update 1`] = `"At least one property is required for update!"`;
+
+exports[`Products Service update product throws if product is not found: not found error product 1`] = `"Product not found."`;

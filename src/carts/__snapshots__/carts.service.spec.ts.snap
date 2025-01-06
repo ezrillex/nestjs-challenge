@@ -1,0 +1,46 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Carts Service Add a Product to cart Tests Should error if nonexistent uuid of product variation is passed.: product variation 404 1`] = `"Product Variation not found!"`;
+
+exports[`Carts Service Get Cart Items Should perform a well formed request to prisma: expected query get cart items 1`] = `
+[
+  [
+    {
+      "include": {
+        "cart_owner": {
+          "include": {
+            "CartItems": {
+              "include": {
+                "product_variation": true,
+              },
+            },
+            "likes_products": {
+              "include": {
+                "likes_product_variation": true,
+              },
+            },
+          },
+        },
+        "product_variation": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
+      "where": {
+        "product_variation": {
+          "product": {
+            "is_deleted": false,
+            "is_published": true,
+          },
+        },
+        "user_id": "2730fc05-6f87-49e5-8a41-559208048ebe",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Carts Service Remove a Product from cart Tests Should error if a cart item id is invalid: tried to remove non existing cart items id 1`] = `"Cart Item not found!"`;
+
+exports[`Carts Service Remove a Product from cart Tests Should error if after deletion the object to return is null: delete called to db but deleted obj not returned, something is wrong 1`] = `"Unexpected error when deleting record!"`;

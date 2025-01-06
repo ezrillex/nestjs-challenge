@@ -1,8 +1,8 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { IsUUID } from 'class-validator';
 import { Categories } from '../categories/categories.model';
-import { ProductVariations } from './product_variation/product-variations';
-import { LikesOfProducts } from '../likes/likes_of_products';
+import { ProductVariations } from './product_variation/product-variations.model';
+import { LikesOfProducts } from '../likes/likes_of_products.model';
 
 @ObjectType()
 export class Products {

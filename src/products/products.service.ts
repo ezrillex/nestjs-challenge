@@ -8,9 +8,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { roles } from '@prisma/client';
 import { CreateProductInput } from './inputs/createProduct.input';
 import { GetProductsInput } from './inputs/get-products.input';
-import { UpdateProductInput } from './inputs/update-product-input';
-import { UpdateProductVariationInput } from './product_variation/update-product-variation-input';
-import { CreateProductVariationInput } from './product_variation/create_product_variation_input';
+import { UpdateProductInput } from './inputs/update-product.input';
+import { UpdateProductVariationInput } from './product_variation/update-product-variation.input';
+import { CreateProductVariationInput } from './product_variation/create_product_variation.input';
 
 @Injectable()
 export class ProductsService {
@@ -37,6 +37,14 @@ export class ProductsService {
 
   async UpdateProduct(data: UpdateProductInput, userId: string) {
     // todo you could in theory update a deleted product if you have the uuid...
+    const countProducts = await this.prisma.products.count({
+      where: { id: data.id },
+    });
+    if (countProducts === 0) {
+      throw new NotFoundException('Product not found.');
+    }
+
+    // assume user id is correct due to guard. no checks.
 
     if (
       !(data.name || data.description || data.categories || data.is_published)
@@ -76,11 +84,11 @@ export class ProductsService {
     const filter = {};
     const pagination = { skip: 0, take: 10 };
 
-    if (params.first) {
+    if (params.first && params.first > 0) {
       pagination.take = params.first;
     }
 
-    if (params.offset) {
+    if (params.offset && params.offset > 0) {
       pagination.skip = params.offset;
     }
 
@@ -102,14 +110,14 @@ export class ProductsService {
       filter['is_deleted'] = false;
     }
 
-    if (params.likedOnly && role === roles.customer) {
-      // todo filter by liked for customers.
-    }
+    // if (params.likedOnly && role === roles.customer) {
+    //   // todo filter by liked for customers.
+    // }
 
     if (params.search && params.search.length > 0) {
       filter['name'] = { contains: params.search };
     }
-    // todo RBAC of queryable fields.
+    // todo should we do RBAC of queryable fields? like a select for one and a select for the other
     return this.prisma.products.findMany({
       include: {
         variations: {
@@ -133,7 +141,7 @@ export class ProductsService {
       filter['is_deleted'] = false;
     }
 
-    return this.prisma.products.findUnique({
+    const result = await this.prisma.products.findUnique({
       include: {
         variations: {
           include: { images: true },
@@ -142,17 +150,31 @@ export class ProductsService {
       },
       where: filter,
     });
+    if (!result) {
+      throw new NotFoundException('Product not found.');
+    }
+    return result;
   }
 
-  async GetProductVariationById(id: string) {
-    const filter = { id: id };
+  async GetProductVariationById(id: string, count_only: boolean = false) {
+    if (count_only) {
+      return this.prisma.productVariations.count({
+        where: { id: id },
+      });
+    } else {
+      const result = this.prisma.productVariations.findUnique({
+        include: {
+          images: true,
+        },
+        where: { id: id },
+      });
 
-    return this.prisma.productVariations.findUnique({
-      include: {
-        images: true,
-      },
-      where: filter,
-    });
+      if (!result) {
+        throw new NotFoundException('Product Variation not found.');
+      } else {
+        return result;
+      }
+    }
   }
 
   async UpdateProductVariation(
@@ -160,6 +182,13 @@ export class ProductsService {
     userId: string,
   ) {
     // todo you could in theory update a deleted product variation if you have the uuid...
+    const count = await this.prisma.productVariations.count({
+      where: { id: data.id },
+    });
+    if (count === 0) {
+      throw new NotFoundException('Product Variation not found.');
+    }
+
     if (!(data.title || data.stock || data.price)) {
       throw new BadRequestException('Must have at least one field to update!');
     }
@@ -189,6 +218,12 @@ export class ProductsService {
     data: CreateProductVariationInput,
     userId: string,
   ) {
+    const count = await this.prisma.products.count({
+      where: { id: data.product_id },
+    });
+    if (count === 0) {
+      throw new NotFoundException('Product not found.');
+    }
     return this.prisma.productVariations.create({
       data: {
         product: { connect: { id: data.product_id } },
@@ -208,17 +243,15 @@ export class ProductsService {
         product: true,
       },
     });
-
     if (!record) {
       throw new NotFoundException('Product Variation not found.');
     }
 
-    // todo research how to get the count directly from query.
-    const variations_of_product = await this.prisma.productVariations.findMany({
+    const variations_of_product = await this.prisma.productVariations.count({
       where: { product_id: record.product_id },
     });
 
-    if (variations_of_product.length === 1) {
+    if (variations_of_product === 1) {
       throw new BadRequestException(
         'Can not delete the product variation if it is the last one.',
       );
@@ -237,6 +270,13 @@ export class ProductsService {
   }
 
   async DeleteProduct(product_id: string, user_id: string) {
+    const count = await this.prisma.products.count({
+      where: { id: product_id },
+    });
+    if (count === 0) {
+      throw new NotFoundException('Product not found.');
+    }
+
     return this.prisma.products.update({
       where: { id: product_id },
       data: {

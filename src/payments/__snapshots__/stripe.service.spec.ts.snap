@@ -1,0 +1,188 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Stripe Service create payment intent should pass request to prisma intents table: query to create intent ok 1`] = `
+[
+  [
+    {
+      "data": {
+        "order": {
+          "connect": {
+            "id": "8b3ae683-0626-44be-b591-9271e288388f",
+          },
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service create payment intent should pass request to stripe service: query to create intent stripe 1`] = `
+[
+  [
+    {
+      "amount": 30,
+      "automatic_payment_methods": {
+        "allow_redirects": "never",
+        "enabled": true,
+      },
+      "currency": "usd",
+      "metadata": {
+        "order_id": "8b3ae683-0626-44be-b591-9271e288388f",
+        "payment_id": "some id",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service create payment intent should throw if amount is not positive: error amount is negative 1`] = `[BadRequestException: Amount cant be negative or zero!]`;
+
+exports[`Stripe Service create payment intent should throw if amount is zero: error amount is zero 1`] = `[BadRequestException: Amount cant be negative or zero!]`;
+
+exports[`Stripe Service create payment intent should throw if order is not found: error order not found 1`] = `[NotFoundException: Order specified not found. Or order does not belong to the logged in user!]`;
+
+exports[`Stripe Service create payment intent should update prisma with response of service and return key data: query to create intent stripe 1`] = `
+[
+  [
+    {
+      "amount": 30,
+      "automatic_payment_methods": {
+        "allow_redirects": "never",
+        "enabled": true,
+      },
+      "currency": "usd",
+      "metadata": {
+        "order_id": "8b3ae683-0626-44be-b591-9271e288388f",
+        "payment_id": "some id",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service create payment intent should update prisma with response of service and return key data: returns ok 1`] = `
+{
+  "client_secret": "test client secret",
+  "payment_id": "updated intent prisma id",
+  "payment_intent_id": "payment intent id",
+}
+`;
+
+exports[`Stripe Service debug method, update payment intent passes a query to update to prisma: sends the update payment method to stripe in query 1`] = `
+[
+  [
+    "test_id",
+    {
+      "payment_method": "new payment method",
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service debug method, update payment intent throws if cant find the payment intent: intent not found error 1`] = `"Payment intent specified not found."`;
+
+exports[`Stripe Service debug method, update payment intent throws if status is already completed: intent already completed error 1`] = `"Payment has already succeeded, no further changes are allowed."`;
+
+exports[`Stripe Service get order payments if valid queries for a list with all the payment intents associated: query of payments with select fields 1`] = `
+[
+  [
+    {
+      "select": {
+        "created_at": true,
+        "id": true,
+        "order_id": true,
+        "status": true,
+        "stripe_event_id": true,
+      },
+      "where": {
+        "order_id": "076b5b00-c719-40c3-a8f2-d1a11c17b75c",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service get order payments throws if cant find order with user: order user combo not found 1`] = `"Order specified not found. Or order does not belong to the logged in user!"`;
+
+exports[`Stripe Service webhook should error if empty body: missing body in request error 1`] = `"Missing Body"`;
+
+exports[`Stripe Service webhook should form an update request to prisma with failed and return received true for stripe: update status payment_failed order 1`] = `
+[
+  [
+    {
+      "data": {
+        "IncomingPaymentWebhooks": {
+          "create": {
+            "data": "{"signature":"some-value","body":{"random":"value"}}",
+            "processed_at": "2021-01-01T16:10:59.000Z",
+          },
+        },
+        "PaymentIntents": {
+          "update": {
+            "data": {
+              "status": undefined,
+            },
+            "where": {
+              "id": "test_payment_id",
+            },
+          },
+        },
+        "paymentStatus": undefined,
+      },
+      "where": {
+        "id": "test_id",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service webhook should form an update request to prisma with success and return received true for stripe: update status ok order 1`] = `
+[
+  [
+    {
+      "data": {
+        "IncomingPaymentWebhooks": {
+          "create": {
+            "data": "{"signature":"some-value","body":{"random":"value"}}",
+            "processed_at": "2021-01-01T16:10:59.000Z",
+          },
+        },
+        "PaymentIntents": {
+          "update": {
+            "data": {
+              "status": "succeeded",
+            },
+            "where": {
+              "id": "test_payment_id",
+            },
+          },
+        },
+        "paymentStatus": "succeeded",
+      },
+      "where": {
+        "id": "test_id",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service webhook should get data from stripe and try to form a request to prisma and throws if prisma returns nothing: prisma find payment query 1`] = `
+[
+  [
+    {
+      "where": {
+        "PaymentIntents": {
+          "some": {
+            "id": "test_payment_id",
+          },
+        },
+        "id": "test_id",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Stripe Service webhook should throw if no headers for signature: missing signature in header error 1`] = `"Missing Stripe Signature"`;

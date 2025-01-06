@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Users } from '../auth/users.model';
-import { ProductVariations } from '../products/product_variation/product-variations';
+import { ProductVariations } from '../products/product_variation/product-variations.model';
 
 @ObjectType()
 export class LikesOfProducts {

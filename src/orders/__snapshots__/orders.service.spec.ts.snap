@@ -1,0 +1,107 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Orders Service Create an order should throw if no cart items: error no items in the cart 1`] = `"User has no items in cart!"`;
+
+exports[`Orders Service Create an order should unroll cart ids and send a valid query: create order return 1`] = `"1"`;
+
+exports[`Orders Service Create an order should unroll cart ids and send a valid query: query of delete many test 1`] = `
+[
+  {
+    "where": {
+      "id": {
+        "in": [
+          "some id",
+          "some id 2",
+        ],
+      },
+    },
+  },
+]
+`;
+
+exports[`Orders Service Create an order should unroll nested product info and send a valid query: error ocurred when creating order 1`] = `"An error occurred when creating the order!"`;
+
+exports[`Orders Service Create an order should unroll nested product info and send a valid query: query of order creation test 1`] = `
+{
+  "data": {
+    "order_items": {
+      "createMany": {
+        "data": [
+          {
+            "price_purchased_at": 34,
+            "product_variation_id": "prod var 1",
+            "quantity": 1,
+          },
+          {
+            "price_purchased_at": 343,
+            "product_variation_id": "prod var 2",
+            "quantity": 4,
+          },
+        ],
+      },
+    },
+    "user": {
+      "connect": {
+        "id": "testing_user_id",
+      },
+    },
+  },
+  "include": {
+    "order_items": true,
+    "user": true,
+  },
+}
+`;
+
+exports[`Orders Service Create an order throws error if delete count is 0, error: error unexpected when deleting 1`] = `"An unexpected error occurred!"`;
+
+exports[`Orders Service Get One Order should include order id and client in query: get one order result 1`] = `
+{
+  "include": {
+    "order_items": {
+      "include": {
+        "product_variation": true,
+      },
+    },
+    "user": true,
+  },
+  "where": {
+    "id": "testing_user_id",
+    "user_id": "testing_client_id",
+  },
+}
+`;
+
+exports[`Orders Service Get Orders should query the client id if role manager: role manager result 1`] = `
+{
+  "include": {
+    "order_items": {
+      "include": {
+        "product_variation": true,
+      },
+    },
+    "user": true,
+  },
+  "where": {
+    "user_id": "client_id",
+  },
+}
+`;
+
+exports[`Orders Service Get Orders should query the user id if role customer: role customer result 1`] = `
+{
+  "include": {
+    "order_items": {
+      "include": {
+        "product_variation": true,
+      },
+    },
+    "user": true,
+  },
+  "where": {
+    "user_id": "the_user_id",
+  },
+}
+`;
+
+exports[`Orders Service Get Orders should throw if the client id is null and  if role manager: client id is null 1`] = `"No client id for manager specific request!"`;

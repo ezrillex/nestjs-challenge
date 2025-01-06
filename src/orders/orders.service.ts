@@ -82,7 +82,10 @@ export class OrdersService {
         user_id: user_id,
         // don't hide deleted or private items.
       };
-    } else if (role === roles.manager && client_id) {
+    } else if (role === roles.manager) {
+      if (!client_id) {
+        throw new Error('No client id for manager specific request!');
+      }
       find_parameters['where'] = {
         user_id: client_id,
         // don't hide deleted or private items.

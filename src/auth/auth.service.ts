@@ -1,18 +1,55 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { SignupUserDto } from './dto/signup-user-dto';
+import { SignupUserDto } from './dto/signup-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { roles } from '@prisma/client';
+import { DateTime } from 'luxon';
+import { LoginUserDto } from './dto/login-user.dto';
+import { JwtService } from '@nestjs/jwt';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
+    private jwtService: JwtService,
   ) {}
 
+  /*
+   @description method throws error if timestamps are in 24-hour period.
+   @param timestamps an array of timestamps
+   @param message customize the error message
+   @param status customize the http status code
+   */
+  util_isIn24h(
+    timestamps: Date[],
+    message: string = 'Too many attempts in 24 hour period.',
+    status: HttpStatus = HttpStatus.FORBIDDEN,
+  ) {
+    // account locked check
+    if (timestamps && timestamps.length >= 3) {
+      const aDayAgo = DateTime.now().minus({ days: 1 });
+
+      const isIn24h = timestamps.reduce((accumulator, current) => {
+        const value = DateTime.fromISO(current.toISOString());
+        accumulator = accumulator === value >= aDayAgo; // basically an AND of whole array to check if is past 24 hours.
+        return accumulator;
+      }, true);
+
+      if (isIn24h) {
+        throw new HttpException(message, status);
+      }
+    }
+  }
+
   async createUser(data: SignupUserDto) {
+    if (data.password !== data.repeat_password) {
+      throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
+    }
+
     let role: roles = roles.customer;
     if (this.configService.get<string>('AUTO_ROLE') === 'TRUE') {
       if (data.email.startsWith('admin')) {
@@ -22,15 +59,14 @@ export class AuthService {
       }
     }
 
-    const duplicate = await this.prisma.users.findUnique({
+    const duplicate = await this.prisma.users.count({
       where: { email: data.email },
     });
-    if (duplicate) {
+    if (duplicate > 0) {
       throw new HttpException('Email is already in use', HttpStatus.CONFLICT);
     }
 
     const hashed = await bcrypt.hash(data.password, 10);
-
     return this.prisma.users.create({
       data: {
         first_name: data.first_name,
@@ -98,9 +134,6 @@ export class AuthService {
     timestamps: Date[],
     resetToken: string,
   ) {
-    // Is it ok to recycle the data the controller already has, I just sent it this, requesting it would be extra db load
-    //const user = await this.prisma.users.findUnique({where: {id: id}});
-
     const ts_length = timestamps.push(new Date());
     if (ts_length > 3) {
       timestamps.shift();
@@ -114,6 +147,32 @@ export class AuthService {
         password_reset_token: resetToken,
       },
     });
+  }
+
+  async forgotPassword(data: ForgotPasswordDto) {
+    const user = await this.findOneByEmail(data.email);
+
+    // too many reset attempts check
+    this.util_isIn24h(
+      user.password_reset_requests_timestamps,
+      'Too many password reset requests in a 24 hour period. Try again later.',
+    );
+
+    const token = this.jwtService.sign({
+      user: user.id,
+    });
+
+    await this.forgotPasswordRequest(
+      user.id,
+      user.password_reset_requests_timestamps,
+      token,
+    );
+
+    console.log('SEND EMAIL WITH TOKEN: ', token);
+    return {
+      message:
+        'An email has been sent with a link to reset the password. Check your email.',
+    };
   }
 
   async resetPassword(id: string, new_password: string) {
@@ -144,5 +203,64 @@ export class AuthService {
         logout_at: now,
       },
     });
+  }
+
+  async loginUser(data: LoginUserDto) {
+    const user = await this.findOneByEmail(data.email);
+
+    // account locked check
+    this.util_isIn24h(
+      user.failed_login_attempts_timestamps,
+      'Too many failed login attempts, account is locked. Try again later.',
+    );
+    const isCorrectPassword = await bcrypt.compare(
+      data.password,
+      user.password,
+    );
+    if (isCorrectPassword) {
+      const token = await this.jwtService.signAsync({
+        user: user.id,
+        role: user.role,
+      });
+
+      const success = await this.loginAttemptSuccess(user.id, token);
+      console.log(' SEND LOGIN SUCESS EMAIL ');
+      return { token, role: user.role };
+    } else {
+      const failed = await this.loginAttemptFailed(
+        user.id,
+        user.failed_login_attempts_timestamps,
+      );
+      console.log(' SEND LOGIN UNSUCCESSFUL EMAIL ');
+      throw new HttpException(
+        'Wrong password. Try again or use the forgot password api to reset it.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
+
+  async changePassword(data: ResetPasswordDto) {
+    if (data.password !== data.repeat_password) {
+      throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
+    }
+    let payload: { user: string };
+    try {
+      payload = await this.jwtService.verifyAsync(data.reset_token);
+    } catch (error) {
+      throw new HttpException(
+        `An error occurred when validating reset token: ${error.message}`,
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    const user = await this.findOneByID(payload.user);
+
+    if (user.password_reset_token === data.reset_token) {
+      await this.resetPassword(user.id, data.password);
+      return {
+        message: 'The password has been reset successfully!',
+      };
+    } else {
+      throw new HttpException('The token is not valid.', HttpStatus.FORBIDDEN);
+    }
   }
 }

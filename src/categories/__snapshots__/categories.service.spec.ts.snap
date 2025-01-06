@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CategoriesService add categories tests should throw if category name already exists: category already exists error 1`] = `"Category already exists"`;
+
+exports[`CategoriesService delete categories tests should throw if category name already exists: category does not exist 1`] = `"Record not found."`;
+
+exports[`CategoriesService delete categories tests should throw if nothing is returned from prisma: error when deleting 1`] = `"An error occurred when deleting the category."`;

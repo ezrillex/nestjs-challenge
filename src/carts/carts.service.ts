@@ -5,10 +5,10 @@ import { PrismaService } from '../prisma/prisma.service';
 export class CartsService {
   constructor(private readonly prisma: PrismaService) {}
   async AddToCart(variation_id: string, user_id: string, quantity: number) {
-    const variation = await this.prisma.productVariations.findUnique({
+    const variation = await this.prisma.productVariations.count({
       where: { id: variation_id },
     });
-    if (!variation) {
+    if (variation === 0) {
       throw new BadRequestException('Product Variation not found!');
     }
 
@@ -41,10 +41,10 @@ export class CartsService {
   }
 
   async RemoveCartItem(cart_id: string) {
-    const record = await this.prisma.cartItems.findUnique({
+    const record = await this.prisma.cartItems.count({
       where: { id: cart_id },
     });
-    if (!record) {
+    if (record === 0) {
       throw new BadRequestException('Cart Item not found!');
     }
 
@@ -53,7 +53,7 @@ export class CartsService {
     });
 
     if (result) {
-      return 'Cart Item deleted succesfully.';
+      return 'Cart Item deleted successfully.';
     } else {
       throw new BadRequestException('Unexpected error when deleting record!');
     }

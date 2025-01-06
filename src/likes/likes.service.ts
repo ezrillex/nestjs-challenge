@@ -37,10 +37,10 @@ export class LikesService {
   }
 
   async RemoveLike(like_id: string) {
-    const record = await this.prisma.likesOfProducts.findUnique({
+    const record = await this.prisma.likesOfProducts.count({
       where: { id: like_id },
     });
-    if (!record) {
+    if (record === 0) {
       throw new BadRequestException('Like not found!');
     }
 
@@ -48,11 +48,10 @@ export class LikesService {
       where: { id: like_id },
     });
 
-    if (result) {
-      return 'Deleted like successfully.';
-    } else {
-      throw new BadRequestException('Unexpected error when deleting record!');
-    }
+    return {
+      result: 'Like removed successfully',
+      ...result,
+    };
   }
 
   async GetLikes(user_id: string) {

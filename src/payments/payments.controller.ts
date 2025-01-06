@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -31,10 +30,6 @@ export class PaymentsController {
     @Body('amount', ParseIntPipe) amount: number,
     @Request() req: Request,
   ) {
-    if (amount <= 0) {
-      throw new BadRequestException('Amount cant be negative or zero!');
-    }
-
     return this.stripeService.createPaymentIntent(
       amount,
       order_id,
@@ -49,18 +44,7 @@ export class PaymentsController {
     @Request() req: Request,
     @Req() rawReq: RawBodyRequest<Request>,
   ) {
-    const sig = req.headers['stripe-signature'];
-
-    if (!sig) {
-      throw new BadRequestException('Missing Stripe Signature');
-    }
-
-    const body = req.body;
-    if (!body) {
-      throw new BadRequestException('Missing Body');
-    }
-
-    return this.stripeService.webhook(sig, body, rawReq.rawBody);
+    return this.stripeService.webhook(req, rawReq.rawBody);
   }
 
   @RequiresRole(roles.customer)
