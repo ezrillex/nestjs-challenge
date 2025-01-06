@@ -13,6 +13,8 @@ You can choose the target of your business, be creative!.
 * ✅ Prettier
 * ✅ Eslint
 
+![](./pictures/coverage.png)
+
 ## Requirements to Run
 1. The following constants on the .env file. A sample file is included.
    - DATABASE_URL
