@@ -111,6 +111,7 @@ model LikesOfProducts {
   user_id                 String?            @db.Uuid
   likes_product_variation ProductVariations? @relation(fields: [product_variation_id], references: [id])
   product_variation_id    String?            @db.Uuid
+  created_at              DateTime           @default(now()) @db.Timestamp()
 
   @@unique([user_id, product_variation_id])
 }

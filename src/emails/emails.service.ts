@@ -7,14 +7,11 @@ export enum EMAIL_TEMPLATE {
   LOGIN_FAIL,
   FORGOT_PASSWORD,
   WELCOME,
+  LOW_STOCK_REMINDER,
 }
 
 @Injectable()
 export class EmailsService {
-  //   await this.emailsService.sendEmail(EMAIL_TEMPLATE.FORGOT_PASSWORD, {
-  //   reset_token: 'asd;lfjaslk;dfjasl;dkjfal;skdjfakl;sdjfa;lsjfd',
-  // });
-
   constructor(configService: ConfigService) {
     sgMail.setApiKey(configService.get<string>('SENDGRID_API_KEY'));
   }
@@ -25,14 +22,38 @@ export class EmailsService {
   ) {
     const resolvedTemplate = this.getTemplateWithData(template, data);
     const msg: sgMail.MailDataRequired = {
-      to: 'ezrillex@gmail.com', // Change to your recipient
-      from: 'ezraabarca@ravn.co', // Change to your verified sender
+      to: 'ezrillex@gmail.com', // todo HARDCODED TO PREVENT SPAMMING SOME RANDOM USER
+      from: 'ezraabarca@ravn.co',
       subject: 'Sending with SendGrid is Fun',
       ...resolvedTemplate,
     };
 
     try {
       await sgMail.send(msg);
+    } catch (error) {
+      console.log(error.response.body.errors);
+      throw new InternalServerErrorException(
+        'An error occurred when sending email.',
+      );
+    }
+  }
+
+  async sendManyEmails(emails: { template: EMAIL_TEMPLATE; data: any }[]) {
+    console.log('emailes many');
+    const compiledEmails: sgMail.MailDataRequired[] = emails.map((email) => {
+      const resolvedTemplate = this.getTemplateWithData(
+        email.template,
+        email.data,
+      );
+      return {
+        to: 'ezrillex@gmail.com', // todo HARDCODED TO PREVENT SPAMMING SOME RANDOM USER
+        from: 'ezraabarca@ravn.co',
+        ...resolvedTemplate,
+      };
+    });
+
+    try {
+      await sgMail.send(compiledEmails, true);
     } catch (error) {
       console.log(error.response.body.errors);
       throw new InternalServerErrorException(
@@ -76,10 +97,28 @@ export class EmailsService {
           },
         };
       case EMAIL_TEMPLATE.WELCOME:
+        if (!data.user_first_name) {
+          throw new InternalServerErrorException(
+            'Internal service call is missing critical data.',
+          );
+        }
         return {
           templateId: 'd-fe46861d809e48b598ed28a463001d42',
           dynamicTemplateData: {
             user_first_name: data.user_first_name,
+          },
+        };
+      case EMAIL_TEMPLATE.LOW_STOCK_REMINDER:
+        if (!(data.product_title && data.product_image)) {
+          throw new InternalServerErrorException(
+            'Internal service call is missing critical data.',
+          );
+        }
+        return {
+          templateId: 'd-50661982a5a4499699949b17e60fd5e5',
+          dynamicTemplateData: {
+            product_title: data.product_title,
+            product_image: data.product_image,
           },
         };
       default:

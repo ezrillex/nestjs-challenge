@@ -52,15 +52,6 @@ export class AuthService {
       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
     }
 
-    let role: roles = roles.customer;
-    if (this.configService.get<string>('AUTO_ROLE') === 'TRUE') {
-      if (data.email.startsWith('admin')) {
-        role = roles.admin;
-      } else if (data.email.startsWith('manager')) {
-        role = roles.manager;
-      }
-    }
-
     const duplicate = await this.prisma.users.count({
       where: { email: data.email },
     });
@@ -69,6 +60,19 @@ export class AuthService {
     }
 
     const hashed = await bcrypt.hash(data.password, 10);
+    let role: roles = roles.customer;
+    if (this.configService.get<string>('AUTO_ROLE') === 'TRUE') {
+      const email = data.email.split('@');
+      const suffix = email[0].split('+');
+      if (suffix.length > 1) {
+        if (suffix.at(-1) === 'admin') {
+          role = roles.admin;
+        } else if (suffix.at(-1) === 'manager') {
+          role = roles.manager;
+        }
+      }
+    }
+
     const user = this.prisma.users.create({
       data: {
         first_name: data.first_name,
@@ -176,7 +180,10 @@ export class AuthService {
       token,
     );
 
-    console.log('SEND EMAIL WITH TOKEN: ', token);
+    await this.emailsService.sendEmail(EMAIL_TEMPLATE.FORGOT_PASSWORD, {
+      reset_token: token,
+    });
+
     return {
       message:
         'An email has been sent with a link to reset the password. Check your email.',
@@ -231,15 +238,15 @@ export class AuthService {
         role: user.role,
       });
 
-      const success = await this.loginAttemptSuccess(user.id, token);
-      console.log(' SEND LOGIN SUCESS EMAIL ');
+      await this.loginAttemptSuccess(user.id, token);
+      await this.emailsService.sendEmail(EMAIL_TEMPLATE.LOGIN_SUCCESSFUL);
       return { token, role: user.role };
     } else {
-      const failed = await this.loginAttemptFailed(
+      await this.loginAttemptFailed(
         user.id,
         user.failed_login_attempts_timestamps,
       );
-      console.log(' SEND LOGIN UNSUCCESSFUL EMAIL ');
+      await this.emailsService.sendEmail(EMAIL_TEMPLATE.LOGIN_FAIL);
       throw new HttpException(
         'Wrong password. Try again or use the forgot password api to reset it.',
         HttpStatus.UNAUTHORIZED,

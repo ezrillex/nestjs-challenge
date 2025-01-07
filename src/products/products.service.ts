@@ -11,6 +11,7 @@ import { GetProductsInput } from './inputs/get-products.input';
 import { UpdateProductInput } from './inputs/update-product.input';
 import { UpdateProductVariationInput } from './product_variation/update-product-variation.input';
 import { CreateProductVariationInput } from './product_variation/create_product_variation.input';
+import { DateTime, Duration } from 'luxon';
 
 @Injectable()
 export class ProductsService {
@@ -295,5 +296,43 @@ export class ProductsService {
         last_updated_at: new Date().toISOString(),
       },
     });
+  }
+
+  // todo figure out how to check if already purchased
+  // once we do handle stock it could be done by doing more queries but since we
+  // do multiple products at once we are too nested to do such a thing.
+  async GetLowStockProducts() {
+    const twoDaysAgo = DateTime.now().minus({ days: 2 });
+
+    const products = await this.prisma.productVariations.findMany({
+      include: {
+        images: true,
+        LikesOfProducts: {
+          where: {
+            created_at: {
+              gte: twoDaysAgo.toISO(),
+            },
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+          take: 1,
+        },
+      },
+      where: {
+        stock: {
+          lte: 3,
+        },
+        LikesOfProducts: {
+          some: {},
+        },
+      },
+    });
+
+    products.forEach((product) => {
+      console.log(product.title, ' ', product.LikesOfProducts);
+    });
+
+    return products;
   }
 }
