@@ -7,5 +7,6 @@ import { ProductsResolver } from './products.resolver';
 @Module({
   imports: [AuthModule],
   providers: [ProductsService, PrismaService, ProductsResolver],
+  exports: [ProductsService],
 })
 export class ProductsModule {}

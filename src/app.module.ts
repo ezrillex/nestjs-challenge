@@ -15,6 +15,8 @@ import { CartsModule } from './carts/carts.module';
 import { OrdersModule } from './orders/orders.module';
 import { LikesModule } from './likes/likes.module';
 import { EmailsModule } from './emails/emails.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksService } from './common/tasks/tasks.service';
 
 @Module({
   imports: [
@@ -74,6 +76,8 @@ import { EmailsModule } from './emails/emails.module';
     OrdersModule,
     LikesModule,
     EmailsModule,
+    ScheduleModule.forRoot(),
   ],
+  providers: [TasksService],
 })
 export class AppModule {}
