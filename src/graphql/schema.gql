@@ -28,12 +28,12 @@ type Users {
   first_name: String!
   last_name: String!
   email: String!
-  likes_products: [LikesOfProducts!]!
+  likes_products: [LikesOfProducts!]
 }
 
 type LikesOfProducts {
   id: ID!
-  liked_by: Users!
+  liked_by: Users
   likes_product_variation: ProductVariations!
 }
 
@@ -71,22 +71,31 @@ type OrderItems {
   price_purchased_at: Float!
 }
 
+type PaymentIntents {
+  id: ID!
+  status: String
+  created_at: String!
+  stripe_event_id: ID!
+}
+
 type Orders {
   id: ID!
   user: Users!
+  payments: [PaymentIntents!]!
   paymentStatus: String!
   orderStatus: String!
   order_items: [OrderItems!]!
 }
 
 type Query {
+  user(id: ID!): Users!
+  getLikes: [LikesOfProducts!]
   getProducts(GetProductsInput: GetProductsInput!): [Products!]
   getProductById(id: String!): Products
   getCartItems: [CartItems!]
   getOrders: [Orders!]
   getOrder(order_id: String!): Orders
   getClientOrders(client_id: String): [Orders!]
-  getLikes: [LikesOfProducts!]
 }
 
 input GetProductsInput {
@@ -100,19 +109,19 @@ input GetProductsInput {
 }
 
 type Mutation {
+  likeProduct(variation_id: String!): String
+  removeLikeProduct(like_id: String!): String
   createProduct(CreateProductInput: CreateProductInput!): Products
   updateProduct(UpdateProductInput: UpdateProductInput!): String
+  deleteProduct(product_id: String!): String
   updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput!): String
   createProductVariation(CreateProductVariationInput: CreateProductVariationInput!): String
   deleteProductVariation(variation_id: String!): String
-  deleteProduct(product_id: String!): String
   createCategory(name: String!): String
   deleteCategory(id: ID!): String
   addToCart(variation_id: String!, quantity: Int!): String
   removeFromCart(cart_item_id: String!): String
   createOrder: String
-  likeProduct(variation_id: String!): String
-  removeLikeProduct(like_id: String!): String
 }
 
 input CreateProductInput {

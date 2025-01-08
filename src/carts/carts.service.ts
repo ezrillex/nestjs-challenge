@@ -60,27 +60,7 @@ export class CartsService {
   }
 
   async GetCartItems(user_id: string) {
-    // TODO A resolve field can take care of a lot of this include stuff
     return this.prisma.cartItems.findMany({
-      include: {
-        cart_owner: {
-          include: {
-            CartItems: {
-              include: {
-                product_variation: true,
-              },
-            },
-            likes_products: {
-              include: {
-                likes_product_variation: true,
-              },
-            },
-          },
-        },
-        product_variation: {
-          include: { images: true },
-        },
-      },
       where: {
         user_id: user_id,
         // hide deleted or private items.

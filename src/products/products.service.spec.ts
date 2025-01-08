@@ -3,8 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ProductsService } from './products.service';
 import { UpdateProductInput } from './inputs/update-product.input';
 import { Products, ProductVariations, roles } from '@prisma/client';
-import { UpdateProductVariationInput } from './product_variation/update-product-variation.input';
-import { CreateProductVariationInput } from './product_variation/create_product_variation.input';
+import { UpdateProductVariationInput } from './product_variation/inputs/update-product-variation.input';
+import { CreateProductVariationInput } from './product_variation/inputs/create_product_variation.input';
 
 describe('Products Service', () => {
   let service: ProductsService;

@@ -1,13 +1,28 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { roles } from '@prisma/client';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { Orders } from './orders.model';
 import { OrdersService } from './orders.service';
+import { CartItems } from '../carts/cart_items.model';
+import { UsersService } from '../users/users.service';
+import { StripeService } from '../payments/stripe.service';
 
-@Resolver()
+@Resolver(() => Orders)
 export class OrdersResolver {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly usersService: UsersService,
+    private readonly stripeService: StripeService,
+  ) {}
 
   @RequiresRole(roles.customer)
   @Mutation(() => String, { nullable: true })
@@ -47,5 +62,27 @@ export class OrdersResolver {
       request['user'].role,
       client_id,
     );
+  }
+
+  @ResolveField()
+  async user(@Parent() orders: Orders) {
+    const { id } = orders;
+    const { user } = await this.usersService.ResolveUsersOnOrdersField(id);
+    return user;
+  }
+
+  @ResolveField()
+  async order_items(@Parent() cart_items: Orders) {
+    const { id } = cart_items;
+    const { order_items } = await this.ordersService.ResolveOrderItemsField(id);
+    return order_items;
+  }
+
+  @ResolveField()
+  async payments(@Parent() cart_items: Orders) {
+    const { id } = cart_items;
+    const { PaymentIntents } =
+      await this.stripeService.ResolvePaymentsOnOrdersField(id);
+    return PaymentIntents;
   }
 }

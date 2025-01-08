@@ -23,6 +23,17 @@ export class StripeService {
     });
   }
 
+  async ResolvePaymentsOnOrdersField(id: string) {
+    return this.prisma.orders.findUnique({
+      where: {
+        id: id,
+      },
+      select: {
+        PaymentIntents: true,
+      },
+    });
+  }
+
   async webhook(req: Request, raw: Buffer) {
     const sig = req.headers['stripe-signature'];
 
