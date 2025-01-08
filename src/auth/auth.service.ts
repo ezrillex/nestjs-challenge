@@ -12,6 +12,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { EMAIL_TEMPLATE, EmailsService } from '../emails/emails.service';
 import { UsersService } from '../users/users.service';
 
+// todo refactor all specific user related operations to user service.
 @Injectable()
 export class AuthService {
   constructor(
