@@ -2,7 +2,6 @@ import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { LikesOfProducts } from '../likes/likes_of_products.model';
 import { IsEmail } from 'class-validator';
 
-// partial implementation of actual table due to graphql not dealing with auth and roles
 @ObjectType()
 export class Users {
   @Field(() => ID)
@@ -18,6 +17,6 @@ export class Users {
   @Field(() => String)
   email: string;
 
-  @Field(() => [LikesOfProducts])
+  @Field(() => [LikesOfProducts], { nullable: true })
   likes_products: LikesOfProducts[];
 }

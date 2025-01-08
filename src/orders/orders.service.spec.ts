@@ -8,6 +8,7 @@ import {
   Orders,
   Prisma,
 } from '@prisma/client';
+import { ProductsService } from '../products/products.service';
 
 describe('Orders Service', () => {
   let service: OrdersService;
@@ -15,7 +16,7 @@ describe('Orders Service', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PrismaService, OrdersService],
+      providers: [PrismaService, OrdersService, ProductsService],
     }).compile();
 
     service = module.get<OrdersService>(OrdersService);

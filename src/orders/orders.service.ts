@@ -12,7 +12,16 @@ export class OrdersService {
 
   async CreateOrder(user_id: string) {
     const cart_items = await this.prisma.cartItems.findMany({
-      include: { product_variation: true },
+      select: {
+        id: true,
+        quantity: true,
+        product_variation_id: true,
+        product_variation: {
+          select: {
+            price: true,
+          },
+        },
+      },
       where: {
         user_id: user_id,
         product_variation: {
@@ -31,10 +40,6 @@ export class OrdersService {
     }));
 
     const order_result = await this.prisma.orders.create({
-      include: {
-        order_items: true,
-        user: true,
-      },
       data: {
         user: {
           connect: { id: user_id },
@@ -67,15 +72,7 @@ export class OrdersService {
   }
 
   async GetOrders(user_id: string, role: roles, client_id: string = null) {
-    // TODO A resolve field can take care of a lot of this include stuff
-    const find_parameters = {
-      include: {
-        user: true,
-        order_items: {
-          include: { product_variation: true },
-        },
-      },
-    };
+    const find_parameters = {};
 
     if (role === roles.customer) {
       find_parameters['where'] = {
@@ -96,14 +93,7 @@ export class OrdersService {
   }
 
   async GetOrder(order_id: string, client_id: string) {
-    // TODO A resolve field can take care of a lot of this include stuff
     const find_parameters = {
-      include: {
-        user: true,
-        order_items: {
-          include: { product_variation: true },
-        },
-      },
       where: {
         id: order_id,
         user_id: client_id,
@@ -112,5 +102,16 @@ export class OrdersService {
     };
 
     return this.prisma.orders.findUnique(find_parameters);
+  }
+
+  async ResolveOrderItemsField(order_id: string) {
+    return this.prisma.orders.findUnique({
+      where: {
+        id: order_id,
+      },
+      select: {
+        order_items: true,
+      },
+    });
   }
 }

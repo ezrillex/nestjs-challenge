@@ -1,13 +1,28 @@
-import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { roles } from '@prisma/client';
 import { ParseIntPipe, ParseUUIDPipe } from '@nestjs/common';
 import { CartItems } from './cart_items.model';
 import { CartsService } from './carts.service';
+import { ProductsService } from '../products/products.service';
+import { UsersService } from '../users/users.service';
 
-@Resolver()
+@Resolver(() => CartItems)
 export class CartItemsResolver {
-  constructor(private readonly cartsService: CartsService) {}
+  constructor(
+    private readonly cartsService: CartsService,
+    private readonly productsService: ProductsService,
+    private readonly usersService: UsersService,
+  ) {}
 
   // create or update
   @RequiresRole(roles.customer)
@@ -40,5 +55,21 @@ export class CartItemsResolver {
   @Query(() => [CartItems], { nullable: true })
   async getCartItems(@Context('req') request: Request) {
     return this.cartsService.GetCartItems(request['user'].id);
+  }
+
+  @ResolveField()
+  async cart_owner(@Parent() cart_items: CartItems) {
+    const { id } = cart_items;
+    const { cart_owner } =
+      await this.usersService.ResolveUsersOnCartItemsField(id);
+    return cart_owner;
+  }
+
+  @ResolveField()
+  async product_variation(@Parent() cart_items: CartItems) {
+    const { id } = cart_items;
+    const { product_variation } =
+      await this.productsService.ResolveProductVariationsOnCartItemsField(id);
+    return product_variation;
   }
 }

@@ -57,14 +57,6 @@ exports[`Orders Service Create an order throws error if delete count is 0, error
 
 exports[`Orders Service Get One Order should include order id and client in query: get one order result 1`] = `
 {
-  "include": {
-    "order_items": {
-      "include": {
-        "product_variation": true,
-      },
-    },
-    "user": true,
-  },
   "where": {
     "id": "testing_user_id",
     "user_id": "testing_client_id",
@@ -74,14 +66,6 @@ exports[`Orders Service Get One Order should include order id and client in quer
 
 exports[`Orders Service Get Orders should query the client id if role manager: role manager result 1`] = `
 {
-  "include": {
-    "order_items": {
-      "include": {
-        "product_variation": true,
-      },
-    },
-    "user": true,
-  },
   "where": {
     "user_id": "client_id",
   },
@@ -90,14 +74,6 @@ exports[`Orders Service Get Orders should query the client id if role manager: r
 
 exports[`Orders Service Get Orders should query the user id if role customer: role customer result 1`] = `
 {
-  "include": {
-    "order_items": {
-      "include": {
-        "product_variation": true,
-      },
-    },
-    "user": true,
-  },
   "where": {
     "user_id": "the_user_id",
   },

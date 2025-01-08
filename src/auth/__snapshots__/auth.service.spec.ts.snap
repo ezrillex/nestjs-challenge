@@ -12,10 +12,6 @@ exports[`AuthService create user should error if email is already in use: email 
 
 exports[`AuthService create user should error if password is different: password mismatch 1`] = `"Passwords do not match"`;
 
-exports[`AuthService find one by ID user should error if id was not found: user with ID not found 1`] = `"Couldn't find an account with the associated id ."`;
-
-exports[`AuthService find one by email user should error if email was not found: user with email not found 1`] = `"Couldn't find your account. Make sure this is the right email."`;
-
 exports[`AuthService forgot password requested should modify the db to append timestamp and shift it to 3: expected database update 1`] = `
 {
   "data": {

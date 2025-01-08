@@ -6,27 +6,6 @@ exports[`Carts Service Get Cart Items Should perform a well formed request to pr
 [
   [
     {
-      "include": {
-        "cart_owner": {
-          "include": {
-            "CartItems": {
-              "include": {
-                "product_variation": true,
-              },
-            },
-            "likes_products": {
-              "include": {
-                "likes_product_variation": true,
-              },
-            },
-          },
-        },
-        "product_variation": {
-          "include": {
-            "images": true,
-          },
-        },
-      },
       "where": {
         "product_variation": {
           "product": {

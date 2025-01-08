@@ -17,6 +17,9 @@ import { LikesModule } from './likes/likes.module';
 import { EmailsModule } from './emails/emails.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksService } from './common/tasks/tasks.service';
+import { UsersResolver } from './users/users.resolver';
+import { PrismaService } from './prisma/prisma.service';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -67,6 +70,7 @@ import { TasksService } from './common/tasks/tasks.service';
       },
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
+    LikesModule,
     AuthModule,
     ProductsModule,
     ImagesModule,
@@ -74,10 +78,10 @@ import { TasksService } from './common/tasks/tasks.service';
     CategoriesModule,
     CartsModule,
     OrdersModule,
-    LikesModule,
     EmailsModule,
     ScheduleModule.forRoot(),
+    UsersModule,
   ],
-  providers: [TasksService],
+  providers: [TasksService, PrismaService, UsersResolver],
 })
 export class AppModule {}

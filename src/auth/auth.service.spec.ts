@@ -4,16 +4,36 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { roles, Users } from '@prisma/client';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
+import { EmailsService } from '../emails/emails.service';
+
+jest.mock('@sendgrid/mail', () => {
+  return {
+    __esModule: true, // Indicates that this is a module with default export
+    default: {
+      setApiKey: jest.fn(), // Mock setApiKey method
+      send: jest.fn(), // Mock send method
+    },
+  };
+});
 
 describe('AuthService', () => {
   let service: AuthService;
   let configService: ConfigService;
   let prismaService: PrismaService;
+  let usersService: UsersService;
   let jwtService: JwtService;
 
   beforeEach(async () => {
+    jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PrismaService, ConfigService, AuthService],
+      providers: [
+        PrismaService,
+        ConfigService,
+        AuthService,
+        UsersService,
+        EmailsService,
+      ],
       imports: [
         JwtModule.registerAsync({
           global: false,
@@ -29,6 +49,7 @@ describe('AuthService', () => {
     configService = module.get(ConfigService);
     prismaService = module.get(PrismaService);
     jwtService = module.get(JwtService);
+    usersService = module.get(UsersService);
   });
   it('should be defined', () => {
     expect(service).toBeDefined();
@@ -76,7 +97,7 @@ describe('AuthService', () => {
   describe('create user', () => {
     it('should error if password is different', async () => {
       await expect(
-        service.createUser({
+        service.registerUser({
           email: 'some@email.com',
           password: 'somepassword!',
           last_name: 'smith',
@@ -90,7 +111,7 @@ describe('AuthService', () => {
       jest.spyOn(prismaService.users, 'count').mockResolvedValue(1);
 
       await expect(
-        service.createUser({
+        service.registerUser({
           email: 'some@email.com',
           password: 'somepassword',
           last_name: 'smith',
@@ -109,7 +130,7 @@ describe('AuthService', () => {
           return null;
         });
 
-      await service.createUser({
+      await service.registerUser({
         email: 'some@email.com',
         password: 'somepassword',
         last_name: 'smith',
@@ -138,8 +159,8 @@ describe('AuthService', () => {
         return 'FALSE';
       });
 
-      await service.createUser({
-        email: 'admin@email.com',
+      await service.registerUser({
+        email: 'name+admin@email.com',
         password: 'somepassword',
         last_name: 'smith',
         first_name: 'john',
@@ -147,7 +168,7 @@ describe('AuthService', () => {
       });
 
       expect(result).toEqual({
-        email: 'admin@email.com',
+        email: 'name+admin@email.com',
         password: expect.any(String),
         last_name: 'smith',
         first_name: 'john',
@@ -166,8 +187,8 @@ describe('AuthService', () => {
 
       jest.spyOn(configService, 'get').mockReturnValue('TRUE');
 
-      await service.createUser({
-        email: 'admin@email.com',
+      await service.registerUser({
+        email: 'name+admin@email.com',
         password: 'somepassword',
         last_name: 'smith',
         first_name: 'john',
@@ -175,7 +196,7 @@ describe('AuthService', () => {
       });
 
       expect(result).toEqual({
-        email: 'admin@email.com',
+        email: 'name+admin@email.com',
         password: expect.any(String),
         last_name: 'smith',
         first_name: 'john',
@@ -194,8 +215,8 @@ describe('AuthService', () => {
 
       jest.spyOn(configService, 'get').mockReturnValue('TRUE');
 
-      await service.createUser({
-        email: 'manager@email.com',
+      await service.registerUser({
+        email: 'name+manager@email.com',
         password: 'somepassword',
         last_name: 'smith',
         first_name: 'john',
@@ -203,50 +224,11 @@ describe('AuthService', () => {
       });
 
       expect(result).toEqual({
-        email: 'manager@email.com',
+        email: 'name+manager@email.com',
         password: expect.any(String),
         last_name: 'smith',
         first_name: 'john',
         role: roles.manager,
-      });
-    });
-  });
-
-  describe('find one by email user', () => {
-    it('should error if email was not found', async () => {
-      jest.spyOn(prismaService.users, 'findUnique').mockResolvedValue(null);
-
-      await expect(
-        service.findOneByEmail('some@email.com'),
-      ).rejects.toThrowErrorMatchingSnapshot('user with email not found');
-    });
-
-    it('should return a user if found', async () => {
-      const user = { id: 'some id of a user we fetched' } as Users;
-      jest.spyOn(prismaService.users, 'findUnique').mockResolvedValue(user);
-
-      await expect(service.findOneByEmail('some@email.com')).resolves.toEqual(
-        user,
-      );
-    });
-  });
-
-  describe('find one by ID user', () => {
-    it('should error if id was not found', async () => {
-      jest.spyOn(prismaService.users, 'findUnique').mockResolvedValue(null);
-
-      await expect(
-        service.findOneByID('some id'),
-      ).rejects.toThrowErrorMatchingSnapshot('user with ID not found');
-    });
-
-    it('should return user if found', async () => {
-      jest
-        .spyOn(prismaService.users, 'findUnique')
-        .mockResolvedValue({ id: 'the user object' } as Users);
-
-      await expect(service.findOneByID('some id')).resolves.toEqual({
-        id: 'the user object',
       });
     });
   });
@@ -382,7 +364,7 @@ describe('AuthService', () => {
       jest.spyOn(service, 'loginAttemptFailed').mockResolvedValue(null);
 
       // hash of 'therightpassword'
-      jest.spyOn(service, 'findOneByEmail').mockResolvedValue({
+      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue({
         id: 'test id',
         password:
           '$2y$10$Xzx25dxZ/cq0xn7toLj1HuZ1ZMfId8gRuR3VBGvX9fWdboh9xZrMa',
@@ -403,7 +385,7 @@ describe('AuthService', () => {
       jest.spyOn(service, 'loginAttemptSuccess').mockResolvedValue(null);
       jest.spyOn(jwtService, 'signAsync').mockResolvedValue('my_token');
 
-      jest.spyOn(service, 'findOneByEmail').mockResolvedValue({
+      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue({
         id: 'test id',
         role: roles.customer,
         password:
@@ -426,7 +408,7 @@ describe('AuthService', () => {
       jest.spyOn(service, 'forgotPasswordRequest').mockResolvedValue(null);
       jest.spyOn(jwtService, 'sign').mockReturnValue('my_token');
 
-      jest.spyOn(service, 'findOneByEmail').mockResolvedValue({} as Users);
+      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue({} as Users);
 
       await expect(
         service.forgotPassword({
@@ -475,7 +457,7 @@ describe('AuthService', () => {
       jest
         .spyOn(jwtService, 'verifyAsync')
         .mockResolvedValue({ user: 'some_user_id' });
-      jest.spyOn(service, 'findOneByID').mockResolvedValue({
+      jest.spyOn(usersService, 'findOneByID').mockResolvedValue({
         password_reset_token: 'some_random_token',
       } as Users);
 
@@ -493,7 +475,7 @@ describe('AuthService', () => {
       jest
         .spyOn(jwtService, 'verifyAsync')
         .mockResolvedValue({ user: 'some_user_id' });
-      jest.spyOn(service, 'findOneByID').mockResolvedValue({
+      jest.spyOn(usersService, 'findOneByID').mockResolvedValue({
         password_reset_token: 'my_token',
       } as Users);
       jest.spyOn(service, 'resetPassword').mockResolvedValue(null);

@@ -262,6 +262,13 @@ exports[`Products Service create product passes data to prisma query correctly: 
           },
         },
       },
+      "include": {
+        "variations": {
+          "include": {
+            "images": true,
+          },
+        },
+      },
     },
   ],
 ]

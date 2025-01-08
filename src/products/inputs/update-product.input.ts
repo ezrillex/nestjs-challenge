@@ -18,6 +18,6 @@ export class UpdateProductInput {
   is_published: boolean;
 
   // todo maybe once we do resolve field we can play with nested stuff
-  // @Field(() => [UpdateProductVariationInput])
-  // variations: UpdateProductVariationInput[];
+  // @Field(() => [ProductVariations])
+  // variations: ProductVariations[];
 }

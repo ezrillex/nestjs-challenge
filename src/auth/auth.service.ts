@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { EMAIL_TEMPLATE, EmailsService } from '../emails/emails.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private jwtService: JwtService,
     private readonly emailsService: EmailsService,
+    private readonly usersService: UsersService,
   ) {}
 
   /*
@@ -47,7 +49,7 @@ export class AuthService {
     }
   }
 
-  async createUser(data: SignupUserDto) {
+  async registerUser(data: SignupUserDto) {
     if (data.password !== data.repeat_password) {
       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
     }
@@ -88,34 +90,6 @@ export class AuthService {
     });
 
     return user;
-  }
-
-  async findOneByEmail(email: string) {
-    const user = await this.prisma.users.findUnique({
-      where: { email: email },
-    });
-    if (user) {
-      return user;
-    } else {
-      throw new HttpException(
-        "Couldn't find your account. Make sure this is the right email.",
-        HttpStatus.NOT_FOUND,
-      );
-    }
-  }
-
-  async findOneByID(id: string) {
-    const user = await this.prisma.users.findUnique({
-      where: { id: id },
-    });
-    if (user) {
-      return user;
-    } else {
-      throw new HttpException(
-        "Couldn't find an account with the associated id .",
-        HttpStatus.NOT_FOUND,
-      );
-    }
   }
 
   async loginAttemptFailed(id: string, timestamps: Date[]) {
@@ -162,7 +136,7 @@ export class AuthService {
   }
 
   async forgotPassword(data: ForgotPasswordDto) {
-    const user = await this.findOneByEmail(data.email);
+    const user = await this.usersService.findOneByEmail(data.email);
 
     // too many reset attempts check
     this.util_isIn24h(
@@ -221,7 +195,7 @@ export class AuthService {
   }
 
   async loginUser(data: LoginUserDto) {
-    const user = await this.findOneByEmail(data.email);
+    const user = await this.usersService.findOneByEmail(data.email);
 
     // account locked check
     this.util_isIn24h(
@@ -267,7 +241,7 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    const user = await this.findOneByID(payload.user);
+    const user = await this.usersService.findOneByID(payload.user);
 
     if (user.password_reset_token === data.reset_token) {
       await this.resetPassword(user.id, data.password);

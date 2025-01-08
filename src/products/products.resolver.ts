@@ -6,12 +6,10 @@ import { ProductsService } from './products.service';
 import { Products } from './products.model';
 import { GetProductsInput } from './inputs/get-products.input';
 import { UpdateProductInput } from './inputs/update-product.input';
-import { UpdateProductVariationInput } from './product_variation/update-product-variation.input';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { PublicPrivate } from '../common/decorators/public_and_private.decorator';
-import { CreateProductVariationInput } from './product_variation/create_product_variation.input';
 
-@Resolver()
+@Resolver(() => Products)
 export class ProductsResolver {
   constructor(private productsService: ProductsService) {}
 
@@ -67,43 +65,6 @@ export class ProductsResolver {
       request['user'].id,
     );
     return result.id;
-  }
-
-  @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
-  async updateProductVariation(
-    @Args('UpdateProductVariationInput')
-    updateProductVariationInput: UpdateProductVariationInput,
-    @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.UpdateProductVariation(
-      updateProductVariationInput,
-      request['user'].id,
-    );
-    return result.id;
-  }
-
-  @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
-  async createProductVariation(
-    @Args('CreateProductVariationInput')
-    createProductVariationInput: CreateProductVariationInput,
-    @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.CreateProductVariation(
-      createProductVariationInput,
-      request['user'].id,
-    );
-    return result.id;
-  }
-
-  @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
-  async deleteProductVariation(
-    @Args('variation_id', { type: () => String }, ParseUUIDPipe)
-    variation_id: string,
-  ) {
-    return this.productsService.DeleteProductVariation(variation_id);
   }
 
   @RequiresRole(roles.manager)

@@ -55,22 +55,7 @@ export class LikesService {
   }
 
   async GetLikes(user_id: string) {
-    // TODO A resolve field can take care of a lot of this include stuff
     return this.prisma.likesOfProducts.findMany({
-      include: {
-        liked_by: {
-          include: {
-            likes_products: {
-              include: {
-                likes_product_variation: true,
-              },
-            },
-          },
-        },
-        likes_product_variation: {
-          include: { images: true },
-        },
-      },
       where: { user_id: user_id },
     });
   }

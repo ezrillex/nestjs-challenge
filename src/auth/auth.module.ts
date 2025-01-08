@@ -9,6 +9,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { EmailsModule } from '../emails/emails.module';
+import { UsersService } from '../users/users.service';
 
 @Module({
   controllers: [AuthController],
@@ -23,6 +24,7 @@ import { EmailsModule } from '../emails/emails.module';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    UsersService,
   ],
   imports: [
     JwtModule.registerAsync({

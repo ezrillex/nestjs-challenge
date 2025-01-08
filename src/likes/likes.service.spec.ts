@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LikesService } from './likes.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { Decimal } from '@prisma/client/runtime/library';
+import { LikesOfProducts } from '@prisma/client';
 
 describe('LikesService', () => {
   let service: LikesService;
@@ -62,7 +63,7 @@ describe('LikesService', () => {
         id: '2730fc05-6f87-49e5-8a41-559208048ebe',
         user_id: '2730fc05-6f87-49e5-8a41-559208048ebe',
         product_variation_id: '2730fc05-6f87-49e5-8a41-559208048ebe',
-      };
+      } as LikesOfProducts;
       jest
         .spyOn(prismaService.likesOfProducts, 'findFirst')
         .mockResolvedValue(mock_likes);
@@ -98,7 +99,7 @@ describe('LikesService', () => {
         id: '2730fc05-6f87-49e5-8a41-559208048ebe',
         user_id: '2730fc05-6f87-49e5-8a41-559208048ebe',
         product_variation_id: '2730fc05-6f87-49e5-8a41-559208048ebe',
-      };
+      } as LikesOfProducts;
       jest
         .spyOn(prismaService.likesOfProducts, 'create')
         .mockResolvedValue(mock_creation);
@@ -131,7 +132,7 @@ describe('LikesService', () => {
         id: '2730fc05-6f87-49e5-8a41-559208048ebe',
         user_id: '2730fc05-6f87-49e5-8a41-559208048ebe',
         product_variation_id: '2730fc05-6f87-49e5-8a41-559208048ebe',
-      };
+      } as LikesOfProducts;
       jest
         .spyOn(prismaService.likesOfProducts, 'delete')
         .mockResolvedValue(mock_delete_result);
