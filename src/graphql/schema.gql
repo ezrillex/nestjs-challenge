@@ -5,7 +5,6 @@
 type Categories {
   id: String!
   name: String!
-  products: [Products!]!
 }
 
 type Images {
@@ -23,27 +22,12 @@ type ProductVariations {
   images: [Images!]
 }
 
-type Users {
-  id: ID!
-  first_name: String!
-  last_name: String!
-  email: String!
-  likes_products: [LikesOfProducts!]
-}
-
-type LikesOfProducts {
-  id: ID!
-  liked_by: Users
-  likes_product_variation: ProductVariations!
-}
-
 type Products {
   id: ID!
   is_published: Boolean!
   is_deleted: Boolean!
   name: String!
   description: String!
-  likes: [LikesOfProducts!]!
   variations: [ProductVariations!]!
   categories: [Categories!]!
   created_by: String!
@@ -56,6 +40,20 @@ type Products {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type LikesOfProducts {
+  id: ID!
+  user_id: ID!
+  product_variation_id: ID!
+}
+
+type Users {
+  id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
+  likes_products: [LikesOfProducts!]
+}
 
 type CartItems {
   id: ID!
@@ -89,7 +87,7 @@ type Orders {
 
 type Query {
   user(id: ID!): Users!
-  getLikes: [LikesOfProducts!]
+  getLikes: [ProductVariations!]
   getProducts(GetProductsInput: GetProductsInput!): [Products!]
   getProductById(id: String!): Products
   getCartItems: [CartItems!]
@@ -111,6 +109,7 @@ input GetProductsInput {
 type Mutation {
   likeProduct(variation_id: String!): String
   removeLikeProduct(like_id: String!): String
+  toggleLike(product_variation_id: String!, status: Boolean!): LikesOfProducts!
   createProduct(CreateProductInput: CreateProductInput!): Products
   updateProduct(UpdateProductInput: UpdateProductInput!): String
   deleteProduct(product_id: String!): String

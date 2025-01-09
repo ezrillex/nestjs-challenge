@@ -39,8 +39,8 @@ describe('UsersService', () => {
     });
   });
 
-  describe('find one by ID user', () => {
-    it('should error if id was not found', async () => {
+  describe('find one by user ID', () => {
+    it('should throw if id was not found', async () => {
       jest.spyOn(prismaService.users, 'findUnique').mockResolvedValue(null);
 
       await expect(
@@ -49,12 +49,14 @@ describe('UsersService', () => {
     });
 
     it('should return user if found', async () => {
-      jest
-        .spyOn(prismaService.users, 'findUnique')
-        .mockResolvedValue({ id: 'the user object' } as Users);
+      jest.spyOn(prismaService.users, 'findUnique').mockResolvedValue({
+        id: '86d739f2-ed29-4a29-8034-e4e2c562e380',
+      } as Users);
 
-      await expect(service.findOneByID('some id')).resolves.toEqual({
-        id: 'the user object',
+      await expect(
+        service.findOneByID('86d739f2-ed29-4a29-8034-e4e2c562e380'),
+      ).resolves.toEqual({
+        id: '86d739f2-ed29-4a29-8034-e4e2c562e380',
       });
     });
   });

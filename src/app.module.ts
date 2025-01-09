@@ -20,6 +20,8 @@ import { TasksService } from './common/tasks/tasks.service';
 import { UsersResolver } from './users/users.resolver';
 import { PrismaService } from './prisma/prisma.service';
 import { UsersModule } from './users/users.module';
+import { ProductVariationResolver } from './products/product_variation/product_variation.resolver';
+import { ProductsResolver } from './products/products.resolver';
 
 @Module({
   imports: [

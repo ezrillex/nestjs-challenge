@@ -358,7 +358,9 @@ describe('AuthService', () => {
 
     it('should error if password is incorrect', async () => {
       // util is tested already.
-      jest.spyOn(service, 'util_isIn24h').mockImplementation(() => {});
+      const util = jest
+        .spyOn(service, 'util_isIn24h')
+        .mockImplementation(() => {});
 
       // tested already
       jest.spyOn(service, 'loginAttemptFailed').mockResolvedValue(null);
@@ -376,6 +378,7 @@ describe('AuthService', () => {
           password: 'thewrongpassword',
         }),
       ).rejects.toThrowErrorMatchingSnapshot('wrong password response');
+      expect(util).toHaveBeenCalled();
     });
 
     it('should return token and role if all ok', async () => {

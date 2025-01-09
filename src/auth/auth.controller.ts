@@ -23,9 +23,7 @@ export class AuthController {
   @Post('signup')
   async signup(@Body() data: SignupUserDto) {
     const created_user = await this.authService.registerUser(data);
-    return {
-      id: created_user.id,
-    };
+    return created_user;
   }
 
   @Public()

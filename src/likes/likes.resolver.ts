@@ -1,6 +1,7 @@
 import {
   Args,
   Context,
+  Directive,
   Mutation,
   Parent,
   Query,
@@ -9,13 +10,14 @@ import {
 } from '@nestjs/graphql';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { roles } from '@prisma/client';
-import { ParseUUIDPipe } from '@nestjs/common';
-import { LikesOfProducts } from './likes_of_products.model';
+import { ParseBoolPipe, ParseUUIDPipe } from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { ProductsService } from '../products/products.service';
 import { UsersService } from '../users/users.service';
+import { ProductVariations } from '../products/product_variation/product-variations.model';
+import { LikesOfProducts } from './LikesOfProducts.model';
 
-@Resolver(() => LikesOfProducts)
+@Resolver()
 export class LikesResolver {
   constructor(
     private readonly likesService: LikesService,
@@ -23,6 +25,7 @@ export class LikesResolver {
     private readonly usersService: UsersService,
   ) {}
 
+  @Directive('@deprecated(reason: "Use toggleLikes instead")')
   @RequiresRole(roles.customer)
   @Mutation(() => String, { nullable: true })
   async likeProduct(
@@ -35,6 +38,7 @@ export class LikesResolver {
     ).id;
   }
 
+  @Directive('@deprecated(reason: "Use toggleLikes instead")')
   @RequiresRole(roles.customer)
   @Mutation(() => String, { nullable: true })
   async removeLikeProduct(
@@ -45,26 +49,20 @@ export class LikesResolver {
   }
 
   @RequiresRole(roles.customer)
-  @Query(() => [LikesOfProducts], { nullable: true })
+  @Mutation(() => LikesOfProducts)
+  async toggleLike(
+    @Args('product_variation_id', { type: () => String }, ParseUUIDPipe)
+    id: string,
+    @Args('status', { type: () => Boolean }, ParseBoolPipe)
+    status: boolean,
+    @Context('req') request: Request,
+  ) {
+    return this.likesService.ToggleLike(id, status, request['user'].id);
+  }
+
+  @RequiresRole(roles.customer)
+  @Query(() => [ProductVariations], { nullable: true })
   async getLikes(@Context('req') request: Request) {
     return this.likesService.GetLikes(request['user'].id);
-  }
-
-  @ResolveField()
-  async likes_product_variation(@Parent() likesOfProduct: LikesOfProducts) {
-    const { id } = likesOfProduct;
-    const { likes_product_variation } =
-      await this.productsService.ResolveProductVariationsOnLikesOfProductsField(
-        id,
-      );
-    return likes_product_variation;
-  }
-
-  @ResolveField()
-  async liked_by(@Parent() likesOfProduct: LikesOfProducts) {
-    const { id } = likesOfProduct;
-    const { liked_by } =
-      await this.usersService.ResolveUsersOnLikesOfProductsField(id);
-    return liked_by;
   }
 }

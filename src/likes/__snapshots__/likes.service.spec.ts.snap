@@ -10,6 +10,13 @@ exports[`LikesService get likes should pass a query to prisma: prisma query get 
 [
   [
     {
+      "include": {
+        "liked_by": {
+          "select": {
+            "id": true,
+          },
+        },
+      },
       "where": {
         "user_id": "8b3ae683-0626-44be-b591-9271e288388f",
       },

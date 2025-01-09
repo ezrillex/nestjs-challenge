@@ -57,7 +57,6 @@ export class Categories {
     __typename?: 'Categories';
     id: string;
     name: string;
-    products: Products[];
 }
 
 export class Images {
@@ -77,22 +76,6 @@ export class ProductVariations {
     images?: Nullable<Images[]>;
 }
 
-export class Users {
-    __typename?: 'Users';
-    id: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    likes_products?: Nullable<LikesOfProducts[]>;
-}
-
-export class LikesOfProducts {
-    __typename?: 'LikesOfProducts';
-    id: string;
-    liked_by?: Nullable<Users>;
-    likes_product_variation: ProductVariations;
-}
-
 export class Products {
     __typename?: 'Products';
     id: string;
@@ -100,13 +83,28 @@ export class Products {
     is_deleted: boolean;
     name: string;
     description: string;
-    likes: LikesOfProducts[];
     variations: ProductVariations[];
     categories: Categories[];
     created_by: string;
     created_at: DateTime;
     last_updated_by?: Nullable<string>;
     last_updated_at?: Nullable<string>;
+}
+
+export class LikesOfProducts {
+    __typename?: 'LikesOfProducts';
+    id: string;
+    user_id: string;
+    product_variation_id: string;
+}
+
+export class Users {
+    __typename?: 'Users';
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    likes_products?: Nullable<LikesOfProducts[]>;
 }
 
 export class CartItems {
@@ -148,7 +146,7 @@ export abstract class IQuery {
 
     abstract user(id: string): Users | Promise<Users>;
 
-    abstract getLikes(): Nullable<LikesOfProducts[]> | Promise<Nullable<LikesOfProducts[]>>;
+    abstract getLikes(): Nullable<ProductVariations[]> | Promise<Nullable<ProductVariations[]>>;
 
     abstract getProducts(GetProductsInput: GetProductsInput): Nullable<Products[]> | Promise<Nullable<Products[]>>;
 
@@ -169,6 +167,8 @@ export abstract class IMutation {
     abstract likeProduct(variation_id: string): Nullable<string> | Promise<Nullable<string>>;
 
     abstract removeLikeProduct(like_id: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract toggleLike(product_variation_id: string, status: boolean): LikesOfProducts | Promise<LikesOfProducts>;
 
     abstract createProduct(CreateProductInput: CreateProductInput): Nullable<Products> | Promise<Nullable<Products>>;
 

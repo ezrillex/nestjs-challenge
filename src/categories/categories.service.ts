@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Categories } from './categories.model';
 
 @Injectable()
 export class CategoriesService {
@@ -47,5 +48,15 @@ export class CategoriesService {
         'An error occurred when deleting the category.',
       );
     }
+  }
+
+  async ResolveCategories(ids: string[]): Promise<Categories[]> {
+    return this.prisma.categories.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
   }
 }

@@ -37,6 +37,13 @@ exports[`AuthService login user should error if password is incorrect: wrong pas
 
 exports[`AuthService login user should return token and role if all ok: ok response 1`] = `
 {
+  "created_at": undefined,
+  "email": undefined,
+  "first_name": undefined,
+  "id": "test id",
+  "last_name": undefined,
+  "login_at": undefined,
+  "password_last_updated": undefined,
   "role": "customer",
   "token": "my_token",
 }

@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { LikesOfProducts } from '../likes/likes_of_products.model';
 import { IsEmail } from 'class-validator';
+import { LikesOfProducts } from '../likes/LikesOfProducts.model';
 
 @ObjectType()
 export class Users {

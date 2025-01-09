@@ -1,5 +1,13 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
-import { roles } from '@prisma/client';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Context,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
+import { Categories, ProductVariations, roles } from '@prisma/client';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { CreateProductInput } from './inputs/createProduct.input';
 import { ProductsService } from './products.service';
@@ -8,10 +16,14 @@ import { GetProductsInput } from './inputs/get-products.input';
 import { UpdateProductInput } from './inputs/update-product.input';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { PublicPrivate } from '../common/decorators/public_and_private.decorator';
+import { CategoriesService } from '../categories/categories.service';
 
 @Resolver(() => Products)
 export class ProductsResolver {
-  constructor(private productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly categoriesService: CategoriesService,
+  ) {}
 
   @PublicPrivate()
   @Query(() => [Products], { nullable: true })
@@ -79,5 +91,19 @@ export class ProductsResolver {
       request['user'].id,
     );
     return result.id;
+  }
+
+  @ResolveField()
+  async variations(@Parent() product: Products): Promise<ProductVariations[]> {
+    const { variations } = product;
+    const ids = variations.map((variation) => variation.id);
+    return this.productsService.ResolveProductVariations(ids);
+  }
+
+  @ResolveField()
+  async categories(@Parent() product: Products): Promise<Categories[]> {
+    const { categories } = product;
+    const ids = categories.map((category) => category.id);
+    return this.categoriesService.ResolveCategories(ids);
   }
 }

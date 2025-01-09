@@ -46,10 +46,6 @@ exports[`Orders Service Create an order should unroll nested product info and se
       },
     },
   },
-  "include": {
-    "order_items": true,
-    "user": true,
-  },
 }
 `;
 

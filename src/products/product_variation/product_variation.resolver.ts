@@ -13,10 +13,14 @@ import { roles } from '@prisma/client';
 import { UpdateProductVariationInput } from './inputs/update-product-variation.input';
 import { CreateProductVariationInput } from './inputs/create_product_variation.input';
 import { ParseUUIDPipe } from '@nestjs/common';
+import { ImagesService } from '../../images/images.service';
 
 @Resolver(() => ProductVariations)
 export class ProductVariationResolver {
-  constructor(private productsService: ProductsService) {}
+  constructor(
+    private productsService: ProductsService,
+    private readonly imagesService: ImagesService,
+  ) {}
 
   @RequiresRole(roles.manager)
   @Mutation(() => String, { nullable: true })
@@ -58,7 +62,7 @@ export class ProductVariationResolver {
   @ResolveField()
   async images(@Parent() product_variation: ProductVariations) {
     const { id } = product_variation;
-    const { images } = await this.productsService.ResolveImagesField(id);
+    const { images } = await this.imagesService.ResolveImagesField(id);
     return images;
   }
 }

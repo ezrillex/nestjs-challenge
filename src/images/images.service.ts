@@ -85,4 +85,13 @@ export class ImagesService {
       );
     }
   }
+
+  async ResolveImagesField(product_variation_id: string) {
+    return this.prisma.productVariations.findUnique({
+      where: { id: product_variation_id },
+      select: {
+        images: true,
+      },
+    });
+  }
 }

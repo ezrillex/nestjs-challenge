@@ -1,5 +1,4 @@
 import { Field, ObjectType } from '@nestjs/graphql';
-import { Products } from '../products/products.model';
 
 @ObjectType()
 export class Categories {
@@ -8,7 +7,4 @@ export class Categories {
 
   @Field(() => String)
   name: string;
-
-  @Field(() => [Products])
-  products: Products[];
 }

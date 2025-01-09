@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Products, roles } from '@prisma/client';
+import { Products, ProductVariations, roles } from '@prisma/client';
 import { CreateProductInput } from './inputs/createProduct.input';
 import { GetProductsInput } from './inputs/get-products.input';
 import { UpdateProductInput } from './inputs/update-product.input';
@@ -17,44 +17,24 @@ import { DateTime } from 'luxon';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  async ResolveProductVariationsOnCartItemsField(id: string) {
-    return this.prisma.cartItems.findUnique({
-      where: {
-        id: id,
-      },
-      select: {
-        product_variation: true,
-      },
-    });
-  }
-
-  async ResolveProductVariationsOnOrderItemsField(id: string) {
-    return this.prisma.orderItems.findUnique({
-      where: {
-        id: id,
-      },
-      select: {
-        product_variation: true,
-      },
-    });
-  }
-
-  async ResolveProductVariationsOnLikesOfProductsField(id: string) {
-    return this.prisma.likesOfProducts.findUnique({
-      where: {
-        id: id,
-      },
-      select: {
-        likes_product_variation: true,
-      },
-    });
-  }
-
-  async ResolveImagesField(product_variation_id: string) {
+  async ResolveProductVariation(id: string) {
     return this.prisma.productVariations.findUnique({
-      where: { id: product_variation_id },
-      select: {
-        images: true,
+      where: { id: id },
+      include: {
+        images: {
+          select: { id: true },
+        },
+      },
+    });
+  }
+
+  async ResolveProductVariations(ids: string[]): Promise<ProductVariations[]> {
+    return this.prisma.productVariations.findMany({
+      where: { id: { in: ids } },
+      include: {
+        images: {
+          select: { id: true },
+        },
       },
     });
   }
@@ -133,7 +113,10 @@ export class ProductsService {
     });
   }
 
-  async GetProducts(role: roles, params: GetProductsInput) {
+  async GetProducts(
+    role: roles,
+    params: GetProductsInput,
+  ): Promise<Products[]> {
     const filter = {};
     const pagination = { skip: 0, take: 10 };
 
@@ -174,9 +157,11 @@ export class ProductsService {
     return this.prisma.products.findMany({
       include: {
         variations: {
-          include: { images: true },
+          select: {
+            id: true,
+          },
         },
-        categories: true,
+        categories: { select: { id: true } },
       },
       where: filter,
       ...pagination,

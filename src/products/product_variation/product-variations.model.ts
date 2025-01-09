@@ -13,4 +13,5 @@ export class ProductVariations {
   stock: number;
   @Field(() => [Images], { nullable: true })
   images: Images[];
+  // todo here we could query likes but only have it be the users entity inside that
 }

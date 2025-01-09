@@ -84,6 +84,14 @@ export class AuthService {
         password: hashed,
         role: role,
       },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        last_name: true,
+        first_name: true,
+        created_at: true,
+      },
     });
 
     await this.emailsService.sendEmail(EMAIL_TEMPLATE.WELCOME, {
@@ -149,7 +157,7 @@ export class AuthService {
       user: user.id,
     });
 
-    await this.forgotPasswordRequest(
+    const forgotPasswordData = await this.forgotPasswordRequest(
       user.id,
       user.password_reset_requests_timestamps,
       token,
@@ -162,6 +170,8 @@ export class AuthService {
     return {
       message:
         'An email has been sent with a link to reset the password. Check your email.',
+      request_count: forgotPasswordData.password_reset_requests,
+      request_timestamps: forgotPasswordData.password_reset_requests_timestamps,
     };
   }
 
@@ -215,7 +225,17 @@ export class AuthService {
 
       await this.loginAttemptSuccess(user.id, token);
       await this.emailsService.sendEmail(EMAIL_TEMPLATE.LOGIN_SUCCESSFUL);
-      return { token, role: user.role };
+      return {
+        id: user.id,
+        token,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        created_at: user.created_at,
+        role: user.role,
+        login_at: user.login_at,
+        password_last_updated: user.password_last_updated,
+      };
     } else {
       await this.loginAttemptFailed(
         user.id,
@@ -242,12 +262,18 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    const user = await this.usersService.findOneByID(payload.user);
+    const { password_reset_token, id } = await this.usersService.findOneByID(
+      payload.user,
+    );
 
-    if (user.password_reset_token === data.reset_token) {
-      await this.resetPassword(user.id, data.password);
+    if (password_reset_token === data.reset_token) {
+      const { password_last_updated } = await this.resetPassword(
+        id,
+        data.password,
+      );
       return {
         message: 'The password has been reset successfully!',
+        password_last_updated,
       };
     } else {
       throw new HttpException('The token is not valid.', HttpStatus.FORBIDDEN);
