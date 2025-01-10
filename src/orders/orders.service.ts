@@ -86,19 +86,19 @@ export class OrdersService {
     role: roles,
     inputs: GetOrdersInput,
   ): Promise<Orders[]> {
-    const find_parameters = { where: {} };
-    const pagination = { skip: inputs.offset ?? 0, take: inputs.first ?? 10 };
+    const find_parameters = {};
+    const pagination = { skip: inputs?.offset ?? 0, take: inputs?.first ?? 10 };
 
     switch (role) {
       case 'customer':
-        find_parameters.where = {
+        find_parameters['where'] = {
           user_id: user_id,
           // don't hide deleted or private items.
         };
         break;
       case 'manager':
-        if (inputs.client_id) {
-          find_parameters.where = {
+        if (inputs?.client_id) {
+          find_parameters['where'] = {
             user_id: inputs.client_id,
             // don't hide deleted or private items.
           };

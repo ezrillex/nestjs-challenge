@@ -22,4 +22,4 @@ exports[`Carts Service Get Cart Items Should perform a well formed request to pr
 
 exports[`Carts Service Remove a Product from cart Tests Should error if a cart item id is invalid: tried to remove non existing cart items id 1`] = `"Cart Item not found!"`;
 
-exports[`Carts Service Remove a Product from cart Tests Should error if after deletion the object to return is null: delete called to db but deleted obj not returned, something is wrong 1`] = `"Unexpected error when deleting record!"`;
+exports[`Carts Service Remove a Product from cart Tests Should error if deletions fails.: delete called to db but deleted obj not returned, something is wrong 1`] = `"Cart Item not found!"`;

@@ -2,7 +2,11 @@
 
 exports[`Orders Service Create an order should throw if no cart items: error no items in the cart 1`] = `"User has no items in cart!"`;
 
-exports[`Orders Service Create an order should unroll cart ids and send a valid query: create order return 1`] = `"1"`;
+exports[`Orders Service Create an order should unroll cart ids and send a valid query: create order return 1`] = `
+{
+  "id": "1",
+}
+`;
 
 exports[`Orders Service Create an order should unroll cart ids and send a valid query: query of delete many test 1`] = `
 [
@@ -19,7 +23,7 @@ exports[`Orders Service Create an order should unroll cart ids and send a valid 
 ]
 `;
 
-exports[`Orders Service Create an order should unroll nested product info and send a valid query: error ocurred when creating order 1`] = `"An error occurred when creating the order!"`;
+exports[`Orders Service Create an order should unroll nested product info and send a valid query: error ocurred when creating order 1`] = `"Transaction failed: An error occurred when creating the order!"`;
 
 exports[`Orders Service Create an order should unroll nested product info and send a valid query: query of order creation test 1`] = `
 {
@@ -49,7 +53,7 @@ exports[`Orders Service Create an order should unroll nested product info and se
 }
 `;
 
-exports[`Orders Service Create an order throws error if delete count is 0, error: error unexpected when deleting 1`] = `"An unexpected error occurred!"`;
+exports[`Orders Service Create an order throws error if delete count is 0, error: error unexpected when deleting 1`] = `"Transaction failed: An error occurred when creating the order!"`;
 
 exports[`Orders Service Get One Order should include order id and client in query: get one order result 1`] = `
 {
@@ -60,20 +64,68 @@ exports[`Orders Service Get One Order should include order id and client in quer
 }
 `;
 
-exports[`Orders Service Get Orders should query the client id if role manager: role manager result 1`] = `
+exports[`Orders Service Get Orders should query all orders w/pagination if role manager and filter by client id if provided: called with manager query, filter by client id 1`] = `
+[
+  [
+    {
+      "skip": 0,
+      "take": 10,
+      "where": {
+        "user_id": "2730fc05-6f87-49e5-8a41-559208048ebe",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Orders Service Get Orders should query all orders w/pagination if role manager and filter by client id if provided: role manager result 1`] = `
 {
+  "skip": 0,
+  "take": 10,
   "where": {
-    "user_id": "client_id",
+    "user_id": "2730fc05-6f87-49e5-8a41-559208048ebe",
   },
+}
+`;
+
+exports[`Orders Service Get Orders should query all orders w/pagination if role manager: called with manager query 1`] = `
+[
+  [
+    {
+      "skip": 0,
+      "take": 10,
+    },
+  ],
+]
+`;
+
+exports[`Orders Service Get Orders should query all orders w/pagination if role manager: role manager result 1`] = `
+{
+  "skip": 0,
+  "take": 10,
 }
 `;
 
 exports[`Orders Service Get Orders should query the user id if role customer: role customer result 1`] = `
 {
+  "skip": 0,
+  "take": 10,
   "where": {
     "user_id": "the_user_id",
   },
 }
 `;
 
-exports[`Orders Service Get Orders should throw if the client id is null and  if role manager: client id is null 1`] = `"No client id for manager specific request!"`;
+exports[`Orders Service Get Orders should query the user id if role customer: user filtered by itself, w/pagination 1`] = `
+[
+  [
+    {
+      "skip": 0,
+      "take": 10,
+      "where": {
+        "user_id": "the_user_id",
+      },
+    },
+  ],
+]
+`;

@@ -63,8 +63,11 @@ exports[`Stripe Service create payment intent should update prisma with response
 exports[`Stripe Service create payment intent should update prisma with response of service and return key data: returns ok 1`] = `
 {
   "client_secret": "test client secret",
-  "payment_id": "updated intent prisma id",
-  "payment_intent_id": "payment intent id",
+  "created_at": 2021-01-12T18:12:12.000Z,
+  "id": "8b3ae683-0626-44be-b591-9271e288388f",
+  "order_id": "8b3ae683-0626-44be-b591-9271e288388f",
+  "status": "requires_payment_method",
+  "stripe_event_id": "8b3ae683-0626-44be-b591-9271e288388f",
 }
 `;
 

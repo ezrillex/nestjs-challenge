@@ -4,14 +4,6 @@ exports[`Products Service Get one product by id passes data to prisma query role
 [
   [
     {
-      "include": {
-        "categories": true,
-        "variations": {
-          "include": {
-            "images": true,
-          },
-        },
-      },
       "where": {
         "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
         "is_deleted": false,
@@ -26,14 +18,6 @@ exports[`Products Service Get one product by id passes data to prisma query role
 [
   [
     {
-      "include": {
-        "categories": true,
-        "variations": {
-          "include": {
-            "images": true,
-          },
-        },
-      },
       "where": {
         "id": "5c0532dc-2174-46f5-b97e-b4b297e9e699",
         "is_deleted": false,
@@ -70,14 +54,6 @@ exports[`Products Service Get products passes data to prisma query including cat
 [
   [
     {
-      "include": {
-        "categories": true,
-        "variations": {
-          "include": {
-            "images": true,
-          },
-        },
-      },
       "skip": 0,
       "take": 10,
       "where": {
@@ -105,14 +81,6 @@ exports[`Products Service Get products passes data to prisma query including cus
 [
   [
     {
-      "include": {
-        "categories": true,
-        "variations": {
-          "include": {
-            "images": true,
-          },
-        },
-      },
       "skip": 20,
       "take": 10,
       "where": {
@@ -140,14 +108,6 @@ exports[`Products Service Get products passes data to prisma query including sea
 [
   [
     {
-      "include": {
-        "categories": true,
-        "variations": {
-          "include": {
-            "images": true,
-          },
-        },
-      },
       "skip": 0,
       "take": 10,
       "where": {
@@ -165,14 +125,6 @@ exports[`Products Service Get products passes data to prisma query including unp
 [
   [
     {
-      "include": {
-        "categories": true,
-        "variations": {
-          "include": {
-            "images": true,
-          },
-        },
-      },
       "skip": 0,
       "take": 10,
       "where": {
@@ -187,14 +139,6 @@ exports[`Products Service Get products passes data to prisma query with defaults
 [
   [
     {
-      "include": {
-        "categories": true,
-        "variations": {
-          "include": {
-            "images": true,
-          },
-        },
-      },
       "skip": 0,
       "take": 10,
       "where": {
@@ -262,13 +206,6 @@ exports[`Products Service create product passes data to prisma query correctly: 
           },
         },
       },
-      "include": {
-        "variations": {
-          "include": {
-            "images": true,
-          },
-        },
-      },
     },
   ],
 ]
@@ -328,7 +265,7 @@ exports[`Products Service delete product variation sends the data to query a del
 ]
 `;
 
-exports[`Products Service delete product variation throws if deletion failed: error when deleting no result 1`] = `"Something went wrong when deleting the product variation."`;
+exports[`Products Service delete product variation throws if deletion failed: error when deleting no result 1`] = `"testing"`;
 
 exports[`Products Service delete product variation throws if not found: not found product variation 1`] = `"Product Variation not found."`;
 

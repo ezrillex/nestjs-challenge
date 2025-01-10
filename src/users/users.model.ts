@@ -35,4 +35,8 @@ export class Users {
 
   password_reset_requests?: number;
   password_reset_requests_timestamps?: Date[];
+  failed_login_attempts_timestamps?: Date[];
+  password?: string;
+  password_reset_token?: string;
+  session_token?: string;
 }

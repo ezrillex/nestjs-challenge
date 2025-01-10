@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.18% </span>
+                <span class="strong">96.42% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>54/55</span>
+                <span class='fraction'>54/56</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">98.11% </span>
+                <span class="strong">96.29% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>52/53</span>
+                <span class='fraction'>52/54</span>
             </div>
         
             
@@ -275,7 +275,25 @@
 <a name='L210'></a><a href='#L210'>210</a>
 <a name='L211'></a><a href='#L211'>211</a>
 <a name='L212'></a><a href='#L212'>212</a>
-<a name='L213'></a><a href='#L213'>213</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a>
+<a name='L221'></a><a href='#L221'>221</a>
+<a name='L222'></a><a href='#L222'>222</a>
+<a name='L223'></a><a href='#L223'>223</a>
+<a name='L224'></a><a href='#L224'>224</a>
+<a name='L225'></a><a href='#L225'>225</a>
+<a name='L226'></a><a href='#L226'>226</a>
+<a name='L227'></a><a href='#L227'>227</a>
+<a name='L228'></a><a href='#L228'>228</a>
+<a name='L229'></a><a href='#L229'>229</a>
+<a name='L230'></a><a href='#L230'>230</a>
+<a name='L231'></a><a href='#L231'>231</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -285,6 +303,7 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -309,6 +328,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -391,6 +411,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -436,7 +460,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -455,6 +488,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -498,6 +534,7 @@ import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaymentStatus } from '@prisma/client';
+import { PaymentIntents } from './payments.model';
 &nbsp;
 @Injectable()
 export class StripeService {
@@ -512,8 +549,8 @@ export class StripeService {
     });
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  async </span>ResolvePaymentsOnOrdersField(id: string) {
-<span class="cstat-no" title="statement not covered" >    return this.prisma.orders.findUnique({</span>
+<span class="fstat-no" title="function not covered" >  async </span>ResolvePaymentsOnOrdersField(id: string): Promise&lt;PaymentIntents[]&gt; {
+    const { PaymentIntents } = <span class="cstat-no" title="statement not covered" >await this.prisma.orders.findUnique({</span>
       where: {
         id: id,
       },
@@ -521,9 +558,10 @@ export class StripeService {
         PaymentIntents: true,
       },
     });
+<span class="cstat-no" title="statement not covered" >    return PaymentIntents;</span>
   }
 &nbsp;
-  async webhook(req: Request, raw: Buffer) {
+  async webhook(req: Request, raw: Buffer): Promise&lt;{ received: boolean }&gt; {
     const sig = req.headers['stripe-signature'];
 &nbsp;
     if (!sig) {
@@ -602,7 +640,11 @@ export class StripeService {
     return { received: true };
   }
 &nbsp;
-  async createPaymentIntent(amount: number, order_id: string, user_id: string) {
+  async createPaymentIntent(
+    amount: number,
+    order_id: string,
+    user_id: string,
+  ): Promise&lt;PaymentIntents &amp; { client_secret: string }&gt; {
     if (amount &lt;= 0) {
       throw new BadRequestException('Amount cant be negative or zero!');
     }
@@ -640,6 +682,13 @@ export class StripeService {
     }
 &nbsp;
     const result = await this.prisma.paymentIntents.update({
+      select: {
+        id: true,
+        status: true,
+        order_id: true,
+        created_at: true,
+        stripe_event_id: true,
+      },
       where: { id: intent_record.id },
       data: {
         status: 'requires_payment_method',
@@ -649,13 +698,15 @@ export class StripeService {
     });
 &nbsp;
     return {
-      payment_intent_id: paymentIntent.id,
+      ...result,
       client_secret: paymentIntent.client_secret,
-      payment_id: result.id,
     };
   }
 &nbsp;
-  async getOrderPayments(order_id: string, user_id: string) {
+  async getOrderPayments(
+    order_id: string,
+    user_id: string,
+  ): Promise&lt;PaymentIntents[]&gt; {
     // checks if order exists and because filter of user checks if is of user.
     const record = await this.prisma.orders.count({
       where: { id: order_id, user_id: user_id },
@@ -680,7 +731,10 @@ export class StripeService {
   }
 &nbsp;
   // DEBUG ONLY METHOD --------------------------------------------------
-  async updatePaymentIntent(payment_id: string, payment_method: string) {
+  async updatePaymentIntent(
+    payment_id: string,
+    payment_method: string,
+  ): Promise&lt;Stripe.PaymentIntent&gt; {
     // check if order exists
     const record = await this.prisma.paymentIntents.findUnique({
       where: { id: payment_id },
@@ -706,7 +760,7 @@ export class StripeService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-08T21:07:37.536Z
+                at 2025-01-10T22:37:17.435Z
             </div>
         <script src="../prettify.js"></script>
         <script>

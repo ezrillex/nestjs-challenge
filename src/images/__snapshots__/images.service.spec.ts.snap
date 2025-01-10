@@ -39,7 +39,9 @@ exports[`ImagesService upload image method should query prisma for creation. : q
         "url": "https://www.cloudinary.com/",
       },
       "select": {
+        "created_at": true,
         "id": true,
+        "product_variation_id": true,
         "url": true,
       },
     },

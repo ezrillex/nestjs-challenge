@@ -42,7 +42,7 @@ describe('Orders Service', () => {
   describe('Get Orders', () => {
     it('should query the user id if role customer', async () => {
       let data;
-      jest
+      const spy = jest
         .spyOn(prismaService.orders, 'findMany')
         .mockImplementation((query) => {
           data = query;
@@ -50,34 +50,47 @@ describe('Orders Service', () => {
         });
 
       await expect(
-        service.GetOrders('the_user_id', roles.customer),
+        service.GetOrders('the_user_id', roles.customer, null),
       ).resolves.not.toThrow();
 
       expect(data).toMatchSnapshot('role customer result');
+      expect(spy.mock.calls).toMatchSnapshot(
+        'user filtered by itself, w/pagination',
+      );
     });
 
-    it('should query the client id if role manager', async () => {
+    it('should query all orders w/pagination if role manager', async () => {
       let data;
-      jest
+      const spy = jest
         .spyOn(prismaService.orders, 'findMany')
         .mockImplementation((query) => {
           data = query;
           return null;
         });
 
-      await service.GetOrders('the_user_id', roles.manager, 'client_id');
+      await service.GetOrders('the_user_id', roles.manager, null);
 
       expect(data).toMatchSnapshot('role manager result');
+      expect(spy.mock.calls).toMatchSnapshot('called with manager query');
     });
 
-    it('should throw if the client id is null and  if role manager', async () => {
-      jest.spyOn(prismaService.orders, 'findMany').mockImplementation(() => {
-        return null;
+    it('should query all orders w/pagination if role manager and filter by client id if provided', async () => {
+      let data;
+      const spy = jest
+        .spyOn(prismaService.orders, 'findMany')
+        .mockImplementation((query) => {
+          data = query;
+          return null;
+        });
+
+      await service.GetOrders('the_user_id', roles.manager, {
+        client_id: '2730fc05-6f87-49e5-8a41-559208048ebe',
       });
 
-      await expect(
-        service.GetOrders('the_user_id', roles.manager),
-      ).rejects.toThrowErrorMatchingSnapshot('client id is null');
+      expect(data).toMatchSnapshot('role manager result');
+      expect(spy.mock.calls).toMatchSnapshot(
+        'called with manager query, filter by client id',
+      );
     });
   });
 
@@ -91,7 +104,7 @@ describe('Orders Service', () => {
           return null;
         });
 
-      await service.GetOrder('testing_user_id', 'testing_client_id');
+      await service.GetOrder('testing_user_id', 'testing_client_id', null);
 
       expect(data).toMatchSnapshot('get one order result');
     });

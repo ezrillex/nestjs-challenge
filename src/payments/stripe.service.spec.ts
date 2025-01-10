@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { StripeService } from './stripe.service';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { PaymentIntents } from '@prisma/client';
+import { PaymentIntents, PaymentStatus } from '@prisma/client';
 
 jest.mock('stripe');
 
@@ -151,7 +151,11 @@ describe('Stripe Service', () => {
         .mockResolvedValue({ id: 'some id' } as PaymentIntents);
 
       jest.spyOn(prismaService.paymentIntents, 'update').mockResolvedValue({
-        id: 'updated intent prisma id',
+        id: '8b3ae683-0626-44be-b591-9271e288388f',
+        status: PaymentStatus.requires_payment_method,
+        order_id: '8b3ae683-0626-44be-b591-9271e288388f',
+        created_at: new Date(2020, 12, 12, 12, 12, 12),
+        stripe_event_id: '8b3ae683-0626-44be-b591-9271e288388f',
       } as PaymentIntents);
 
       await expect(

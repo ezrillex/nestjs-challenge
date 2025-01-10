@@ -5,6 +5,7 @@ import { UpdateProductInput } from './inputs/update-product.input';
 import { Products, ProductVariations, roles } from '@prisma/client';
 import { UpdateProductVariationInput } from './product_variation/inputs/update-product-variation.input';
 import { CreateProductVariationInput } from './product_variation/inputs/create_product_variation.input';
+import { InternalServerErrorException } from '@nestjs/common';
 
 describe('Products Service', () => {
   let service: ProductsService;
@@ -406,8 +407,12 @@ describe('Products Service', () => {
       jest
         .spyOn(prismaService.productVariations, 'findUnique')
         .mockResolvedValue({
-          product_id: '3d13dcec-6894-4de0-b980-688b897ad7ac',
-        } as ProductVariations);
+          product: {
+            _count: {
+              variations: 1,
+            },
+          },
+        } as any);
       jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(1);
 
       await expect(
@@ -419,13 +424,17 @@ describe('Products Service', () => {
       jest
         .spyOn(prismaService.productVariations, 'findUnique')
         .mockResolvedValue({
-          product_id: '3d13dcec-6894-4de0-b980-688b897ad7ac',
-        } as ProductVariations);
+          product: {
+            _count: {
+              variations: 3,
+            },
+          },
+        } as any);
       jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(2);
 
       jest
         .spyOn(prismaService.productVariations, 'delete')
-        .mockResolvedValue(null);
+        .mockRejectedValue(new InternalServerErrorException('testing'));
 
       await expect(
         service.DeleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
@@ -436,8 +445,12 @@ describe('Products Service', () => {
       jest
         .spyOn(prismaService.productVariations, 'findUnique')
         .mockResolvedValue({
-          product_id: '3d13dcec-6894-4de0-b980-688b897ad7ac',
-        } as ProductVariations);
+          product: {
+            _count: {
+              variations: 3,
+            },
+          },
+        } as any);
       jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(2);
 
       const spy = jest

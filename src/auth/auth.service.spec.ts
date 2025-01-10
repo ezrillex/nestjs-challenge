@@ -408,7 +408,12 @@ describe('AuthService', () => {
     it('should return status string with token', async () => {
       // is already tested.
       jest.spyOn(service, 'util_isIn24h').mockImplementation(() => {});
-      jest.spyOn(service, 'forgotPasswordRequest').mockResolvedValue(null);
+      jest.spyOn(service, 'forgotPasswordRequest').mockResolvedValue({
+        password_reset_requests: 1,
+        password_reset_requests_timestamps: [
+          new Date(2020, 12, 12, 12, 12, 12),
+        ],
+      } as Users);
       jest.spyOn(jwtService, 'sign').mockReturnValue('my_token');
 
       jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue({} as Users);
@@ -420,6 +425,8 @@ describe('AuthService', () => {
       ).resolves.toEqual({
         message:
           'An email has been sent with a link to reset the password. Check your email.',
+        request_count: 1,
+        request_timestamps: [new Date(2020, 12, 12, 12, 12, 12)],
       });
     });
   });
@@ -481,7 +488,9 @@ describe('AuthService', () => {
       jest.spyOn(usersService, 'findOneByID').mockResolvedValue({
         password_reset_token: 'my_token',
       } as Users);
-      jest.spyOn(service, 'resetPassword').mockResolvedValue(null);
+      jest.spyOn(service, 'resetPassword').mockResolvedValue({
+        password_last_updated: new Date(2020, 12, 12, 12, 12, 12),
+      } as Users);
 
       await expect(
         service.changePassword({
@@ -491,6 +500,7 @@ describe('AuthService', () => {
         }),
       ).resolves.toEqual({
         message: 'The password has been reset successfully!',
+        password_last_updated: new Date(2020, 12, 12, 12, 12, 12),
       });
     });
   });

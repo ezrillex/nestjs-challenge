@@ -66,9 +66,11 @@ describe('CategoriesService', () => {
       ).resolves.toEqual('Record Deleted');
     });
 
-    it('should throw if nothing is returned from prisma', async () => {
+    it('should throw if prisma fails', async () => {
       jest.spyOn(prismaService.categories, 'count').mockResolvedValue(1);
-      jest.spyOn(prismaService.categories, 'delete').mockResolvedValue(null);
+      jest
+        .spyOn(prismaService.categories, 'delete')
+        .mockRejectedValue(new Error('testing'));
       await expect(
         service.DeleteCategory('2730fc05-6f87-49e5-8a41-559208048ebe'),
       ).rejects.toThrowErrorMatchingSnapshot('error when deleting');

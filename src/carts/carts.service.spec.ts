@@ -46,7 +46,7 @@ describe('Carts Service', () => {
     it('Should if given an id update an existing element', async () => {
       jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(1);
       jest
-        .spyOn(prismaService.cartItems, 'findFirst')
+        .spyOn(prismaService.cartItems, 'findUnique')
         .mockResolvedValue({ id: 'testing' } as CartItems);
 
       let updated = false;
@@ -94,8 +94,10 @@ describe('Carts Service', () => {
       );
     });
 
-    it('Should error if after deletion the object to return is null', async () => {
-      jest.spyOn(prismaService.cartItems, 'delete').mockResolvedValue(null);
+    it('Should error if deletions fails.', async () => {
+      jest
+        .spyOn(prismaService.cartItems, 'delete')
+        .mockRejectedValue(new Error('testing'));
       jest.spyOn(prismaService.cartItems, 'count').mockResolvedValue(1);
 
       await expect(
@@ -115,7 +117,9 @@ describe('Carts Service', () => {
         product_variation_id: 'testing',
         quantity: 3,
       });
-      jest.spyOn(prismaService.cartItems, 'count').mockResolvedValue(1);
+      jest
+        .spyOn(prismaService.cartItems, 'findUnique')
+        .mockResolvedValue({ testing: 'test' } as any);
 
       await expect(
         service.RemoveCartItem(
