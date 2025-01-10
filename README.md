@@ -13,6 +13,7 @@ You can choose the target of your business, be creative!.
 * ✅ Prettier
 * ✅ Eslint
 
+Interactive Coverage Report : [https://ezrillex.github.io/nestjs-challenge/coverage/lcov-report/](https://ezrillex.github.io/nestjs-challenge/coverage/lcov-report/)
 ![](./pictures/coverage.png)
 
 ## Requirements to Run
