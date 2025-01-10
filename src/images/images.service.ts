@@ -28,7 +28,7 @@ export class ImagesService {
     imageBase64: string,
     mime_type: string,
     product_variation_id: string,
-  ) {
+  ): Promise<Images> {
     if (!mime_type.startsWith('image/')) {
       throw new BadRequestException('Image must have a valid image mime type');
     }
@@ -54,6 +54,8 @@ export class ImagesService {
       select: {
         id: true,
         url: true,
+        created_at: true,
+        product_variation_id: true,
       },
       data: {
         cdn_id: image.public_id,
@@ -66,7 +68,7 @@ export class ImagesService {
     });
   }
 
-  async deleteImageById(id: string) {
+  async deleteImageById(id: string): Promise<Images> {
     const record = await this.prisma.images.findUnique({
       where: { id: id },
     });

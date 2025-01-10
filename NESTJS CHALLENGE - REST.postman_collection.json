@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "ad0df67b-e7eb-4877-bf35-8027b0f194d4",
-		"name": "NESTJS CHALLENGE",
+		"name": "NESTJS CHALLENGE - REST",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "18493640"
 	},
@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"first_name\": \"JUAN\",\r\n    \"last_name\": \"PEREZ\",\r\n    \"email\": \"admin@gmail.com\", \r\n    \"password\": \"password\",\r\n    \"repeat_password\": \"password\"\r\n}",
+							"raw": "{\r\n    \"first_name\": \"JUAN\",\r\n    \"last_name\": \"PEREZ\",\r\n    \"email\": \"what_is_this@gmail.com\", \r\n    \"password\": \"password\",\r\n    \"repeat_password\": \"password\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -44,7 +44,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"customer@gmail.com\", \r\n    \"password\": \"password\"\r\n}",
+							"raw": "{\r\n    \"email\": \"customer@gmail.com\", \r\n    \"password\": \"new_password\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -72,7 +72,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"customer@gmail.com\"\r\n}",
+							"raw": "{\r\n    \"email\": \"manager@gmail.com\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -100,7 +100,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"reset_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNWVkYzQ0ZjAtMjVlYy00OGIwLWIwZDItZDQzMzczZmY0NzkwIiwiaWF0IjoxNzM1NjU2NjA2LCJleHAiOjE3MzU3NDMwMDZ9.O4uaI6kaQQio8l0BJsif2cyuYFAeXgjguDnR_WQpU0A\", \r\n    \"password\": \"new_password\",\r\n    \"repeat_password\": \"new_password\"\r\n}",
+							"raw": "{\r\n    \"reset_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMGI2NTUzODYtMjcyNy00OTZjLTg2ZjUtYjQ3MjgzNjI5ZGNlIiwiaWF0IjoxNzM2MzcyMDUxLCJleHAiOjE3MzY0NTg0NTF9.zw718aJw-CEVvSmFKjnETcEw9OM9PPRIPN-zrx1PBSw\", \r\n    \"password\": \"new_password\",\r\n    \"repeat_password\": \"new_password\"\r\n}\r\n\r\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -149,579 +149,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "[DEPRECATED] get my user",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "localhost:3000/auth",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"auth"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "products",
-			"item": [
-				{
-					"name": "product_variations",
-					"item": [
-						{
-							"name": "update product variation",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{MANAGER_TOKEN}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation UpdateProductVariation($updateProductVariationInput: UpdateProductVariationInput!) {\r\n  updateProductVariation(UpdateProductVariationInput: $updateProductVariationInput)\r\n}",
-										"variables": "{\r\n  \"updateProductVariationInput\": {\r\n    \"id\": \"bbb0fbd8-c277-4983-bdcb-b6ddb13a4c30\",\r\n    \"title\": \"CHANGED FOR DEMO\"\r\n  }\r\n}"
-									}
-								},
-								"url": {
-									"raw": "localhost:3000/graphql",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"graphql"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "create product variation",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{MANAGER_TOKEN}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation CreateProductVariation($createProductVariationInput: CreateProductVariationInput!) {\r\n  createProductVariation(CreateProductVariationInput: $createProductVariationInput)\r\n}",
-										"variables": "{\r\n  \"createProductVariationInput\": {\r\n    \"product_id\": \"cc4f8da6-acc4-456c-812a-8ce92bdb8f43\",\r\n    \"title\": \"WHOA NEW VARIATION\",\r\n    \"price\": 690,\r\n    \"stock\": 42\r\n  }\r\n}"
-									}
-								},
-								"url": {
-									"raw": "localhost:3000/graphql",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"graphql"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "delete product variation",
-							"request": {
-								"auth": {
-									"type": "bearer",
-									"bearer": [
-										{
-											"key": "token",
-											"value": "{{MANAGER_TOKEN}}",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "graphql",
-									"graphql": {
-										"query": "mutation DeleteProductVariation($variationId: String!) {\r\n  deleteProductVariation(variation_id: $variationId)\r\n}",
-										"variables": "{\r\n  \"variationId\": \"da2eeec3-8d3d-4f91-a05f-34482a472a79\"\r\n}"
-									}
-								},
-								"url": {
-									"raw": "localhost:3000/graphql",
-									"host": [
-										"localhost"
-									],
-									"port": "3000",
-									"path": [
-										"graphql"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "get products",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query myQuery($getProductsInput: GetProductsInput!) {\r\n  getProducts(GetProductsInput: $getProductsInput) {\r\n    id\r\n    categories {\r\n        id\r\n        name\r\n    }\r\n    name\r\n    description\r\n    variations {\r\n        id\r\n      title\r\n      price\r\n      stock\r\n    }\r\n  }\r\n}",
-								"variables": "{\r\n  \"getProductsInput\": {\r\n    \"first\": 10,\r\n    \"offset\": 0,\r\n    \"categoryFilter\": [],\r\n    \"search\": \"\",\r\n    \"likedOnly\": false,\r\n    \"omitImages\": false,\r\n    \"sort\": \"ASC\"\r\n  }\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get one product",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query GetProductById($getProductByIdId: String!) {\r\n  getProductById(id: $getProductByIdId) {\r\n    id\r\n    is_published\r\n    is_deleted\r\n    name\r\n    description\r\n    categories {\r\n        id\r\n        name\r\n    }\r\n    variations {\r\n      id\r\n      title\r\n      price\r\n      stock\r\n      images {\r\n        id\r\n        url\r\n        created_at\r\n        product_variation_id\r\n      }\r\n    }\r\n    created_by\r\n    created_at\r\n    last_updated_by\r\n    last_updated_at\r\n  }\r\n}",
-								"variables": "{\r\n  \"getProductByIdId\": \"ec2d1c71-fbcf-4a9b-9834-9af427d48779\"\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "create a product",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{MANAGER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation CreateProduct($createProductInput: CreateProductInput!) {\r\n  createProduct(CreateProductInput: $createProductInput)\r\n}",
-								"variables": "{\r\n  \"createProductInput\": {\r\n    \"name\": \"testing new branch\",\r\n    \"description\": \"life is good\",\r\n    \"categories\": [],\r\n    \"variations\": [\r\n      {\r\n        \"title\": \"256 gb bluee\",\r\n        \"price\": 99.79,\r\n        \"stock\": 5\r\n      },\r\n      {\r\n        \"title\": \"256 gb green\",\r\n        \"price\": 99.79,\r\n        \"stock\": 5\r\n      }\r\n    ]\r\n  }\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete product",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{MANAGER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation DeleteProduct($productId: String!) {\r\n  deleteProduct(product_id: $productId)\r\n}",
-								"variables": "{\r\n  \"productId\": \"7e8679d7-9e15-44a7-88d9-7a87c8590171\"\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "update product",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{MANAGER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation UpdateProduct($updateProductInput: UpdateProductInput!) {\r\n  updateProduct(UpdateProductInput: $updateProductInput)\r\n}",
-								"variables": "{\r\n  \"updateProductInput\": {\r\n    \"id\": \"11198073-91b7-41e9-8f0e-07d763921059\",\r\n    \"name\": \"TEST TODAY\",\r\n    \"description\": \"NEW DESCRIPTION!\",\r\n    \"is_published\": true\r\n  }\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "carts",
-			"item": [
-				{
-					"name": "add to cart",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation AddToCart($variationId: String!, $quantity: Int!) {\r\n  addToCart(variation_id: $variationId, quantity: $quantity)\r\n}",
-								"variables": "{  \"variationId\": \"bbb0fbd8-c277-4983-bdcb-b6ddb13a4c30\",\r\n  \"quantity\": 5\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get cart items",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query GetCartItems {\r\n  getCartItems {\r\n    id\r\n    cart_owner {\r\n      email\r\n    }\r\n    product_variation {\r\n      title\r\n      id\r\n      price\r\n      stock\r\n      images {\r\n        url\r\n      }\r\n    }\r\n    quantity\r\n  }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete cart item",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation RemoveFromCart($cartItemId: String!) {\r\n  removeFromCart(cart_item_id: $cartItemId)\r\n}",
-								"variables": "{\r\n  \"cartItemId\": \"2a3b069e-ffe9-41b1-993e-5359d3ec19bc\"\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "orders",
-			"item": [
-				{
-					"name": "create order",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation Mutation {\r\n  createOrder\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET orders",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query GetOrders {\r\n  getOrders {\r\n    id\r\n    user {\r\n      id\r\n      first_name\r\n      last_name\r\n      email\r\n    }\r\n    paymentStatus\r\n    order_items {\r\n      id\r\n      quantity\r\n      price_purchased_at\r\n      product_variation {\r\n        title\r\n        stock\r\n      }\r\n    }\r\n  }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET order single",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query GetOrder($orderId: String!) {\r\n  getOrder(order_id: $orderId) {\r\n    id\r\n    user {\r\n      id\r\n      first_name\r\n      last_name\r\n      email\r\n    }\r\n    paymentStatus\r\n    orderStatus\r\n    order_items {\r\n      id\r\n      quantity\r\n      price_purchased_at\r\n      product_variation {\r\n        title\r\n        stock\r\n      }\r\n    }\r\n  }\r\n}\r\n\r\n\r\n\r\n",
-								"variables": "{\r\n  \"orderId\": \"d89c905b-d405-432d-a5ce-729ccc558fec\"\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get client orders manager",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{MANAGER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query GetClientOrders($clientId: String) {\r\n  getClientOrders(client_id: $clientId) {\r\n    id\r\n    user {\r\n      id\r\n      first_name\r\n      last_name\r\n      email\r\n    }\r\n    paymentStatus\r\n    orderStatus\r\n    order_items {\r\n      id\r\n      quantity\r\n      price_purchased_at\r\n      product_variation {\r\n        title\r\n        stock\r\n      }\r\n    }\r\n  }\r\n}",
-								"variables": "{\r\n  \"clientId\": \"5edc44f0-25ec-48b0-b0d2-d43373ff4790\"\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		},
@@ -745,7 +172,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"order_id\":\"d89c905b-d405-432d-a5ce-729ccc558fec\",\r\n    \"amount\": 2999\r\n}",
+							"raw": "{\r\n    \"order_id\":\"5111a64f-ab04-460a-aef8-6cf6c187110c\",\r\n    \"amount\": 2999\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -781,14 +208,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/payments/d89c905b-d405-432d-a5ce-729ccc558fec",
+							"raw": "localhost:3000/payments/5111a64f-ab04-460a-aef8-6cf6c187110c",
 							"host": [
 								"localhost"
 							],
 							"port": "3000",
 							"path": [
 								"payments",
-								"d89c905b-d405-432d-a5ce-729ccc558fec"
+								"5111a64f-ab04-460a-aef8-6cf6c187110c"
 							]
 						}
 					},
@@ -928,199 +355,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:3000/images/c5988720-6308-4b50-b422-7e569996290b",
+							"raw": "localhost:3000/images/06945785-f957-4feb-af45-add61dfd8505",
 							"host": [
 								"localhost"
 							],
 							"port": "3000",
 							"path": [
 								"images",
-								"c5988720-6308-4b50-b422-7e569996290b"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "categories",
-			"item": [
-				{
-					"name": "create category",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{MANAGER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation CreateCategory($name: String!) {\r\n  createCategory(name: $name)\r\n}",
-								"variables": "{\r\n    \"name\": \"random_category_name1\"\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete category",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{MANAGER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "\r\nmutation DeleteCategory($deleteCategoryId: ID!) {\r\n  deleteCategory(id: $deleteCategoryId)\r\n}",
-								"variables": "{\r\n  \"deleteCategoryId\": \"e6b56ce3-1b3b-473f-85a0-1efc6838ee37\"\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "likes",
-			"item": [
-				{
-					"name": "LIKE a product variation",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation LikeProduct($variationId: String!) {\r\n  likeProduct(variation_id: $variationId)\r\n}",
-								"variables": "{\r\n  \"variationId\": \"03304941-45b9-4b64-9c97-5210cb49b53c\"\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get likes of self auth user",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "query GetLikes {\r\n  getLikes {\r\n    id\r\n    likes_product_variation {\r\n      title\r\n      price\r\n      stock\r\n    }\r\n  }\r\n}",
-								"variables": ""
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "delete a like",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{CUSTOMER_TOKEN}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "graphql",
-							"graphql": {
-								"query": "mutation RemoveLikeProduct($likeId: String!) {\r\n  removeLikeProduct(like_id: $likeId)\r\n}",
-								"variables": "{\r\n  \"likeId\": \"301cbd57-1c19-4532-ab37-5a79e5435e7c\"\r\n}"
-							}
-						},
-						"url": {
-							"raw": "localhost:3000/graphql",
-							"host": [
-								"localhost"
-							],
-							"port": "3000",
-							"path": [
-								"graphql"
+								"06945785-f957-4feb-af45-add61dfd8505"
 							]
 						}
 					},
@@ -1158,13 +400,18 @@
 		},
 		{
 			"key": "CUSTOMER_TOKEN",
-			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNGU0Mzk1YWMtNTlkNy00Y2JkLWFlNmUtNTg5YmRhZTRlNWVkIiwicm9sZSI6ImN1c3RvbWVyIiwiaWF0IjoxNzM2MTY2MzkyLCJleHAiOjE3MzYyNTI3OTJ9.rbnKvNpq6YKljHQJwkH14h-7nIeWi3cAKxssvXJGb2I",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMmViZjlkZGEtNzEyYS00MWVhLTg3YWQtMjk1N2JjZjFiMTRhIiwicm9sZSI6ImN1c3RvbWVyIiwiaWF0IjoxNzM2MzUyMTkwLCJleHAiOjE3MzY0Mzg1OTB9.pIXB5j1Op0Mb9DZZ76hYh9aIDpdmLkBlfqRMYg3kMoI",
 			"type": "default"
 		},
 		{
 			"key": "MANAGER_TOKEN",
 			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiMWM5YzQ4MzMtMTM5NS00ZTQ1LTkzOTEtNzlmZjk1M2JjNWVlIiwicm9sZSI6Im1hbmFnZXIiLCJpYXQiOjE3MzYxNjY1MDIsImV4cCI6MTczNjI1MjkwMn0.fJa6asfFk7VH-9Iy8DKWZwtX2uS4a8BBcSLUlxK_l-E",
 			"type": "string"
+		},
+		{
+			"key": "OTHER_CUSTOMER_TOKEN",
+			"value": "",
+			"type": "default"
 		}
 	]
 }

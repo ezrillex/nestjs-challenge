@@ -78,7 +78,7 @@ type OrderItems {
 type PaymentIntents {
   id: ID!
   status: String
-  created_at: String!
+  created_at: DateTime!
   stripe_event_id: ID!
 }
 
@@ -130,7 +130,7 @@ type Mutation {
   deleteCategory(id: ID!): String
   addToCart(variation_id: ID!, quantity: Int!): CartItems
   removeFromCart(product_variation_id: String!): String
-  createOrder: String
+  createOrder: Orders
 }
 
 input CreateProductInput {

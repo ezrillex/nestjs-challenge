@@ -41,8 +41,9 @@ export class OrdersService {
       product_variation_id: item.product_variation_id,
       price_purchased_at: item.product_variation.price,
     }));
+    const cart_ids = cart_items.map((item) => item.id);
 
-    const order_result = await this.prisma.orders.create({
+    const create_query = {
       data: {
         user: {
           connect: { id: user_id },
@@ -53,24 +54,30 @@ export class OrdersService {
           },
         },
       },
-    });
-    if (!order_result) {
-      throw new InternalServerErrorException(
-        'An error occurred when creating the order!',
-      );
-    }
-    const cart_ids = cart_items.map((item) => item.id);
-    const delete_result = await this.prisma.cartItems.deleteMany({
+    };
+
+    const delete_query = {
       where: {
         id: {
           in: cart_ids,
         },
       },
-    });
-    if (delete_result.count === 0) {
-      throw new InternalServerErrorException('An unexpected error occurred!');
-    } else {
-      return order_result.id;
+    };
+
+    try {
+      return await this.prisma.$transaction(async () => {
+        const create_result = await this.prisma.orders.create(create_query);
+        const delete_result =
+          await this.prisma.cartItems.deleteMany(delete_query);
+        if (delete_result.count === 0) {
+          throw new InternalServerErrorException('Error deleting cart items!');
+        }
+        return create_result;
+      });
+    } catch {
+      throw new InternalServerErrorException(
+        'Transaction failed: An error occurred when creating the order!',
+      );
     }
   }
 

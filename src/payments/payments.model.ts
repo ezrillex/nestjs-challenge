@@ -9,8 +9,8 @@ export class PaymentIntents {
   @Field(() => String, { nullable: true })
   status: PaymentStatus;
 
-  @Field(() => String)
-  created_at: string;
+  @Field(() => Date)
+  created_at: Date;
 
   @Field(() => ID)
   stripe_event_id: string;

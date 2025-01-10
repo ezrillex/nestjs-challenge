@@ -140,7 +140,7 @@ export class PaymentIntents {
     __typename?: 'PaymentIntents';
     id: string;
     status?: Nullable<string>;
-    created_at: string;
+    created_at: DateTime;
     stripe_event_id: string;
 }
 
@@ -199,7 +199,7 @@ export abstract class IMutation {
 
     abstract removeFromCart(product_variation_id: string): Nullable<string> | Promise<Nullable<string>>;
 
-    abstract createOrder(): Nullable<string> | Promise<Nullable<string>>;
+    abstract createOrder(): Nullable<Orders> | Promise<Nullable<Orders>>;
 }
 
 export type DateTime = any;

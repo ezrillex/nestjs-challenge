@@ -16,6 +16,8 @@ import { UsersService } from '../users/users.service';
 import { StripeService } from '../payments/stripe.service';
 import { GetOrdersInput } from './inputs/get_orders.input';
 import { Users } from '../users/users.model';
+import { OrderItems } from './order_items.model';
+import { PaymentIntents } from '../payments/payments.model';
 
 @Resolver(() => Orders)
 export class OrdersResolver {
@@ -26,8 +28,8 @@ export class OrdersResolver {
   ) {}
 
   @RequiresRole(roles.customer)
-  @Mutation(() => String, { nullable: true })
-  async createOrder(@Context('req') request: Request) {
+  @Mutation(() => Orders, { nullable: true })
+  async createOrder(@Context('req') request: Request): Promise<Orders> {
     // let's assume the customer is buying the entire cart.
     return this.ordersService.CreateOrder(request['user'].id);
   }
@@ -64,17 +66,14 @@ export class OrdersResolver {
   }
 
   @ResolveField()
-  async order_items(@Parent() cart_items: Orders) {
+  async order_items(@Parent() cart_items: Orders): Promise<OrderItems[]> {
     const { id } = cart_items;
-    const { order_items } = await this.ordersService.ResolveOrderItemsField(id);
-    return order_items;
+    return this.ordersService.ResolveOrderItemsField(id);
   }
 
   @ResolveField()
-  async payments(@Parent() cart_items: Orders) {
+  async payments(@Parent() cart_items: Orders): Promise<PaymentIntents[]> {
     const { id } = cart_items;
-    const { PaymentIntents } =
-      await this.stripeService.ResolvePaymentsOnOrdersField(id);
-    return PaymentIntents;
+    return this.stripeService.ResolvePaymentsOnOrdersField(id);
   }
 }

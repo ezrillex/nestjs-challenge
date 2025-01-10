@@ -9,6 +9,7 @@ import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaymentStatus } from '@prisma/client';
+import { PaymentIntents } from './payments.model';
 
 @Injectable()
 export class StripeService {
@@ -23,8 +24,8 @@ export class StripeService {
     });
   }
 
-  async ResolvePaymentsOnOrdersField(id: string) {
-    return this.prisma.orders.findUnique({
+  async ResolvePaymentsOnOrdersField(id: string): Promise<PaymentIntents[]> {
+    const { PaymentIntents } = await this.prisma.orders.findUnique({
       where: {
         id: id,
       },
@@ -32,6 +33,7 @@ export class StripeService {
         PaymentIntents: true,
       },
     });
+    return PaymentIntents;
   }
 
   async webhook(req: Request, raw: Buffer) {
@@ -113,7 +115,11 @@ export class StripeService {
     return { received: true };
   }
 
-  async createPaymentIntent(amount: number, order_id: string, user_id: string) {
+  async createPaymentIntent(
+    amount: number,
+    order_id: string,
+    user_id: string,
+  ): Promise<PaymentIntents & { client_secret: string }> {
     if (amount <= 0) {
       throw new BadRequestException('Amount cant be negative or zero!');
     }
@@ -151,6 +157,13 @@ export class StripeService {
     }
 
     const result = await this.prisma.paymentIntents.update({
+      select: {
+        id: true,
+        status: true,
+        order_id: true,
+        created_at: true,
+        stripe_event_id: true,
+      },
       where: { id: intent_record.id },
       data: {
         status: 'requires_payment_method',
@@ -160,9 +173,8 @@ export class StripeService {
     });
 
     return {
-      payment_intent_id: paymentIntent.id,
+      ...result,
       client_secret: paymentIntent.client_secret,
-      payment_id: result.id,
     };
   }
 

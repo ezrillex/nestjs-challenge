@@ -17,6 +17,7 @@ import { StripeService } from './stripe.service';
 import { roles } from '@prisma/client';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
+import { PaymentIntents } from './payments.model';
 
 @Controller('payments')
 export class PaymentsController {
@@ -29,7 +30,7 @@ export class PaymentsController {
     @Body('order_id', ParseUUIDPipe) order_id: string,
     @Body('amount', ParseIntPipe) amount: number,
     @Request() req: Request,
-  ) {
+  ): Promise<PaymentIntents & { client_secret: string }> {
     return this.stripeService.createPaymentIntent(
       amount,
       order_id,
