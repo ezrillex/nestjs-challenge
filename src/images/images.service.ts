@@ -8,6 +8,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProductsService } from '../products/products.service';
+import { Images } from './images.model';
 
 @Injectable()
 export class ImagesService {
@@ -86,12 +87,13 @@ export class ImagesService {
     }
   }
 
-  async ResolveImagesField(product_variation_id: string) {
-    return this.prisma.productVariations.findUnique({
+  async ResolveImagesField(product_variation_id: string): Promise<Images[]> {
+    const { images } = await this.prisma.productVariations.findUnique({
       where: { id: product_variation_id },
       select: {
         images: true,
       },
     });
+    return images;
   }
 }

@@ -1,21 +1,31 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CartItems } from './cart_items.model';
 
 @Injectable()
 export class CartsService {
   constructor(private readonly prisma: PrismaService) {}
-  async AddToCart(variation_id: string, user_id: string, quantity: number) {
+  async AddToCart(
+    variation_id: string,
+    user_id: string,
+    quantity: number,
+  ): Promise<CartItems> {
+    if (quantity <= 0) {
+      throw new BadRequestException('Quantity must be greater than 0');
+    }
     const variation = await this.prisma.productVariations.count({
       where: { id: variation_id },
     });
-    if (variation === 0) {
+    if (!variation) {
       throw new BadRequestException('Product Variation not found!');
     }
 
-    const record = await this.prisma.cartItems.findFirst({
+    const record = await this.prisma.cartItems.findUnique({
       where: {
-        product_variation_id: variation_id,
-        user_id: user_id,
+        user_id_product_variation_id: {
+          product_variation_id: variation_id,
+          user_id: user_id,
+        },
       },
     });
     if (record) {
@@ -40,26 +50,32 @@ export class CartsService {
     }
   }
 
-  async RemoveCartItem(cart_id: string) {
-    const record = await this.prisma.cartItems.count({
-      where: { id: cart_id },
+  async RemoveCartItem(
+    product_variation_id: string,
+    user_id: string,
+  ): Promise<string> {
+    const record = await this.prisma.cartItems.findUnique({
+      where: {
+        user_id_product_variation_id: {
+          product_variation_id,
+          user_id,
+        },
+      },
+      select: {
+        id: true,
+      },
     });
-    if (record === 0) {
+    if (!record) {
       throw new BadRequestException('Cart Item not found!');
     }
 
-    const result = await this.prisma.cartItems.delete({
-      where: { id: cart_id },
+    await this.prisma.cartItems.delete({
+      where: { id: record.id },
     });
-
-    if (result) {
-      return 'Cart Item deleted successfully.';
-    } else {
-      throw new BadRequestException('Unexpected error when deleting record!');
-    }
+    return 'Cart Item deleted successfully.';
   }
 
-  async GetCartItems(user_id: string) {
+  async GetCartItems(user_id: string): Promise<CartItems[]> {
     return this.prisma.cartItems.findMany({
       where: {
         user_id: user_id,

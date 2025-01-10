@@ -1,11 +1,11 @@
 import {
-  Resolver,
-  Query,
-  Mutation,
   Args,
   Context,
-  ResolveField,
+  Mutation,
   Parent,
+  Query,
+  ResolveField,
+  Resolver,
 } from '@nestjs/graphql';
 import { Categories, ProductVariations, roles } from '@prisma/client';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
@@ -30,7 +30,7 @@ export class ProductsResolver {
   async getProducts(
     @Args('GetProductsInput') getProductsInput: GetProductsInput,
     @Context('req') request: Request,
-  ) {
+  ): Promise<Products[]> {
     // todo on auth guard we set a value to know what mode we are in...
     let role: roles = roles.public;
     if (request['user'] && request['user'].role) {
@@ -44,7 +44,7 @@ export class ProductsResolver {
   async getProductById(
     @Args('id', { type: () => String }, ParseUUIDPipe) id: string,
     @Context('req') request: Request,
-  ) {
+  ): Promise<Products> {
     // todo on auth guard we set a value to know what mode we are in...
     let role: roles = roles.public;
     if (request['user'] && request['user'].role) {
@@ -58,25 +58,23 @@ export class ProductsResolver {
   async createProduct(
     @Args('CreateProductInput') createProductInput: CreateProductInput,
     @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.CreateProduct(
+  ): Promise<Products> {
+    return await this.productsService.CreateProduct(
       createProductInput,
       request['user'].id,
     );
-    return result;
   }
 
   @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
+  @Mutation(() => Products, { nullable: true })
   async updateProduct(
     @Args('UpdateProductInput') updateProductInput: UpdateProductInput,
     @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.UpdateProduct(
+  ): Promise<Products> {
+    return await this.productsService.UpdateProduct(
       updateProductInput,
       request['user'].id,
     );
-    return result.id;
   }
 
   @RequiresRole(roles.manager)
@@ -85,25 +83,20 @@ export class ProductsResolver {
     @Args('product_id', { type: () => String }, ParseUUIDPipe)
     product_id: string,
     @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.DeleteProduct(
-      product_id,
-      request['user'].id,
-    );
-    return result.id;
+  ): Promise<string> {
+    await this.productsService.DeleteProduct(product_id, request['user'].id);
+    return 'Product successfully deleted!';
   }
 
   @ResolveField()
   async variations(@Parent() product: Products): Promise<ProductVariations[]> {
-    const { variations } = product;
-    const ids = variations.map((variation) => variation.id);
-    return this.productsService.ResolveProductVariations(ids);
+    const { id } = product;
+    return this.productsService.ResolveProductVariations(id);
   }
 
   @ResolveField()
   async categories(@Parent() product: Products): Promise<Categories[]> {
-    const { categories } = product;
-    const ids = categories.map((category) => category.id);
-    return this.categoriesService.ResolveCategories(ids);
+    const { id } = product;
+    return this.categoriesService.ResolveCategories(id);
   }
 }

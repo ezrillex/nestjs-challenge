@@ -10,10 +10,10 @@ export class Orders {
   id: string;
 
   @Field(() => Users)
-  user: Users;
+  user?: Users;
 
   @Field(() => [PaymentIntents])
-  payments: [PaymentIntents];
+  payments?: [PaymentIntents];
 
   @Field(() => String)
   paymentStatus: PaymentStatus;
@@ -22,5 +22,5 @@ export class Orders {
   orderStatus: OrderStatus;
 
   @Field(() => [OrderItems])
-  order_items: OrderItems[];
+  order_items?: OrderItems[];
 }

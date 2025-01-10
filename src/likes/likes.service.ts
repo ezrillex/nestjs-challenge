@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { LikesOfProducts } from '@prisma/client';
+import { LikesOfProducts } from './LikesOfProducts.model';
 
 @Injectable()
 export class LikesService {
@@ -57,7 +57,6 @@ export class LikesService {
 
   async ToggleLike(
     variation_id: string,
-    state: boolean,
     user_id: string,
   ): Promise<LikesOfProducts> {
     const variation = await this.prisma.productVariations.count({
@@ -68,32 +67,35 @@ export class LikesService {
     }
 
     const where = {
-      user_id_product_variation_id: {
-        user_id: user_id,
-        product_variation_id: variation_id,
-      },
+      user_id: user_id,
+      product_variation_id: variation_id,
     };
 
-    if (state) {
-      return this.prisma.likesOfProducts.upsert({
-        where: where,
-        create: {
+    const like = await this.prisma.likesOfProducts.count({
+      where: where,
+    });
+
+    if (like > 0) {
+      const data = await this.prisma.likesOfProducts.delete({
+        where: {
+          user_id_product_variation_id: where,
+        },
+      });
+      return {
+        state: false,
+        ...data,
+      };
+    } else {
+      const data = await this.prisma.likesOfProducts.create({
+        data: {
           user_id: user_id,
           product_variation_id: variation_id,
         },
-        update: {},
       });
-    } else {
-      const count = await this.prisma.likesOfProducts.count({
-        where: { user_id: user_id, product_variation_id: variation_id },
-      });
-      if (count > 0) {
-        return this.prisma.likesOfProducts.delete({
-          where: where,
-        });
-      } else {
-        throw new BadRequestException('User has not liked that product!');
-      }
+      return {
+        state: true,
+        ...data,
+      };
     }
   }
 

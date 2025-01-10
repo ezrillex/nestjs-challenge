@@ -21,21 +21,21 @@ export class Products {
   description: string;
 
   @Field(() => [ProductVariations])
-  variations: ProductVariations[];
+  variations?: ProductVariations[];
 
   @Field(() => [Categories])
-  categories: Categories[];
+  categories?: Categories[];
 
   @Field(() => String)
   created_by: string;
 
   @Field(() => Date)
-  created_at: string;
+  created_at: Date;
 
   @IsUUID()
   @Field(() => String, { nullable: true })
   last_updated_by: string;
 
-  @Field(() => String, { nullable: true })
-  last_updated_at: string;
+  @Field(() => Date, { nullable: true })
+  last_updated_at: Date;
 }

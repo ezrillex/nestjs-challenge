@@ -12,9 +12,10 @@ import { roles } from '@prisma/client';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { Orders } from './orders.model';
 import { OrdersService } from './orders.service';
-import { CartItems } from '../carts/cart_items.model';
 import { UsersService } from '../users/users.service';
 import { StripeService } from '../payments/stripe.service';
+import { GetOrdersInput } from './inputs/get_orders.input';
+import { Users } from '../users/users.model';
 
 @Resolver(() => Orders)
 export class OrdersResolver {
@@ -31,44 +32,35 @@ export class OrdersResolver {
     return this.ordersService.CreateOrder(request['user'].id);
   }
 
-  @RequiresRole(roles.customer)
   @Query(() => [Orders], { nullable: true })
-  async getOrders(@Context('req') request: Request) {
+  async getOrders(
+    @Args('GetOrdersInput') getOrdersInput: GetOrdersInput,
+    @Context('req') request: Request,
+  ): Promise<Orders[]> {
     return this.ordersService.GetOrders(
       request['user'].id,
       request['user'].role,
+      getOrdersInput,
     );
   }
 
-  @RequiresRole(roles.customer)
   @Query(() => Orders, { nullable: true })
   async getOrder(
     @Args('order_id', { type: () => String }, ParseUUIDPipe)
     order_id: string,
     @Context('req') request: Request,
-  ) {
-    return this.ordersService.GetOrder(order_id, request['user'].id);
-  }
-
-  @RequiresRole(roles.manager)
-  @Query(() => [Orders], { nullable: true })
-  async getClientOrders(
-    @Context('req') request: Request,
-    @Args('client_id', { type: () => String, nullable: true }, ParseUUIDPipe)
-    client_id: string,
-  ) {
-    return this.ordersService.GetOrders(
+  ): Promise<Orders> {
+    return this.ordersService.GetOrder(
+      order_id,
       request['user'].id,
       request['user'].role,
-      client_id,
     );
   }
 
   @ResolveField()
-  async user(@Parent() orders: Orders) {
+  async user(@Parent() orders: Orders): Promise<Users> {
     const { id } = orders;
-    const { user } = await this.usersService.ResolveUsersOnOrdersField(id);
-    return user;
+    return this.usersService.ResolveUsersOnOrdersField(id);
   }
 
   @ResolveField()

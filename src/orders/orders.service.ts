@@ -5,12 +5,15 @@ import {
 } from '@nestjs/common';
 import { roles } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { Orders } from './orders.model';
+import { GetOrdersInput } from './inputs/get_orders.input';
+import { OrderItems } from './order_items.model';
 
 @Injectable()
 export class OrdersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async CreateOrder(user_id: string) {
+  async CreateOrder(user_id: string): Promise<Orders> {
     const cart_items = await this.prisma.cartItems.findMany({
       select: {
         id: true,
@@ -71,41 +74,60 @@ export class OrdersService {
     }
   }
 
-  async GetOrders(user_id: string, role: roles, client_id: string = null) {
-    const find_parameters = {};
+  async GetOrders(
+    user_id: string,
+    role: roles,
+    inputs: GetOrdersInput,
+  ): Promise<Orders[]> {
+    const find_parameters = { where: {} };
+    const pagination = { skip: inputs.offset ?? 0, take: inputs.first ?? 10 };
 
-    if (role === roles.customer) {
-      find_parameters['where'] = {
-        user_id: user_id,
-        // don't hide deleted or private items.
-      };
-    } else if (role === roles.manager) {
-      if (!client_id) {
-        throw new Error('No client id for manager specific request!');
-      }
-      find_parameters['where'] = {
-        user_id: client_id,
-        // don't hide deleted or private items.
-      };
+    switch (role) {
+      case 'customer':
+        find_parameters.where = {
+          user_id: user_id,
+          // don't hide deleted or private items.
+        };
+        break;
+      case 'manager':
+        if (inputs.client_id) {
+          find_parameters.where = {
+            user_id: inputs.client_id,
+            // don't hide deleted or private items.
+          };
+        }
+        break;
+      default:
+        throw new InternalServerErrorException(
+          'Invalid role expected customer or manager',
+        );
     }
 
-    return this.prisma.orders.findMany(find_parameters);
+    return this.prisma.orders.findMany({ ...find_parameters, ...pagination });
   }
 
-  async GetOrder(order_id: string, client_id: string) {
+  async GetOrder(
+    order_id: string,
+    client_id: string,
+    role: roles,
+  ): Promise<Orders> {
+    const filter = {
+      id: order_id,
+    };
+    // if not a manager is only allowed to view its own orders.
+    if (role !== roles.manager) {
+      filter['user_id'] = client_id;
+    }
     const find_parameters = {
-      where: {
-        id: order_id,
-        user_id: client_id,
-        // don't hide deleted or private items.
-      },
+      where: { ...filter },
     };
 
+    // todo should I error if there is nothing ? if not from self user it returns null is it graphql way of doing it like so?
     return this.prisma.orders.findUnique(find_parameters);
   }
 
-  async ResolveOrderItemsField(order_id: string) {
-    return this.prisma.orders.findUnique({
+  async ResolveOrderItemsField(order_id: string): Promise<OrderItems[]> {
+    const { order_items } = await this.prisma.orders.findUnique({
       where: {
         id: order_id,
       },
@@ -113,5 +135,6 @@ export class OrdersService {
         order_items: true,
       },
     });
+    return order_items;
   }
 }

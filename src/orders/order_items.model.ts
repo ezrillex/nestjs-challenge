@@ -1,5 +1,7 @@
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 import { ProductVariations } from '../products/product_variation/product-variations.model';
+import { GraphQLFloat } from 'graphql/type';
+import { Decimal } from '@prisma/client/runtime/library';
 
 @ObjectType()
 export class OrderItems {
@@ -11,11 +13,11 @@ export class OrderItems {
   // order: Orders;
 
   @Field(() => ProductVariations)
-  product_variation: ProductVariations;
+  product_variation?: ProductVariations;
 
   @Field(() => Int)
   quantity: number;
 
-  @Field(() => Number)
-  price_purchased_at: number;
+  @Field(() => GraphQLFloat)
+  price_purchased_at: Decimal;
 }

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Users } from './users.model';
 
 @Injectable()
 export class UsersService {
@@ -33,8 +34,8 @@ export class UsersService {
     }
   }
 
-  async ResolveUsersOnCartItemsField(id: string) {
-    return this.prisma.cartItems.findUnique({
+  async ResolveUsersOnCartItemsField(id: string): Promise<Users> {
+    const { cart_owner } = await this.prisma.cartItems.findUnique({
       where: {
         id: id,
       },
@@ -42,10 +43,11 @@ export class UsersService {
         cart_owner: true,
       },
     });
+    return cart_owner;
   }
 
-  async ResolveUsersOnOrdersField(id: string) {
-    return this.prisma.orders.findUnique({
+  async ResolveUsersOnOrdersField(id: string): Promise<Users> {
+    const { user } = await this.prisma.orders.findUnique({
       where: {
         id: id,
       },
@@ -53,6 +55,7 @@ export class UsersService {
         user: true,
       },
     });
+    return user;
   }
 
   async ResolveUsersOnLikesOfProductsField(id: string) {

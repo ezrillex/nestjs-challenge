@@ -17,6 +17,6 @@ export class Users {
   @Field(() => String)
   email: string;
 
-  @Field(() => [LikesOfProducts], { nullable: true })
-  likes_products: LikesOfProducts[];
+  @Field(() => [LikesOfProducts])
+  likes_products?: LikesOfProducts[];
 }

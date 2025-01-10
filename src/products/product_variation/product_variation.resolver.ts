@@ -14,6 +14,7 @@ import { UpdateProductVariationInput } from './inputs/update-product-variation.i
 import { CreateProductVariationInput } from './inputs/create_product_variation.input';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { ImagesService } from '../../images/images.service';
+import { Images } from '../../images/images.model';
 
 @Resolver(() => ProductVariations)
 export class ProductVariationResolver {
@@ -23,31 +24,29 @@ export class ProductVariationResolver {
   ) {}
 
   @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
+  @Mutation(() => ProductVariations, { nullable: true })
   async updateProductVariation(
     @Args('UpdateProductVariationInput')
     updateProductVariationInput: UpdateProductVariationInput,
     @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.UpdateProductVariation(
+  ): Promise<ProductVariations> {
+    return await this.productsService.UpdateProductVariation(
       updateProductVariationInput,
       request['user'].id,
     );
-    return result.id;
   }
 
   @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
+  @Mutation(() => ProductVariations, { nullable: true })
   async createProductVariation(
     @Args('CreateProductVariationInput')
     createProductVariationInput: CreateProductVariationInput,
     @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.CreateProductVariation(
+  ): Promise<ProductVariations> {
+    return await this.productsService.CreateProductVariation(
       createProductVariationInput,
       request['user'].id,
     );
-    return result.id;
   }
 
   @RequiresRole(roles.manager)
@@ -55,14 +54,15 @@ export class ProductVariationResolver {
   async deleteProductVariation(
     @Args('variation_id', { type: () => String }, ParseUUIDPipe)
     variation_id: string,
-  ) {
+  ): Promise<string> {
     return this.productsService.DeleteProductVariation(variation_id);
   }
 
   @ResolveField()
-  async images(@Parent() product_variation: ProductVariations) {
+  async images(
+    @Parent() product_variation: ProductVariations,
+  ): Promise<Images[]> {
     const { id } = product_variation;
-    const { images } = await this.imagesService.ResolveImagesField(id);
-    return images;
+    return await this.imagesService.ResolveImagesField(id);
   }
 }

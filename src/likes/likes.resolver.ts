@@ -25,39 +25,14 @@ export class LikesResolver {
     private readonly usersService: UsersService,
   ) {}
 
-  @Directive('@deprecated(reason: "Use toggleLikes instead")')
   @RequiresRole(roles.customer)
-  @Mutation(() => String, { nullable: true })
-  async likeProduct(
-    @Args('variation_id', { type: () => String }, ParseUUIDPipe)
-    variation_id: string,
-    @Context('req') request: Request,
-  ) {
-    return (
-      await this.likesService.LikeProduct(variation_id, request['user'].id)
-    ).id;
-  }
-
-  @Directive('@deprecated(reason: "Use toggleLikes instead")')
-  @RequiresRole(roles.customer)
-  @Mutation(() => String, { nullable: true })
-  async removeLikeProduct(
-    @Args('like_id', { type: () => String }, ParseUUIDPipe)
-    like_id: string,
-  ) {
-    return (await this.likesService.RemoveLike(like_id)).result;
-  }
-
-  @RequiresRole(roles.customer)
-  @Mutation(() => LikesOfProducts)
+  @Mutation(() => LikesOfProducts, { nullable: true })
   async toggleLike(
     @Args('product_variation_id', { type: () => String }, ParseUUIDPipe)
     id: string,
-    @Args('status', { type: () => Boolean }, ParseBoolPipe)
-    status: boolean,
     @Context('req') request: Request,
-  ) {
-    return this.likesService.ToggleLike(id, status, request['user'].id);
+  ): Promise<LikesOfProducts> {
+    return this.likesService.ToggleLike(id, request['user'].id);
   }
 
   @RequiresRole(roles.customer)

@@ -8,10 +8,10 @@ export class CartItems {
   id: string;
 
   @Field(() => Users)
-  cart_owner: Users;
+  cart_owner?: Users;
 
   @Field(() => ProductVariations)
-  product_variation: ProductVariations;
+  product_variation?: ProductVariations;
 
   @Field(() => Int)
   quantity: number;
