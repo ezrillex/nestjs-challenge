@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -12,6 +11,7 @@ import { UpdateProductInput } from './inputs/update-product.input';
 import { UpdateProductVariationInput } from './product_variation/inputs/update-product-variation.input';
 import { CreateProductVariationInput } from './product_variation/inputs/create_product_variation.input';
 import { DateTime } from 'luxon';
+import { Images } from '../images/images.model';
 
 @Injectable()
 export class ProductsService {
@@ -187,7 +187,10 @@ export class ProductsService {
     return result;
   }
 
-  async GetProductVariationById(id: string, count_only: boolean = false) {
+  async GetProductVariationById(
+    id: string,
+    count_only: boolean = false,
+  ): Promise<ProductVariations | number> {
     if (count_only) {
       return this.prisma.productVariations.count({
         where: { id: id },
@@ -321,10 +324,12 @@ export class ProductsService {
   // todo figure out how to check if already purchased
   // once we do handle stock it could be done by doing more queries but since we
   // do multiple products at once we are too nested to do such a thing.
-  async GetLowStockProducts(): Promise<ProductVariations[]> {
+  async GetLowStockProducts(): Promise<
+    (ProductVariations & { images: Images[] })[]
+  > {
     const twoDaysAgo = DateTime.now().minus({ days: 2 });
 
-    const products = await this.prisma.productVariations.findMany({
+    return this.prisma.productVariations.findMany({
       include: {
         images: true,
         LikesOfProducts: {
@@ -348,11 +353,5 @@ export class ProductsService {
         },
       },
     });
-
-    products.forEach((product) => {
-      console.log(product.title, ' ', product.LikesOfProducts);
-    });
-
-    return products;
   }
 }

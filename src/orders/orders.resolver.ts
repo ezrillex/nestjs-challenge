@@ -16,7 +16,7 @@ import { UsersService } from '../users/users.service';
 import { StripeService } from '../payments/stripe.service';
 import { GetOrdersInput } from './inputs/get_orders.input';
 import { Users } from '../users/users.model';
-import { OrderItems } from './order_items.model';
+import { OrderItems } from './order-items/order_items.model';
 import { PaymentIntents } from '../payments/payments.model';
 
 @Resolver(() => Orders)

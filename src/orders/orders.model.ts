@@ -1,5 +1,5 @@
 import { OrderStatus, PaymentStatus } from '@prisma/client';
-import { OrderItems } from './order_items.model';
+import { OrderItems } from './order-items/order_items.model';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Users } from '../users/users.model';
 import { PaymentIntents } from '../payments/payments.model';

@@ -1,5 +1,5 @@
 import { Parent, ResolveField, Resolver } from '@nestjs/graphql';
-import { OrderItems } from '../order_items.model';
+import { OrderItems } from './order_items.model';
 import { ProductsService } from '../../products/products.service';
 import { ProductVariations } from '../../products/product_variation/product-variations.model';
 

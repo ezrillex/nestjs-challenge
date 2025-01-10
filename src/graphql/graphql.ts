@@ -117,6 +117,10 @@ export class Users {
     first_name: string;
     last_name: string;
     email: string;
+    role: string;
+    created_at: DateTime;
+    login_at: DateTime;
+    password_last_updated: DateTime;
     likes_products: LikesOfProducts[];
 }
 

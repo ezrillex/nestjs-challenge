@@ -1,4 +1,4 @@
-import { SetMetadata } from '@nestjs/common';
+import { CustomDecorator, SetMetadata } from '@nestjs/common';
 import { roles } from '@prisma/client';
 
 export const ROLE_REQUIRED = 'rolesRequired';
@@ -12,8 +12,9 @@ export const ROLE_REQUIRED = 'rolesRequired';
       manager code flow
     else {
       maybe error out?
-
+    }
     // code after should do shared code. such as pagination for example
     return data
  */
-export const RequiresRole = (role: roles) => SetMetadata(ROLE_REQUIRED, role);
+export const RequiresRole = (role: roles): CustomDecorator =>
+  SetMetadata(ROLE_REQUIRED, role);

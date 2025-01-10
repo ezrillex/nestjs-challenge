@@ -58,6 +58,10 @@ type Users {
   first_name: String!
   last_name: String!
   email: String!
+  role: String!
+  created_at: DateTime!
+  login_at: DateTime!
+  password_last_updated: DateTime!
   likes_products: [LikesOfProducts!]!
 }
 

@@ -18,6 +18,7 @@ import { roles } from '@prisma/client';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
 import { PaymentIntents } from './payments.model';
+import Stripe from 'stripe';
 
 @Controller('payments')
 export class PaymentsController {
@@ -44,7 +45,7 @@ export class PaymentsController {
   async updatePaymentWebhook(
     @Request() req: Request,
     @Req() rawReq: RawBodyRequest<Request>,
-  ) {
+  ): Promise<{ received: boolean }> {
     return this.stripeService.webhook(req, rawReq.rawBody);
   }
 
@@ -54,7 +55,7 @@ export class PaymentsController {
   async getPayments(
     @Param('order_id', ParseUUIDPipe) order_id: string,
     @Request() req: Request,
-  ) {
+  ): Promise<PaymentIntents[]> {
     return this.stripeService.getOrderPayments(order_id, req['user'].id);
   }
 
@@ -65,7 +66,7 @@ export class PaymentsController {
   async updatePaymentIntent(
     @Body('payment_id', ParseUUIDPipe) payment_id: string,
     @Body('payment_method') payment_method: string,
-  ) {
+  ): Promise<Stripe.PaymentIntent> {
     return this.stripeService.updatePaymentIntent(payment_id, payment_method);
   }
 }

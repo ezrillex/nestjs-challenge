@@ -1,5 +1,5 @@
 import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
-import { ProductVariations } from '../products/product_variation/product-variations.model';
+import { ProductVariations } from '../../products/product_variation/product-variations.model';
 import { GraphQLFloat } from 'graphql/type';
 import { Decimal } from '@prisma/client/runtime/library';
 

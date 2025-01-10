@@ -19,7 +19,7 @@ export class EmailsService {
   async sendEmail(
     template: EMAIL_TEMPLATE,
     data: { [key: string]: string } = {},
-  ) {
+  ): Promise<void> {
     const resolvedTemplate = this.getTemplateWithData(template, data);
     const msg: sgMail.MailDataRequired = {
       to: 'ezrillex@gmail.com', // todo HARDCODED TO PREVENT SPAMMING SOME RANDOM USER
@@ -30,16 +30,16 @@ export class EmailsService {
 
     try {
       await sgMail.send(msg);
-    } catch (error) {
-      console.log(error.response.body.errors);
+    } catch {
       throw new InternalServerErrorException(
         'An error occurred when sending email.',
       );
     }
   }
 
-  async sendManyEmails(emails: { template: EMAIL_TEMPLATE; data: any }[]) {
-    console.log('emailes many');
+  async sendManyEmails(
+    emails: { template: EMAIL_TEMPLATE; data: any }[],
+  ): Promise<void> {
     const compiledEmails: sgMail.MailDataRequired[] = emails.map((email) => {
       const resolvedTemplate = this.getTemplateWithData(
         email.template,
@@ -54,8 +54,7 @@ export class EmailsService {
 
     try {
       await sgMail.send(compiledEmails, true);
-    } catch (error) {
-      console.log(error.response.body.errors);
+    } catch {
       throw new InternalServerErrorException(
         'An error occurred when sending email.',
       );

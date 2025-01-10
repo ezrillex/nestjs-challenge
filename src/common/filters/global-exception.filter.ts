@@ -8,8 +8,7 @@ import { BaseExceptionFilter } from '@nestjs/core';
 
 @Catch()
 export class GlobalExceptionFilter extends BaseExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
-    //console.log(exception);
+  catch(exception: any, host: ArgumentsHost): any | void {
     let code;
     let message;
     if (exception instanceof HttpException) {

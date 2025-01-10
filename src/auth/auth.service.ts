@@ -11,6 +11,9 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { EMAIL_TEMPLATE, EmailsService } from '../emails/emails.service';
 import { UsersService } from '../users/users.service';
+import { Users } from '../users/users.model';
+import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
+import { ResetPasswordResponseDto } from './dto/ResetPasswordResponse.dto';
 
 // todo refactor all specific user related operations to user service.
 @Injectable()
@@ -33,7 +36,7 @@ export class AuthService {
     timestamps: Date[],
     message: string = 'Too many attempts in 24 hour period.',
     status: HttpStatus = HttpStatus.FORBIDDEN,
-  ) {
+  ): void {
     // account locked check
     if (timestamps && timestamps.length >= 3) {
       const aDayAgo = DateTime.now().minus({ days: 1 });
@@ -50,7 +53,7 @@ export class AuthService {
     }
   }
 
-  async registerUser(data: SignupUserDto) {
+  async registerUser(data: SignupUserDto): Promise<Users> {
     if (data.password !== data.repeat_password) {
       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
     }
@@ -82,7 +85,7 @@ export class AuthService {
         last_name: data.last_name,
         email: data.email,
         password: hashed,
-        role: role,
+        role,
       },
       select: {
         id: true,
@@ -101,7 +104,7 @@ export class AuthService {
     return user;
   }
 
-  async loginAttemptFailed(id: string, timestamps: Date[]) {
+  async loginAttemptFailed(id: string, timestamps: Date[]): Promise<Users> {
     const ts_length = timestamps.push(new Date());
     if (ts_length > 3) {
       timestamps.shift();
@@ -116,7 +119,7 @@ export class AuthService {
     });
   }
 
-  async loginAttemptSuccess(id: string, token: string) {
+  async loginAttemptSuccess(id: string, token: string): Promise<Users> {
     const now = new Date().toISOString();
     return this.prisma.users.update({
       where: { id: id },
@@ -128,7 +131,7 @@ export class AuthService {
     id: string,
     timestamps: Date[],
     resetToken: string,
-  ) {
+  ): Promise<Users> {
     const ts_length = timestamps.push(new Date());
     if (ts_length > 3) {
       timestamps.shift();
@@ -144,7 +147,9 @@ export class AuthService {
     });
   }
 
-  async forgotPassword(data: ForgotPasswordDto) {
+  async forgotPassword(
+    data: ForgotPasswordDto,
+  ): Promise<ForgotPasswordResponseDto> {
     const user = await this.usersService.findOneByEmail(data.email);
 
     // too many reset attempts check
@@ -175,7 +180,7 @@ export class AuthService {
     };
   }
 
-  async resetPassword(id: string, new_password: string) {
+  async resetPassword(id: string, new_password: string): Promise<Users> {
     const hashed = await bcrypt.hash(new_password, 10);
 
     return this.prisma.users.update({
@@ -194,7 +199,7 @@ export class AuthService {
     });
   }
 
-  async logoutUser(id: string) {
+  async logoutUser(id: string): Promise<Users> {
     const now = new Date().toISOString();
     return this.prisma.users.update({
       where: { id: id },
@@ -205,7 +210,7 @@ export class AuthService {
     });
   }
 
-  async loginUser(data: LoginUserDto) {
+  async loginUser(data: LoginUserDto): Promise<Users & { token: string }> {
     const user = await this.usersService.findOneByEmail(data.email);
 
     // account locked check
@@ -249,7 +254,9 @@ export class AuthService {
     }
   }
 
-  async changePassword(data: ResetPasswordDto) {
+  async changePassword(
+    data: ResetPasswordDto,
+  ): Promise<ResetPasswordResponseDto> {
     if (data.password !== data.repeat_password) {
       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
     }

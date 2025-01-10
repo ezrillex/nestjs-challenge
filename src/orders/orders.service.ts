@@ -7,7 +7,7 @@ import { roles } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { Orders } from './orders.model';
 import { GetOrdersInput } from './inputs/get_orders.input';
-import { OrderItems } from './order_items.model';
+import { OrderItems } from './order-items/order_items.model';
 
 @Injectable()
 export class OrdersService {

@@ -85,7 +85,10 @@ describe('Carts Service', () => {
   describe('Remove a Product from cart Tests', () => {
     it('Should error if a cart item id is invalid', async () => {
       await expect(
-        service.RemoveCartItem('2730fc05-6f87-49e5-8a41-559208048ebe'),
+        service.RemoveCartItem(
+          '2730fc05-6f87-49e5-8a41-559208048ebe',
+          '2730fc05-6f87-49e5-8a41-559208048ebe',
+        ),
       ).rejects.toThrowErrorMatchingSnapshot(
         'tried to remove non existing cart items id',
       );
@@ -96,7 +99,10 @@ describe('Carts Service', () => {
       jest.spyOn(prismaService.cartItems, 'count').mockResolvedValue(1);
 
       await expect(
-        service.RemoveCartItem('2730fc05-6f87-49e5-8a41-559208048ebe'),
+        service.RemoveCartItem(
+          '2730fc05-6f87-49e5-8a41-559208048ebe',
+          '2730fc05-6f87-49e5-8a41-559208048ebe',
+        ),
       ).rejects.toThrowErrorMatchingSnapshot(
         'delete called to db but deleted obj not returned, something is wrong',
       );
@@ -112,7 +118,10 @@ describe('Carts Service', () => {
       jest.spyOn(prismaService.cartItems, 'count').mockResolvedValue(1);
 
       await expect(
-        service.RemoveCartItem('2730fc05-6f87-49e5-8a41-559208048ebe'),
+        service.RemoveCartItem(
+          '2730fc05-6f87-49e5-8a41-559208048ebe',
+          '2730fc05-6f87-49e5-8a41-559208048ebe',
+        ),
       ).resolves.toEqual('Cart Item deleted successfully.');
     });
   });

@@ -11,7 +11,8 @@ export class TasksService {
   ) {}
 
   @Cron('* * * * *')
-  async randomCron() {
+  async randomCron(): Promise<void> {
+    // eslint-disable-next-line
     console.log(
       `Current Time: ${new Date().toLocaleString()}, random number: ${Math.random()}`,
     );
@@ -21,7 +22,7 @@ export class TasksService {
   // When the stock of a product reaches 3, notify the last user that liked it and not purchased the product yet with an email.
   // Use a background job and make sure to include the product's image in the email.
   @Cron('0 18 * * *')
-  async marketingLowStockProducts() {
+  async marketingLowStockProducts(): Promise<void> {
     const subjects = await this.productsService.GetLowStockProducts();
     if (subjects.length === 0) {
       return;

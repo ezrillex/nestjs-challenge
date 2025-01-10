@@ -14,6 +14,9 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { Users } from '../users/users.model';
+import { ForgotPasswordResponseDto } from './dto/forgot-password-response.dto';
+import { ResetPasswordResponseDto } from './dto/ResetPasswordResponse.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,29 +24,30 @@ export class AuthController {
 
   @Public()
   @Post('signup')
-  async signup(@Body() data: SignupUserDto) {
-    const created_user = await this.authService.registerUser(data);
-    return created_user;
+  async signup(@Body() data: SignupUserDto): Promise<Users> {
+    return await this.authService.registerUser(data);
   }
 
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() data: LoginUserDto) {
+  async login(@Body() data: LoginUserDto): Promise<Users & { token: string }> {
     return this.authService.loginUser(data);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
-  async logout(@Request() request: Request) {
+  async logout(@Request() request: Request): Promise<void> {
     const userId = request['user'].id;
-    return this.authService.logoutUser(userId);
+    await this.authService.logoutUser(userId);
   }
 
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('forgot')
-  async forgot(@Body() data: ForgotPasswordDto) {
+  async forgot(
+    @Body() data: ForgotPasswordDto,
+  ): Promise<ForgotPasswordResponseDto> {
     return this.authService.forgotPassword(data);
   }
 
@@ -52,7 +56,9 @@ export class AuthController {
   @UseGuards(ThrottlerGuard)
   @HttpCode(HttpStatus.OK)
   @Post('reset')
-  async reset(@Body() data: ResetPasswordDto) {
+  async reset(
+    @Body() data: ResetPasswordDto,
+  ): Promise<ResetPasswordResponseDto> {
     return this.authService.changePassword(data);
   }
 }

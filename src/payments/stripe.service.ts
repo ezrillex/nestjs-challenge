@@ -36,7 +36,7 @@ export class StripeService {
     return PaymentIntents;
   }
 
-  async webhook(req: Request, raw: Buffer) {
+  async webhook(req: Request, raw: Buffer): Promise<{ received: boolean }> {
     const sig = req.headers['stripe-signature'];
 
     if (!sig) {
@@ -178,7 +178,10 @@ export class StripeService {
     };
   }
 
-  async getOrderPayments(order_id: string, user_id: string) {
+  async getOrderPayments(
+    order_id: string,
+    user_id: string,
+  ): Promise<PaymentIntents[]> {
     // checks if order exists and because filter of user checks if is of user.
     const record = await this.prisma.orders.count({
       where: { id: order_id, user_id: user_id },
@@ -203,7 +206,10 @@ export class StripeService {
   }
 
   // DEBUG ONLY METHOD --------------------------------------------------
-  async updatePaymentIntent(payment_id: string, payment_method: string) {
+  async updatePaymentIntent(
+    payment_id: string,
+    payment_method: string,
+  ): Promise<Stripe.PaymentIntent> {
     // check if order exists
     const record = await this.prisma.paymentIntents.findUnique({
       where: { id: payment_id },

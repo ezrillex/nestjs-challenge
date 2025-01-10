@@ -6,7 +6,7 @@ import { Users } from './users.model';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findOneByEmail(email: string) {
+  async findOneByEmail(email: string): Promise<Users> {
     const user = await this.prisma.users.findUnique({
       where: { email: email },
     });
@@ -20,7 +20,7 @@ export class UsersService {
     }
   }
 
-  async findOneByID(id: string) {
+  async findOneByID(id: string): Promise<Users> {
     const user = await this.prisma.users.findUnique({
       where: { id: id },
     });
@@ -56,24 +56,5 @@ export class UsersService {
       },
     });
     return user;
-  }
-
-  async ResolveUsersOnLikesOfProductsField(id: string) {
-    return this.prisma.likesOfProducts.findUnique({
-      where: {
-        id: id,
-      },
-      select: {
-        liked_by: true,
-      },
-    });
-  }
-
-  async ResolveUser(id: string) {
-    return this.prisma.users.findUnique({
-      where: {
-        id: id,
-      },
-    });
   }
 }

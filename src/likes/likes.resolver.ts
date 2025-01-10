@@ -1,29 +1,14 @@
-import {
-  Args,
-  Context,
-  Directive,
-  Mutation,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { roles } from '@prisma/client';
-import { ParseBoolPipe, ParseUUIDPipe } from '@nestjs/common';
+import { ParseUUIDPipe } from '@nestjs/common';
 import { LikesService } from './likes.service';
-import { ProductsService } from '../products/products.service';
-import { UsersService } from '../users/users.service';
 import { ProductVariations } from '../products/product_variation/product-variations.model';
 import { LikesOfProducts } from './LikesOfProducts.model';
 
 @Resolver()
 export class LikesResolver {
-  constructor(
-    private readonly likesService: LikesService,
-    private readonly productsService: ProductsService,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private readonly likesService: LikesService) {}
 
   @RequiresRole(roles.customer)
   @Mutation(() => LikesOfProducts, { nullable: true })
@@ -37,7 +22,9 @@ export class LikesResolver {
 
   @RequiresRole(roles.customer)
   @Query(() => [ProductVariations], { nullable: true })
-  async getLikes(@Context('req') request: Request) {
+  async getLikes(
+    @Context('req') request: Request,
+  ): Promise<ProductVariations[]> {
     return this.likesService.GetLikes(request['user'].id);
   }
 }
