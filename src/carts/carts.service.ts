@@ -14,7 +14,13 @@ export class CartsService {
       throw new BadRequestException('Quantity must be greater than 0');
     }
     const variation = await this.prisma.productVariations.count({
-      where: { id: variation_id },
+      where: {
+        id: variation_id,
+        product: {
+          is_published: true,
+          is_deleted: false,
+        },
+      },
     });
     if (!variation) {
       throw new BadRequestException('Product Variation not found!');

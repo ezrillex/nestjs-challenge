@@ -74,7 +74,7 @@ type CartItems {
 
 type OrderItems {
   id: ID!
-  product_variation: ProductVariations!
+  product_variation: ProductVariations
   quantity: Int!
   price_purchased_at: Float!
 }

@@ -135,7 +135,7 @@ export class CartItems {
 export class OrderItems {
     __typename?: 'OrderItems';
     id: string;
-    product_variation: ProductVariations;
+    product_variation?: Nullable<ProductVariations>;
     quantity: number;
     price_purchased_at: number;
 }

@@ -36,9 +36,9 @@ describe('LikesService', () => {
           'c0177e32-5584-4518-bbe8-5a648fa33f85',
         ),
       ).rejects.toThrowErrorMatchingSnapshot('prod var not found');
-      expect(spy).toHaveBeenCalledWith({
-        where: { id: 'c0177e32-5584-4518-bbe8-5a648fa33f85' },
-      });
+      expect(spy.mock.calls).toMatchSnapshot(
+        'like query w/delete publish filters',
+      );
     });
     it('if the like exists it should delete the database record', async () => {
       const ids = {
@@ -68,9 +68,9 @@ describe('LikesService', () => {
         state: false,
         ...deleteResult,
       });
-      expect(spy).toHaveBeenCalledWith({
-        where: { id: 'c0177e32-5584-4518-bbe8-5a648fa33f85' },
-      });
+      expect(spy.mock.calls).toMatchSnapshot(
+        'query w/is delete publish filters',
+      );
       expect(likeSpy).toHaveBeenCalledWith({
         where: ids,
       });
@@ -108,9 +108,9 @@ describe('LikesService', () => {
         state: true,
         ...createResult,
       });
-      expect(spy).toHaveBeenCalledWith({
-        where: { id: 'c0177e32-5584-4518-bbe8-5a648fa33f85' },
-      });
+      expect(spy.mock.calls).toMatchSnapshot(
+        'query w/is delete publish filters',
+      );
       expect(likeSpy).toHaveBeenCalledWith({
         where: ids,
       });

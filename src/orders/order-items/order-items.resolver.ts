@@ -10,7 +10,7 @@ export class OrderItemsResolver {
   @ResolveField()
   async product_variation(
     @Parent() order_items: OrderItems,
-  ): Promise<ProductVariations> {
+  ): Promise<ProductVariations | null> {
     const { id } = order_items;
     return this.productsService.ResolveProductVariationOnOrderItems(id);
   }

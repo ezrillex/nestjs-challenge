@@ -31,14 +31,14 @@ export class ProductsService {
 
   async ResolveProductVariationOnOrderItems(
     id: string,
-  ): Promise<ProductVariations> {
-    const { product_variation } = await this.prisma.orderItems.findUnique({
-      where: { id: id },
+  ): Promise<ProductVariations | null> {
+    const result = await this.prisma.orderItems.findUnique({
+      where: { id, product_variation: { product: { is_deleted: false } } },
       select: {
         product_variation: true,
       },
     });
-    return product_variation;
+    return result.product_variation ?? null;
   }
 
   async ResolveProductVariations(id: string): Promise<ProductVariations[]> {

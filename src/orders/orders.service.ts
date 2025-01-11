@@ -110,7 +110,10 @@ export class OrdersService {
         );
     }
 
-    return this.prisma.orders.findMany({ ...find_parameters, ...pagination });
+    return this.prisma.orders.findMany({
+      ...find_parameters,
+      ...pagination,
+    });
   }
 
   async GetOrder(

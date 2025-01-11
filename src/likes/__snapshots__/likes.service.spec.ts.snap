@@ -8,7 +8,61 @@ exports[`LikesService get likes should pass a query to prisma: prisma query get 
         "likes_product_variation": true,
       },
       "where": {
+        "likes_product_variation": {
+          "product": {
+            "is_deleted": false,
+            "is_published": true,
+          },
+        },
         "user_id": "8b3ae683-0626-44be-b591-9271e288388f",
+      },
+    },
+  ],
+]
+`;
+
+exports[`LikesService toggle likes if the like does not exist it should create a database record: query w/is delete publish filters 1`] = `
+[
+  [
+    {
+      "where": {
+        "id": "c0177e32-5584-4518-bbe8-5a648fa33f85",
+        "product": {
+          "is_deleted": false,
+          "is_published": true,
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`LikesService toggle likes if the like exists it should delete the database record: query w/is delete publish filters 1`] = `
+[
+  [
+    {
+      "where": {
+        "id": "c0177e32-5584-4518-bbe8-5a648fa33f85",
+        "product": {
+          "is_deleted": false,
+          "is_published": true,
+        },
+      },
+    },
+  ],
+]
+`;
+
+exports[`LikesService toggle likes throws if variation to like is invalid: like query w/delete publish filters 1`] = `
+[
+  [
+    {
+      "where": {
+        "id": "c0177e32-5584-4518-bbe8-5a648fa33f85",
+        "product": {
+          "is_deleted": false,
+          "is_published": true,
+        },
       },
     },
   ],

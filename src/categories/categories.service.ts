@@ -6,18 +6,38 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { Categories } from './categories.model';
 import { Products } from '../products/products.model';
+import { roles } from '@prisma/client';
 
 @Injectable()
 export class CategoriesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async ResolveProductsOnCategories(id: string): Promise<Products[]> {
+  async ResolveProductsOnCategories(
+    id: string,
+    role: roles,
+  ): Promise<Products[]> {
+    let hide = {};
+    if (role === roles.manager) {
+      hide = {
+        where: {
+          is_deleted: false,
+        },
+      };
+    } else {
+      hide = {
+        where: {
+          is_deleted: false,
+          is_published: true,
+        },
+      };
+    }
+
     const { Products } = await this.prisma.categories.findUnique({
       where: {
         id,
       },
       select: {
-        Products: true,
+        Products: hide,
       },
     });
     return Products;

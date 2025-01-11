@@ -12,7 +12,13 @@ export class LikesService {
     user_id: string,
   ): Promise<LikesOfProducts> {
     const variation = await this.prisma.productVariations.count({
-      where: { id: variation_id },
+      where: {
+        id: variation_id,
+        product: {
+          is_published: true,
+          is_deleted: false,
+        },
+      },
     });
     if (variation === 0) {
       throw new BadRequestException('Product Variation not found!');
@@ -53,7 +59,15 @@ export class LikesService {
 
   async GetLikes(user_id: string): Promise<ProductVariations[]> {
     const likes = await this.prisma.likesOfProducts.findMany({
-      where: { user_id: user_id },
+      where: {
+        user_id: user_id,
+        likes_product_variation: {
+          product: {
+            is_published: true,
+            is_deleted: false,
+          },
+        },
+      },
       select: {
         likes_product_variation: true,
       },

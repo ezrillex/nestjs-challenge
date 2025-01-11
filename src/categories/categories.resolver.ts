@@ -1,5 +1,6 @@
 import {
   Args,
+  Context,
   ID,
   Mutation,
   Parent,
@@ -32,9 +33,15 @@ export class CategoriesResolver {
   }
 
   @ResolveField()
-  async products(@Parent() category: Categories): Promise<Products[]> {
+  async products(
+    @Parent() category: Categories,
+    @Context('req') request: Request,
+  ): Promise<Products[]> {
     const { id } = category;
-    return this.categoriesService.ResolveProductsOnCategories(id);
+    return this.categoriesService.ResolveProductsOnCategories(
+      id,
+      request['user'].role,
+    );
   }
 
   @RequiresRole(roles.manager)

@@ -12,7 +12,8 @@ export class OrderItems {
   // @Field(() => Orders, { nullable: true })
   // order: Orders;
 
-  @Field(() => ProductVariations)
+  // it CAN be null because if its deleted we cant return it.
+  @Field(() => ProductVariations, { nullable: true })
   product_variation?: ProductVariations;
 
   @Field(() => Int)
