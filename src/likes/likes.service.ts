@@ -7,7 +7,7 @@ import { ProductVariations } from '../products/product_variation/product-variati
 export class LikesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async ToggleLike(
+  async toggleLike(
     variation_id: string,
     user_id: string,
   ): Promise<LikesOfProducts> {
@@ -57,7 +57,7 @@ export class LikesService {
     }
   }
 
-  async GetLikes(user_id: string): Promise<ProductVariations[]> {
+  async getLikes(user_id: string): Promise<ProductVariations[]> {
     const likes = await this.prisma.likesOfProducts.findMany({
       where: {
         user_id: user_id,

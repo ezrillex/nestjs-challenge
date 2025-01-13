@@ -15,23 +15,27 @@ describe('LikesService', () => {
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  it('should be defined', () => {
+  it('LikesService should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should have method ToggleLike', () => {
-    expect(service.ToggleLike).toBeDefined();
+  it('PrismaService should be defined', () => {
+    expect(prismaService).toBeDefined();
   });
 
-  it('should have method Get Likes of User', () => {
-    expect(service.GetLikes).toBeDefined();
+  it('toggleLike should be defined', () => {
+    expect(service.toggleLike).toBeDefined();
   });
 
-  describe('toggle likes', () => {
-    it('throws if variation to like is invalid', async () => {
+  it('getLikes should be defined', () => {
+    expect(service.getLikes).toBeDefined();
+  });
+
+  describe('toggleLike', () => {
+    it('should throw an error for invalid product variation to like', async () => {
       const spy = jest.spyOn(prismaService.productVariations, 'count');
       await expect(
-        service.ToggleLike(
+        service.toggleLike(
           'c0177e32-5584-4518-bbe8-5a648fa33f85',
           'c0177e32-5584-4518-bbe8-5a648fa33f85',
         ),
@@ -40,7 +44,7 @@ describe('LikesService', () => {
         'like query w/delete publish filters',
       );
     });
-    it('if the like exists it should delete the database record', async () => {
+    it('should delete the existing like record from the database', async () => {
       const ids = {
         user_id: 'c0177e32-5584-4518-bbe8-5a648fa33f85',
         product_variation_id: 'c0177e32-5584-4518-bbe8-5a648fa33f85',
@@ -60,7 +64,7 @@ describe('LikesService', () => {
         .spyOn(prismaService.likesOfProducts, 'delete')
         .mockResolvedValue(deleteResult);
       await expect(
-        service.ToggleLike(
+        service.toggleLike(
           'c0177e32-5584-4518-bbe8-5a648fa33f85',
           'c0177e32-5584-4518-bbe8-5a648fa33f85',
         ),
@@ -80,7 +84,7 @@ describe('LikesService', () => {
         },
       });
     });
-    it('if the like does not exist it should create a database record', async () => {
+    it('should create a new like record in the database', async () => {
       const ids = {
         user_id: 'c0177e32-5584-4518-bbe8-5a648fa33f85',
         product_variation_id: 'c0177e32-5584-4518-bbe8-5a648fa33f85',
@@ -100,7 +104,7 @@ describe('LikesService', () => {
         .spyOn(prismaService.likesOfProducts, 'create')
         .mockResolvedValue(createResult);
       await expect(
-        service.ToggleLike(
+        service.toggleLike(
           'c0177e32-5584-4518-bbe8-5a648fa33f85',
           'c0177e32-5584-4518-bbe8-5a648fa33f85',
         ),
@@ -120,12 +124,12 @@ describe('LikesService', () => {
     });
   });
 
-  describe('get likes', () => {
-    it('should pass a query to prisma', async () => {
+  describe('getLikes', () => {
+    it('should query prisma to get the likes', async () => {
       const spy = jest.spyOn(prismaService.likesOfProducts, 'findMany');
 
       await expect(
-        service.GetLikes('8b3ae683-0626-44be-b591-9271e288388f'),
+        service.getLikes('8b3ae683-0626-44be-b591-9271e288388f'),
       ).resolves.toEqual([]);
       expect(spy.mock.calls).toMatchSnapshot('prisma query get likes');
     });

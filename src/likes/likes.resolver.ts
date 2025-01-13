@@ -17,7 +17,7 @@ export class LikesResolver {
     id: string,
     @Context('req') request: Request,
   ): Promise<LikesOfProducts> {
-    return this.likesService.ToggleLike(id, request['user'].id);
+    return this.likesService.toggleLike(id, request['user'].id);
   }
 
   @RequiresRole(roles.customer)
@@ -25,6 +25,6 @@ export class LikesResolver {
   async getLikes(
     @Context('req') request: Request,
   ): Promise<ProductVariations[]> {
-    return this.likesService.GetLikes(request['user'].id);
+    return this.likesService.getLikes(request['user'].id);
   }
 }
