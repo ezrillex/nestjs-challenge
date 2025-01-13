@@ -5,7 +5,7 @@ import { CartItems } from './cart_items.model';
 @Injectable()
 export class CartsService {
   constructor(private readonly prisma: PrismaService) {}
-  async AddToCart(
+  async addToCart(
     variation_id: string,
     user_id: string,
     quantity: number,
@@ -56,7 +56,7 @@ export class CartsService {
     }
   }
 
-  async RemoveCartItem(
+  async removeFromCart(
     product_variation_id: string,
     user_id: string,
   ): Promise<string> {
@@ -81,7 +81,7 @@ export class CartsService {
     return 'Cart Item deleted successfully.';
   }
 
-  async GetCartItems(user_id: string): Promise<CartItems[]> {
+  async getCartItems(user_id: string): Promise<CartItems[]> {
     return this.prisma.cartItems.findMany({
       where: {
         user_id: user_id,

@@ -36,7 +36,7 @@ export class CartItemsResolver {
     @Args('quantity', { type: () => Int }, ParseIntPipe) quantity: number,
     @Context('req') request: Request,
   ): Promise<CartItems> {
-    return await this.cartsService.AddToCart(
+    return await this.cartsService.addToCart(
       variation_id,
       request['user'].id,
       quantity,
@@ -50,7 +50,7 @@ export class CartItemsResolver {
     product_variation_id: string,
     @Context('req') request: Request,
   ): Promise<string> {
-    return this.cartsService.RemoveCartItem(
+    return this.cartsService.removeFromCart(
       product_variation_id,
       request['user'].id,
     );
@@ -59,7 +59,7 @@ export class CartItemsResolver {
   @RequiresRole(roles.customer)
   @Query(() => [CartItems], { nullable: true })
   async getCartItems(@Context('req') request: Request): Promise<CartItems[]> {
-    return this.cartsService.GetCartItems(request['user'].id);
+    return this.cartsService.getCartItems(request['user'].id);
   }
 
   @ResolveField()

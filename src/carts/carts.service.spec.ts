@@ -24,22 +24,22 @@ describe('CartsService', () => {
     expect(prismaService).toBeDefined();
   });
 
-  it('AddToCart should be defined', () => {
-    expect(service.AddToCart).toBeDefined();
+  it('addToCart should be defined', () => {
+    expect(service.addToCart).toBeDefined();
   });
 
-  it('RemoveCartItem should be defined', () => {
-    expect(service.RemoveCartItem).toBeDefined();
+  it('removeFromCart should be defined', () => {
+    expect(service.removeFromCart).toBeDefined();
   });
 
-  it('GetCartItems should be defined', () => {
-    expect(service.GetCartItems).toBeDefined();
+  it('getCartItems should be defined', () => {
+    expect(service.getCartItems).toBeDefined();
   });
 
-  describe('AddToCart', () => {
+  describe('addToCart', () => {
     it('throws an error when the product variation ID does not exist', async () => {
       await expect(
-        service.AddToCart(
+        service.addToCart(
           '2730fc05-6f87-49e5-8a41-559208048ebe',
           '2730fc05-6f87-49e5-8a41-559208048ebe',
           50,
@@ -59,7 +59,7 @@ describe('CartsService', () => {
         return null;
       });
 
-      await service.AddToCart(
+      await service.addToCart(
         '2730fc05-6f87-49e5-8a41-559208048ebe',
         '2730fc05-6f87-49e5-8a41-559208048ebe',
         3,
@@ -77,7 +77,7 @@ describe('CartsService', () => {
         return null;
       });
 
-      await service.AddToCart(
+      await service.addToCart(
         '2730fc05-6f87-49e5-8a41-559208048ebe',
         '2730fc05-6f87-49e5-8a41-559208048ebe',
         3,
@@ -86,10 +86,10 @@ describe('CartsService', () => {
     });
   });
 
-  describe('RemoveCartItem', () => {
+  describe('removeFromCart', () => {
     it('throws an error when attempting to remove a cart item that does not exist', async () => {
       await expect(
-        service.RemoveCartItem(
+        service.removeFromCart(
           '2730fc05-6f87-49e5-8a41-559208048ebe',
           '2730fc05-6f87-49e5-8a41-559208048ebe',
         ),
@@ -105,7 +105,7 @@ describe('CartsService', () => {
       jest.spyOn(prismaService.cartItems, 'count').mockResolvedValue(1);
 
       await expect(
-        service.RemoveCartItem(
+        service.removeFromCart(
           '2730fc05-6f87-49e5-8a41-559208048ebe',
           '2730fc05-6f87-49e5-8a41-559208048ebe',
         ),
@@ -126,7 +126,7 @@ describe('CartsService', () => {
         .mockResolvedValue({ testing: 'test' } as any);
 
       await expect(
-        service.RemoveCartItem(
+        service.removeFromCart(
           '2730fc05-6f87-49e5-8a41-559208048ebe',
           '2730fc05-6f87-49e5-8a41-559208048ebe',
         ),
@@ -134,13 +134,13 @@ describe('CartsService', () => {
     });
   });
 
-  describe('GetCartItems', () => {
+  describe('getCartItems', () => {
     it('should call the database with the correct query for retrieving cart items', async () => {
       const spy = jest
         .spyOn(prismaService.cartItems, 'findMany')
         .mockResolvedValue(null);
 
-      await service.GetCartItems('2730fc05-6f87-49e5-8a41-559208048ebe');
+      await service.getCartItems('2730fc05-6f87-49e5-8a41-559208048ebe');
       expect(spy.mock.calls).toMatchSnapshot('expected query get cart items');
     });
   });
