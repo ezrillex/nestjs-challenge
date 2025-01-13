@@ -1,18 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AuthService change password  should throw if password mismatch: mismatch password response 1`] = `"Passwords do not match"`;
+exports[`AuthService changePassword throws an error when the password and repeat password do not match: mismatch password response 1`] = `"Passwords do not match"`;
 
-exports[`AuthService change password  should throw if payload user token mismatch (requested again, or already used and tried to use link again): token mismatch, invalidated 1`] = `"The token is not valid."`;
+exports[`AuthService changePassword throws an error when the token is invalid: token is invalid 1`] = `"An error occurred when validating reset token: invalid signature"`;
 
-exports[`AuthService change password  should throw if token is invalid: token is invalid 1`] = `"An error occurred when validating reset token: invalid signature"`;
+exports[`AuthService changePassword throws an error when the token is malformed: token is malformed 1`] = `"An error occurred when validating reset token: jwt malformed"`;
 
-exports[`AuthService change password  should throw if token is malformed: token is malformed 1`] = `"An error occurred when validating reset token: jwt malformed"`;
+exports[`AuthService changePassword throws an error when the token payload does not match the user's current token (e.g., token reused or invalidated): token mismatch, invalidated 1`] = `"The token is not valid."`;
 
-exports[`AuthService create user should error if email is already in use: email is already in use 1`] = `"Email is already in use"`;
+exports[`AuthService checkIfAttemptsInLast24h throws an error when more than two timestamps fall within a 24-hour period: too many in 24 h 1`] = `"Too many attempts in 24 hour period."`;
 
-exports[`AuthService create user should error if password is different: password mismatch 1`] = `"Passwords do not match"`;
-
-exports[`AuthService forgot password requested should modify the db to append timestamp and shift it to 3: expected database update 1`] = `
+exports[`AuthService forgotPasswordRequest updates the database to append a new timestamp and retain only the latest three timestamps: expected database update 1`] = `
 {
   "data": {
     "password_reset_requests": 3,
@@ -29,13 +27,7 @@ exports[`AuthService forgot password requested should modify the db to append ti
 }
 `;
 
-exports[`AuthService is in 24 hour period utility Should error if 3 timestamps are in 24 hours: too many in 24 h 1`] = `"Too many attempts in 24 hour period."`;
-
-exports[`AuthService login user should error if credentials email doesnt exist: email not found response 1`] = `"Couldn't find your account. Make sure this is the right email."`;
-
-exports[`AuthService login user should error if password is incorrect: wrong password response 1`] = `"Wrong password. Try again or use the forgot password api to reset it."`;
-
-exports[`AuthService login user should return token and role if all ok: ok response 1`] = `
+exports[`AuthService loginUser returns a token and role when credentials are valid: ok response 1`] = `
 {
   "created_at": undefined,
   "email": undefined,
@@ -49,7 +41,11 @@ exports[`AuthService login user should return token and role if all ok: ok respo
 }
 `;
 
-exports[`AuthService logout user should update db with valid logout user request: the expected database update 1`] = `
+exports[`AuthService loginUser throws an error when the email does not exist in the database: email not found response 1`] = `"Couldn't find your account. Make sure this is the right email."`;
+
+exports[`AuthService loginUser throws an error when the password is incorrect: wrong password response 1`] = `"Wrong password. Try again or use the forgot password api to reset it."`;
+
+exports[`AuthService logoutUser updates the database with a valid logout request for the user: the expected database update 1`] = `
 {
   "data": {
     "logout_at": "2021-01-30T07:45:50.000Z",
@@ -61,7 +57,11 @@ exports[`AuthService logout user should update db with valid logout user request
 }
 `;
 
-exports[`AuthService reset password should update the database: the expected database update 1`] = `
+exports[`AuthService registerUser throws an error when email is already registered: email is already in use 1`] = `"Email is already in use"`;
+
+exports[`AuthService registerUser throws an error when password and repeat_password do not match: password mismatch 1`] = `"Passwords do not match"`;
+
+exports[`AuthService resetPassword updates the database with the new password: the expected database update 1`] = `
 {
   "data": {
     "failed_login_attempts": 0,

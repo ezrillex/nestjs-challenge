@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`LikesService get likes should pass a query to prisma: prisma query get likes 1`] = `
+exports[`LikesService getLikes should query prisma to get the likes: prisma query get likes 1`] = `
 [
   [
     {
@@ -21,7 +21,7 @@ exports[`LikesService get likes should pass a query to prisma: prisma query get 
 ]
 `;
 
-exports[`LikesService toggle likes if the like does not exist it should create a database record: query w/is delete publish filters 1`] = `
+exports[`LikesService toggleLike should create a new like record in the database: query w/is delete publish filters 1`] = `
 [
   [
     {
@@ -37,7 +37,7 @@ exports[`LikesService toggle likes if the like does not exist it should create a
 ]
 `;
 
-exports[`LikesService toggle likes if the like exists it should delete the database record: query w/is delete publish filters 1`] = `
+exports[`LikesService toggleLike should delete the existing like record from the database: query w/is delete publish filters 1`] = `
 [
   [
     {
@@ -53,7 +53,7 @@ exports[`LikesService toggle likes if the like exists it should delete the datab
 ]
 `;
 
-exports[`LikesService toggle likes throws if variation to like is invalid: like query w/delete publish filters 1`] = `
+exports[`LikesService toggleLike should throw an error for invalid product variation to like: like query w/delete publish filters 1`] = `
 [
   [
     {
@@ -69,4 +69,4 @@ exports[`LikesService toggle likes throws if variation to like is invalid: like 
 ]
 `;
 
-exports[`LikesService toggle likes throws if variation to like is invalid: prod var not found 1`] = `"Product Variation not found!"`;
+exports[`LikesService toggleLike should throw an error for invalid product variation to like: prod var not found 1`] = `"Product Variation not found!"`;

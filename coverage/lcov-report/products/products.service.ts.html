@@ -437,15 +437,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-yes">64x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">70x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -461,6 +453,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -796,9 +796,7 @@ import { Images } from '../images/images.model';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 &nbsp;
-<span class="fstat-no" title="function not covered" >  async </span>ResolveProductVariationOnCartItems(
-    id: string,
-  ): Promise&lt;ProductVariations&gt; {
+<span class="fstat-no" title="function not covered" >  async </span>getProductVariationByCartItem(id: string): Promise&lt;ProductVariations&gt; {
     const { product_variation } = <span class="cstat-no" title="statement not covered" >await this.prisma.cartItems.findUnique({</span>
       where: { id: id },
       select: {
@@ -808,7 +806,7 @@ export class ProductsService {
 <span class="cstat-no" title="statement not covered" >    return product_variation;</span>
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  async </span>ResolveProductVariationOnOrderItems(
+<span class="fstat-no" title="function not covered" >  async </span>getProductVariationByOrderItem(
     id: string,
   ): Promise&lt;ProductVariations | null&gt; {
     const result = <span class="cstat-no" title="statement not covered" >await this.prisma.orderItems.findUnique({</span>
@@ -820,7 +818,9 @@ export class ProductsService {
 <span class="cstat-no" title="statement not covered" >    return result.product_variation ?? null;</span>
   }
 &nbsp;
-<span class="fstat-no" title="function not covered" >  async </span>ResolveProductVariations(id: string): Promise&lt;ProductVariations[]&gt; {
+<span class="fstat-no" title="function not covered" >  async </span>getProductVariationsByProduct(
+    id: string,
+  ): Promise&lt;ProductVariations[]&gt; {
     const { variations } = <span class="cstat-no" title="statement not covered" >await this.prisma.products.findUnique({</span>
       where: { id: id },
       select: {
@@ -830,7 +830,7 @@ export class ProductsService {
 <span class="cstat-no" title="statement not covered" >    return variations;</span>
   }
 &nbsp;
-  async CreateProduct(
+  async createProduct(
     data: CreateProductInput,
     userId: string,
   ): Promise&lt;Products&gt; {
@@ -852,7 +852,7 @@ export class ProductsService {
     });
   }
 &nbsp;
-  async UpdateProduct(
+  async updateProduct(
     data: UpdateProductInput,
     userId: string,
   ): Promise&lt;Products&gt; {
@@ -900,7 +900,7 @@ export class ProductsService {
     });
   }
 &nbsp;
-  async GetProducts(
+  async getProducts(
     role: roles,
     params: GetProductsInput,
   ): Promise&lt;Products[]&gt; {
@@ -947,7 +947,7 @@ export class ProductsService {
     });
   }
 &nbsp;
-  async GetProductById(role: roles, id: string): Promise&lt;Products&gt; {
+  async getProductById(role: roles, id: string): Promise&lt;Products&gt; {
     const filter = { id: id };
 &nbsp;
     if (role === roles.manager) {
@@ -966,7 +966,7 @@ export class ProductsService {
     return result;
   }
 &nbsp;
-  async GetProductVariationById(
+  async getProductVariationById(
     id: string,
     count_only: boolean = false,
   ): Promise&lt;ProductVariations | number&gt; {
@@ -990,7 +990,7 @@ export class ProductsService {
     }
   }
 &nbsp;
-  async UpdateProductVariation(
+  async updateProductVariation(
     data: UpdateProductVariationInput,
     userId: string,
   ): Promise&lt;ProductVariations&gt; {
@@ -1027,7 +1027,7 @@ export class ProductsService {
     });
   }
 &nbsp;
-  async CreateProductVariation(
+  async createProductVariation(
     data: CreateProductVariationInput,
     userId: string,
   ): Promise&lt;ProductVariations&gt; {
@@ -1050,7 +1050,7 @@ export class ProductsService {
   }
 &nbsp;
   // todo future refactor, dont actually delete the variations.
-  async DeleteProductVariation(id: string): Promise&lt;string&gt; {
+  async deleteProductVariation(id: string): Promise&lt;string&gt; {
     const record = await this.prisma.productVariations.findUnique({
       where: { id: id },
       select: {
@@ -1082,7 +1082,7 @@ export class ProductsService {
     return 'Product Variation deleted.';
   }
 &nbsp;
-  async DeleteProduct(product_id: string, user_id: string): Promise&lt;Products&gt; {
+  async deleteProduct(product_id: string, user_id: string): Promise&lt;Products&gt; {
     const count = await this.prisma.products.count({
       where: { id: product_id },
     });
@@ -1103,7 +1103,7 @@ export class ProductsService {
   // todo figure out how to check if already purchased
   // once we do handle stock it could be done by doing more queries but since we
   // do multiple products at once we are too nested to do such a thing.
-<span class="fstat-no" title="function not covered" >  async </span>GetLowStockProducts(): Promise&lt;
+<span class="fstat-no" title="function not covered" >  async </span>getLowStockProducts(): Promise&lt;
     (ProductVariations &amp; { images: Images[] })[]
   &gt; {
     const twoDaysAgo = <span class="cstat-no" title="statement not covered" >DateTime.now().minus({ days: 2 });</span>
@@ -1141,7 +1141,7 @@ export class ProductsService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-01-11T00:41:49.193Z
+                at 2025-01-13T18:25:28.375Z
             </div>
         <script src="../prettify.js"></script>
         <script>
