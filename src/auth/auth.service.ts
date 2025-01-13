@@ -156,7 +156,7 @@ export class AuthService {
   async forgotPassword(
     data: ForgotPasswordDto,
   ): Promise<ForgotPasswordResponseDto> {
-    const user = await this.usersService.findOneByEmail(data.email);
+    const user = await this.usersService.getUserByEmail(data.email);
 
     // too many reset attempts check
     this.checkIfAttemptsInLast24h(
@@ -220,7 +220,7 @@ export class AuthService {
   }
 
   async login(data: LoginUserDto): Promise<Users & { token: string }> {
-    const user = await this.usersService.findOneByEmail(data.email);
+    const user = await this.usersService.getUserByEmail(data.email);
 
     // account locked check
     this.checkIfAttemptsInLast24h(
@@ -278,7 +278,7 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    const { password_reset_token, id } = await this.usersService.findOneByID(
+    const { password_reset_token, id } = await this.usersService.getUserById(
       payload.user,
     );
 

@@ -62,7 +62,7 @@ export class OrdersResolver {
   @ResolveField()
   async user(@Parent() orders: Orders): Promise<Users> {
     const { id } = orders;
-    return this.usersService.ResolveUsersOnOrdersField(id);
+    return this.usersService.getUserByOrder(id);
   }
 
   @ResolveField()

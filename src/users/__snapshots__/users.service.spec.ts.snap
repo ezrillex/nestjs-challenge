@@ -3,3 +3,7 @@
 exports[`UsersService find one by email user should error if email was not found: user with email not found 1`] = `"Couldn't find your account. Make sure this is the right email."`;
 
 exports[`UsersService find one by user ID should throw if id was not found: user with ID not found 1`] = `"Couldn't find an account with the associated id ."`;
+
+exports[`UsersService getUserByEmail should error if email was not found: user with email not found 1`] = `"Couldn't find your account. Make sure this is the right email."`;
+
+exports[`UsersService getUserById should throw if id was not found: user with ID not found 1`] = `"Couldn't find an account with the associated id ."`;

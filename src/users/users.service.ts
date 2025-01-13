@@ -6,7 +6,7 @@ import { Users } from './users.model';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findOneByEmail(email: string): Promise<Users> {
+  async getUserByEmail(email: string): Promise<Users> {
     const user = await this.prisma.users.findUnique({
       where: { email: email },
     });
@@ -20,7 +20,7 @@ export class UsersService {
     }
   }
 
-  async findOneByID(id: string): Promise<Users> {
+  async getUserById(id: string): Promise<Users> {
     const user = await this.prisma.users.findUnique({
       where: { id: id },
     });
@@ -34,7 +34,7 @@ export class UsersService {
     }
   }
 
-  async ResolveUsersOnCartItemsField(id: string): Promise<Users> {
+  async getUserByCartItem(id: string): Promise<Users> {
     const { cart_owner } = await this.prisma.cartItems.findUnique({
       where: {
         id: id,
@@ -46,7 +46,7 @@ export class UsersService {
     return cart_owner;
   }
 
-  async ResolveUsersOnOrdersField(id: string): Promise<Users> {
+  async getUserByOrder(id: string): Promise<Users> {
     const { user } = await this.prisma.orders.findUnique({
       where: {
         id: id,

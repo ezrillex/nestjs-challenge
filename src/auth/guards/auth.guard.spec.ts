@@ -119,7 +119,7 @@ describe('Auth Guard', () => {
       .spyOn(jwtService, 'verifyAsync')
       .mockResolvedValue({ user: 'some user id' });
     jest
-      .spyOn(usersService, 'findOneByID')
+      .spyOn(usersService, 'getUserById')
       .mockResolvedValue({ id: 'some user id' } as Users);
     requestMock.headers.authorization = 'Bearer SPAIN-GO';
     jest
@@ -137,7 +137,7 @@ describe('Auth Guard', () => {
     jest
       .spyOn(jwtService, 'verifyAsync')
       .mockResolvedValue({ user: 'some user id' });
-    jest.spyOn(usersService, 'findOneByID').mockResolvedValue({
+    jest.spyOn(usersService, 'getUserById').mockResolvedValue({
       id: 'some user id',
       session_token: 'JAPAN-GO',
     } as Users);
@@ -162,7 +162,7 @@ describe('Auth Guard', () => {
     jest
       .spyOn(jwtService, 'verifyAsync')
       .mockResolvedValue({ user: 'some user id' });
-    jest.spyOn(usersService, 'findOneByID').mockResolvedValue(user);
+    jest.spyOn(usersService, 'getUserById').mockResolvedValue(user);
     requestMock.headers.authorization = 'Bearer SPAIN-GO';
     jest
       .spyOn(reflector, 'getAllAndOverride')
@@ -185,7 +185,7 @@ describe('Auth Guard', () => {
     jest
       .spyOn(jwtService, 'verifyAsync')
       .mockResolvedValue({ user: 'some user id' });
-    jest.spyOn(usersService, 'findOneByID').mockResolvedValue(user);
+    jest.spyOn(usersService, 'getUserById').mockResolvedValue(user);
     requestMock.headers.authorization = 'Bearer SPAIN-GO';
     jest
       .spyOn(reflector, 'getAllAndOverride')
@@ -220,7 +220,7 @@ describe('Auth Guard', () => {
     jest
       .spyOn(jwtService, 'verifyAsync')
       .mockResolvedValue({ user: 'some user id' });
-    jest.spyOn(usersService, 'findOneByID').mockResolvedValue(user);
+    jest.spyOn(usersService, 'getUserById').mockResolvedValue(user);
     requestMock.headers.authorization = 'Bearer SPAIN-GO';
     jest
       .spyOn(reflector, 'getAllAndOverride')
@@ -253,7 +253,7 @@ describe('Auth Guard', () => {
     jest
       .spyOn(jwtService, 'verifyAsync')
       .mockResolvedValue({ user: 'some user id' });
-    jest.spyOn(usersService, 'findOneByID').mockResolvedValue(user);
+    jest.spyOn(usersService, 'getUserById').mockResolvedValue(user);
     requestMock.headers.authorization = 'Bearer SPAIN-GO';
     jest
       .spyOn(reflector, 'getAllAndOverride')
@@ -284,7 +284,7 @@ describe('Auth Guard', () => {
     jest
       .spyOn(jwtService, 'verifyAsync')
       .mockResolvedValue({ user: 'some user id' });
-    jest.spyOn(usersService, 'findOneByID').mockResolvedValue(user);
+    jest.spyOn(usersService, 'getUserById').mockResolvedValue(user);
     requestMock.headers.authorization = 'Bearer SPAIN-GO';
     jest
       .spyOn(reflector, 'getAllAndOverride')

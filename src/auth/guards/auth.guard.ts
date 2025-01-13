@@ -67,7 +67,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Bearer token is invalid.');
     }
 
-    const user = await this.usersService.findOneByID(payload.user);
+    const user = await this.usersService.getUserById(payload.user);
 
     if (!user.session_token) {
       throw new UnauthorizedException('User has no active sessions.');

@@ -65,7 +65,7 @@ export class CartItemsResolver {
   @ResolveField()
   async cart_owner(@Parent() cart_items: CartItems): Promise<Users> {
     const { id } = cart_items;
-    return this.usersService.ResolveUsersOnCartItemsField(id);
+    return this.usersService.getUserByCartItem(id);
   }
 
   @ResolveField()

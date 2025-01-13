@@ -413,7 +413,7 @@ describe('AuthService', () => {
       jest.spyOn(service, 'recordFailedLoginAttempt').mockResolvedValue(null);
 
       // hash of 'therightpassword'
-      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue({
+      jest.spyOn(usersService, 'getUserByEmail').mockResolvedValue({
         id: 'test id',
         password:
           '$2y$10$Xzx25dxZ/cq0xn7toLj1HuZ1ZMfId8gRuR3VBGvX9fWdboh9xZrMa',
@@ -439,7 +439,7 @@ describe('AuthService', () => {
         .mockResolvedValue(null);
       jest.spyOn(jwtService, 'signAsync').mockResolvedValue('my_token');
 
-      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue({
+      jest.spyOn(usersService, 'getUserByEmail').mockResolvedValue({
         id: 'test id',
         role: roles.customer,
         password:
@@ -469,7 +469,7 @@ describe('AuthService', () => {
       } as Users);
       jest.spyOn(jwtService, 'sign').mockReturnValue('my_token');
 
-      jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue({} as Users);
+      jest.spyOn(usersService, 'getUserByEmail').mockResolvedValue({} as Users);
 
       await expect(
         service.forgotPassword({
@@ -520,7 +520,7 @@ describe('AuthService', () => {
       jest
         .spyOn(jwtService, 'verifyAsync')
         .mockResolvedValue({ user: 'some_user_id' });
-      jest.spyOn(usersService, 'findOneByID').mockResolvedValue({
+      jest.spyOn(usersService, 'getUserById').mockResolvedValue({
         password_reset_token: 'some_random_token',
       } as Users);
 
@@ -538,7 +538,7 @@ describe('AuthService', () => {
       jest
         .spyOn(jwtService, 'verifyAsync')
         .mockResolvedValue({ user: 'some_user_id' });
-      jest.spyOn(usersService, 'findOneByID').mockResolvedValue({
+      jest.spyOn(usersService, 'getUserById').mockResolvedValue({
         password_reset_token: 'my_token',
       } as Users);
       jest.spyOn(service, 'resetPasswordWithToken').mockResolvedValue({
