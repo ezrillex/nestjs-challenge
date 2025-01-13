@@ -17,9 +17,7 @@ import { Images } from '../images/images.model';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  async ResolveProductVariationOnCartItems(
-    id: string,
-  ): Promise<ProductVariations> {
+  async getProductVariationByCartItem(id: string): Promise<ProductVariations> {
     const { product_variation } = await this.prisma.cartItems.findUnique({
       where: { id: id },
       select: {
@@ -29,7 +27,7 @@ export class ProductsService {
     return product_variation;
   }
 
-  async ResolveProductVariationOnOrderItems(
+  async getProductVariationByOrderItem(
     id: string,
   ): Promise<ProductVariations | null> {
     const result = await this.prisma.orderItems.findUnique({
@@ -41,7 +39,9 @@ export class ProductsService {
     return result.product_variation ?? null;
   }
 
-  async ResolveProductVariations(id: string): Promise<ProductVariations[]> {
+  async getProductVariationsByProduct(
+    id: string,
+  ): Promise<ProductVariations[]> {
     const { variations } = await this.prisma.products.findUnique({
       where: { id: id },
       select: {
@@ -51,7 +51,7 @@ export class ProductsService {
     return variations;
   }
 
-  async CreateProduct(
+  async createProduct(
     data: CreateProductInput,
     userId: string,
   ): Promise<Products> {
@@ -73,7 +73,7 @@ export class ProductsService {
     });
   }
 
-  async UpdateProduct(
+  async updateProduct(
     data: UpdateProductInput,
     userId: string,
   ): Promise<Products> {
@@ -121,7 +121,7 @@ export class ProductsService {
     });
   }
 
-  async GetProducts(
+  async getProducts(
     role: roles,
     params: GetProductsInput,
   ): Promise<Products[]> {
@@ -168,7 +168,7 @@ export class ProductsService {
     });
   }
 
-  async GetProductById(role: roles, id: string): Promise<Products> {
+  async getProductById(role: roles, id: string): Promise<Products> {
     const filter = { id: id };
 
     if (role === roles.manager) {
@@ -187,7 +187,7 @@ export class ProductsService {
     return result;
   }
 
-  async GetProductVariationById(
+  async getProductVariationById(
     id: string,
     count_only: boolean = false,
   ): Promise<ProductVariations | number> {
@@ -211,7 +211,7 @@ export class ProductsService {
     }
   }
 
-  async UpdateProductVariation(
+  async updateProductVariation(
     data: UpdateProductVariationInput,
     userId: string,
   ): Promise<ProductVariations> {
@@ -248,7 +248,7 @@ export class ProductsService {
     });
   }
 
-  async CreateProductVariation(
+  async createProductVariation(
     data: CreateProductVariationInput,
     userId: string,
   ): Promise<ProductVariations> {
@@ -271,7 +271,7 @@ export class ProductsService {
   }
 
   // todo future refactor, dont actually delete the variations.
-  async DeleteProductVariation(id: string): Promise<string> {
+  async deleteProductVariation(id: string): Promise<string> {
     const record = await this.prisma.productVariations.findUnique({
       where: { id: id },
       select: {
@@ -303,7 +303,7 @@ export class ProductsService {
     return 'Product Variation deleted.';
   }
 
-  async DeleteProduct(product_id: string, user_id: string): Promise<Products> {
+  async deleteProduct(product_id: string, user_id: string): Promise<Products> {
     const count = await this.prisma.products.count({
       where: { id: product_id },
     });
@@ -324,7 +324,7 @@ export class ProductsService {
   // todo figure out how to check if already purchased
   // once we do handle stock it could be done by doing more queries but since we
   // do multiple products at once we are too nested to do such a thing.
-  async GetLowStockProducts(): Promise<
+  async getLowStockProducts(): Promise<
     (ProductVariations & { images: Images[] })[]
   > {
     const twoDaysAgo = DateTime.now().minus({ days: 2 });

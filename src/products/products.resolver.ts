@@ -36,7 +36,7 @@ export class ProductsResolver {
     if (request['user'] && request['user'].role) {
       role = request['user'].role;
     }
-    return this.productsService.GetProducts(role, getProductsInput);
+    return this.productsService.getProducts(role, getProductsInput);
   }
 
   @PublicPrivate()
@@ -50,7 +50,7 @@ export class ProductsResolver {
     if (request['user'] && request['user'].role) {
       role = request['user'].role;
     }
-    return this.productsService.GetProductById(role, id);
+    return this.productsService.getProductById(role, id);
   }
 
   @RequiresRole(roles.manager)
@@ -59,7 +59,7 @@ export class ProductsResolver {
     @Args('CreateProductInput') createProductInput: CreateProductInput,
     @Context('req') request: Request,
   ): Promise<Products> {
-    return await this.productsService.CreateProduct(
+    return await this.productsService.createProduct(
       createProductInput,
       request['user'].id,
     );
@@ -71,7 +71,7 @@ export class ProductsResolver {
     @Args('UpdateProductInput') updateProductInput: UpdateProductInput,
     @Context('req') request: Request,
   ): Promise<Products> {
-    return await this.productsService.UpdateProduct(
+    return await this.productsService.updateProduct(
       updateProductInput,
       request['user'].id,
     );
@@ -84,14 +84,14 @@ export class ProductsResolver {
     product_id: string,
     @Context('req') request: Request,
   ): Promise<string> {
-    await this.productsService.DeleteProduct(product_id, request['user'].id);
+    await this.productsService.deleteProduct(product_id, request['user'].id);
     return 'Product successfully deleted!';
   }
 
   @ResolveField()
   async variations(@Parent() product: Products): Promise<ProductVariations[]> {
     const { id } = product;
-    return this.productsService.ResolveProductVariations(id);
+    return this.productsService.getProductVariationsByProduct(id);
   }
 
   @ResolveField()

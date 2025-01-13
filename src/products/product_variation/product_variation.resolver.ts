@@ -30,7 +30,7 @@ export class ProductVariationResolver {
     updateProductVariationInput: UpdateProductVariationInput,
     @Context('req') request: Request,
   ): Promise<ProductVariations> {
-    return await this.productsService.UpdateProductVariation(
+    return await this.productsService.updateProductVariation(
       updateProductVariationInput,
       request['user'].id,
     );
@@ -43,7 +43,7 @@ export class ProductVariationResolver {
     createProductVariationInput: CreateProductVariationInput,
     @Context('req') request: Request,
   ): Promise<ProductVariations> {
-    return await this.productsService.CreateProductVariation(
+    return await this.productsService.createProductVariation(
       createProductVariationInput,
       request['user'].id,
     );
@@ -55,7 +55,7 @@ export class ProductVariationResolver {
     @Args('variation_id', { type: () => String }, ParseUUIDPipe)
     variation_id: string,
   ): Promise<string> {
-    return this.productsService.DeleteProductVariation(variation_id);
+    return this.productsService.deleteProductVariation(variation_id);
   }
 
   @ResolveField()

@@ -33,7 +33,7 @@ export class ImagesService {
       throw new BadRequestException('Image must have a valid image mime type');
     }
 
-    const record = await this.productsService.GetProductVariationById(
+    const record = await this.productsService.getProductVariationById(
       product_variation_id,
       true,
     );

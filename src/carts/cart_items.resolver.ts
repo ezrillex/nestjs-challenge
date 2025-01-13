@@ -73,6 +73,6 @@ export class CartItemsResolver {
     @Parent() cart_items: CartItems,
   ): Promise<ProductVariations> {
     const { id } = cart_items;
-    return this.productsService.ResolveProductVariationOnCartItems(id);
+    return this.productsService.getProductVariationByCartItem(id);
   }
 }

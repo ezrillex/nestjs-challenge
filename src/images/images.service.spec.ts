@@ -78,7 +78,7 @@ describe('ImagesService', () => {
         .mockResolvedValue(mock_cdn_response);
 
       jest
-        .spyOn(productService, 'GetProductVariationById')
+        .spyOn(productService, 'getProductVariationById')
         .mockResolvedValue(1);
 
       await expect(
@@ -104,7 +104,7 @@ describe('ImagesService', () => {
         .mockResolvedValue(mock_cdn_response);
 
       jest
-        .spyOn(productService, 'GetProductVariationById')
+        .spyOn(productService, 'getProductVariationById')
         .mockResolvedValue(1);
 
       const spy = jest

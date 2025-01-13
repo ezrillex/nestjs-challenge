@@ -12,6 +12,6 @@ export class OrderItemsResolver {
     @Parent() order_items: OrderItems,
   ): Promise<ProductVariations | null> {
     const { id } = order_items;
-    return this.productsService.ResolveProductVariationOnOrderItems(id);
+    return this.productsService.getProductVariationByOrderItem(id);
   }
 }

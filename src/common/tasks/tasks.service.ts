@@ -23,7 +23,7 @@ export class TasksService {
   // Use a background job and make sure to include the product's image in the email.
   @Cron('0 18 * * *')
   async marketingLowStockProducts(): Promise<void> {
-    const subjects = await this.productsService.GetLowStockProducts();
+    const subjects = await this.productsService.getLowStockProducts();
     if (subjects.length === 0) {
       return;
     }
