@@ -23,13 +23,13 @@ export class CategoriesResolver {
   @RequiresRole(roles.manager)
   @Mutation(() => Categories, { nullable: true })
   async createCategory(@Args('name') name: string): Promise<Categories> {
-    return this.categoriesService.CreateCategory(name);
+    return this.categoriesService.createCategory(name);
   }
 
   @PublicPrivate()
   @Query(() => [GetCategoriesResponse], { nullable: true })
   async getCategories(): Promise<Categories[]> {
-    return this.categoriesService.GetCategories();
+    return this.categoriesService.getAllCategories();
   }
 
   @ResolveField()
@@ -38,7 +38,7 @@ export class CategoriesResolver {
     @Context('req') request: Request,
   ): Promise<Products[]> {
     const { id } = category;
-    return this.categoriesService.ResolveProductsOnCategories(
+    return this.categoriesService.getProductsByCategory(
       id,
       request['user'].role,
     );
@@ -49,6 +49,6 @@ export class CategoriesResolver {
   async deleteCategory(
     @Args('id', { type: () => ID }, ParseUUIDPipe) id: string,
   ): Promise<string> {
-    return this.categoriesService.DeleteCategory(id);
+    return this.categoriesService.deleteCategoryById(id);
   }
 }

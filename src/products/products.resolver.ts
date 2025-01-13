@@ -97,6 +97,6 @@ export class ProductsResolver {
   @ResolveField()
   async categories(@Parent() product: Products): Promise<Categories[]> {
     const { id } = product;
-    return this.categoriesService.ResolveCategories(id);
+    return this.categoriesService.getCategoriesByProduct(id);
   }
 }
