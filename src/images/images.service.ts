@@ -89,7 +89,9 @@ export class ImagesService {
     }
   }
 
-  async ResolveImagesField(product_variation_id: string): Promise<Images[]> {
+  async getImagesByProductVariation(
+    product_variation_id: string,
+  ): Promise<Images[]> {
     const { images } = await this.prisma.productVariations.findUnique({
       where: { id: product_variation_id },
       select: {

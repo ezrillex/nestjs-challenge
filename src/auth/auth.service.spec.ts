@@ -72,77 +72,79 @@ describe('AuthService', () => {
     expect(jwtService).toBeDefined();
   });
 
-  it('util_isIn24h should be defined', () => {
-    expect(service.util_isIn24h).toBeDefined();
+  it('checkIfAttemptsInLast24h should be defined', () => {
+    expect(service.checkIfAttemptsInLast24h).toBeDefined();
   });
 
-  it('registerUser should be defined', () => {
-    expect(service.registerUser).toBeDefined();
+  it('register should be defined', () => {
+    expect(service.register).toBeDefined();
   });
 
-  it('loginAttemptFailed should be defined', () => {
-    expect(service.loginAttemptFailed).toBeDefined();
+  it('recordFailedLoginAttempt should be defined', () => {
+    expect(service.recordFailedLoginAttempt).toBeDefined();
   });
 
-  it('loginAttemptSuccess should be defined', () => {
-    expect(service.loginAttemptSuccess).toBeDefined();
+  it('recordSuccessfulLoginAttempt should be defined', () => {
+    expect(service.recordSuccessfulLoginAttempt).toBeDefined();
   });
 
-  it('forgotPasswordRequest should be defined', () => {
-    expect(service.forgotPasswordRequest).toBeDefined();
+  it('recordPasswordResetRequest should be defined', () => {
+    expect(service.recordPasswordResetRequest).toBeDefined();
   });
 
   it('forgotPassword should be defined', () => {
     expect(service.forgotPassword).toBeDefined();
   });
 
-  it('resetPassword should be defined', () => {
-    expect(service.resetPassword).toBeDefined();
+  it('resetPasswordWithToken should be defined', () => {
+    expect(service.resetPasswordWithToken).toBeDefined();
   });
 
-  it('logoutUser should be defined', () => {
-    expect(service.logoutUser).toBeDefined();
+  it('logout should be defined', () => {
+    expect(service.logout).toBeDefined();
   });
 
-  it('loginUser should be defined', () => {
-    expect(service.loginUser).toBeDefined();
+  it('login should be defined', () => {
+    expect(service.login).toBeDefined();
   });
 
   it('changePassword should be defined', () => {
     expect(service.changePassword).toBeDefined();
   });
 
-  describe('util_isIn24h', () => {
+  describe('checkIfAttemptsInLast24h', () => {
     it('does not throw an error when no timestamps are provided', () => {
-      expect(() => service.util_isIn24h([])).not.toThrow();
+      expect(() => service.checkIfAttemptsInLast24h([])).not.toThrow();
     });
 
     it('throws an error when more than two timestamps fall within a 24-hour period', () => {
       const now = new Date();
       expect(() =>
-        service.util_isIn24h([now, now, now]),
+        service.checkIfAttemptsInLast24h([now, now, now]),
       ).toThrowErrorMatchingSnapshot('too many in 24 h');
     });
 
     it('does not throw an error when exactly two timestamps fall within a 24-hour period', () => {
       const now = new Date();
-      expect(() => service.util_isIn24h([now, now])).not.toThrow();
+      expect(() => service.checkIfAttemptsInLast24h([now, now])).not.toThrow();
     });
 
     it('does not throw an error when input is undefined', () => {
-      expect(() => service.util_isIn24h(undefined)).not.toThrow();
+      expect(() => service.checkIfAttemptsInLast24h(undefined)).not.toThrow();
     });
 
     it('does not throw an error when all timestamps are in the past', () => {
       const past = new Date(1999, 2, 20, 1, 50, 20);
-      expect(() => service.util_isIn24h([past, past, past])).not.toThrow();
+      expect(() =>
+        service.checkIfAttemptsInLast24h([past, past, past]),
+      ).not.toThrow();
     });
   });
 
   describe('registerUser', () => {
     it('throws an error when password and repeat_password do not match', async () => {
       await expect(
-        service.registerUser({
+        service.register({
           email: 'some@email.com',
           password: 'somepassword!',
           last_name: 'smith',
@@ -156,7 +158,7 @@ describe('AuthService', () => {
       jest.spyOn(prismaService.users, 'count').mockResolvedValue(1);
 
       await expect(
-        service.registerUser({
+        service.register({
           email: 'some@email.com',
           password: 'somepassword',
           last_name: 'smith',
@@ -175,7 +177,7 @@ describe('AuthService', () => {
           return null;
         });
 
-      await service.registerUser({
+      await service.register({
         email: 'some@email.com',
         password: 'somepassword',
         last_name: 'smith',
@@ -204,7 +206,7 @@ describe('AuthService', () => {
         return 'FALSE';
       });
 
-      await service.registerUser({
+      await service.register({
         email: 'name+admin@email.com',
         password: 'somepassword',
         last_name: 'smith',
@@ -232,7 +234,7 @@ describe('AuthService', () => {
 
       jest.spyOn(configService, 'get').mockReturnValue('TRUE');
 
-      await service.registerUser({
+      await service.register({
         email: 'name+admin@email.com',
         password: 'somepassword',
         last_name: 'smith',
@@ -260,7 +262,7 @@ describe('AuthService', () => {
 
       jest.spyOn(configService, 'get').mockReturnValue('TRUE');
 
-      await service.registerUser({
+      await service.register({
         email: 'name+manager@email.com',
         password: 'somepassword',
         last_name: 'smith',
@@ -278,7 +280,7 @@ describe('AuthService', () => {
     });
   });
 
-  describe('loginAttemptFailed', () => {
+  describe('recordFailedLoginAttempt', () => {
     it('updates the database to append the current timestamp and retain only the latest three timestamps', async () => {
       let result;
 
@@ -292,7 +294,7 @@ describe('AuthService', () => {
       const now = new Date(2020, 12, 30, 1, 45, 50);
       jest.useFakeTimers().setSystemTime(now);
 
-      await service.loginAttemptFailed('some id', [past, past, past]);
+      await service.recordFailedLoginAttempt('some id', [past, past, past]);
       expect(result.failed_login_attempts_timestamps).toEqual([
         past,
         past,
@@ -301,7 +303,7 @@ describe('AuthService', () => {
     });
   });
 
-  describe('loginAttemptSuccess', () => {
+  describe('recordSuccessfulLoginAttempt', () => {
     it('sends a correctly structured update query to the database with the current timestamp and session token', async () => {
       let result;
       jest.spyOn(prismaService.users, 'update').mockImplementation((data) => {
@@ -311,7 +313,7 @@ describe('AuthService', () => {
       const now = new Date();
       jest.useFakeTimers().setSystemTime(now);
 
-      await service.loginAttemptSuccess('test_id', 'test_token');
+      await service.recordSuccessfulLoginAttempt('test_id', 'test_token');
       expect(result).toEqual({
         where: { id: 'test_id' },
         data: {
@@ -334,7 +336,7 @@ describe('AuthService', () => {
       const now = new Date(2020, 12, 30, 1, 45, 50);
       jest.useFakeTimers().setSystemTime(now);
 
-      await service.forgotPasswordRequest(
+      await service.recordPasswordResetRequest(
         'some id',
         [past, past, past],
         'made up token',
@@ -355,7 +357,7 @@ describe('AuthService', () => {
       const now = new Date(2020, 12, 30, 1, 45, 50);
       jest.useFakeTimers().setSystemTime(now);
 
-      await service.resetPassword('some id', 'the new password');
+      await service.resetPasswordWithToken('some id', 'the new password');
       expect(result).toMatchSnapshot('the expected database update');
     });
 
@@ -369,7 +371,7 @@ describe('AuthService', () => {
       const now = new Date(2020, 12, 30, 1, 45, 50);
       jest.useFakeTimers().setSystemTime(now);
 
-      await service.resetPassword('some id', 'the new password');
+      await service.resetPasswordWithToken('some id', 'the new password');
       expect(result.data.password).not.toEqual('the new password');
     });
   });
@@ -385,7 +387,7 @@ describe('AuthService', () => {
       const now = new Date(2020, 12, 30, 1, 45, 50);
       jest.useFakeTimers().setSystemTime(now);
 
-      await service.logoutUser('some id');
+      await service.logout('some id');
       expect(result).toMatchSnapshot('the expected database update');
     });
   });
@@ -394,7 +396,7 @@ describe('AuthService', () => {
     it('throws an error when the email does not exist in the database', async () => {
       jest.spyOn(prismaService.users, 'findUnique').mockReset();
       await expect(
-        service.loginUser({
+        service.login({
           email: 'some@email.com',
           password: 'some password',
         }),
@@ -404,11 +406,11 @@ describe('AuthService', () => {
     it('throws an error when the password is incorrect', async () => {
       // util is tested already.
       const util = jest
-        .spyOn(service, 'util_isIn24h')
+        .spyOn(service, 'checkIfAttemptsInLast24h')
         .mockImplementation(() => {});
 
       // tested already
-      jest.spyOn(service, 'loginAttemptFailed').mockResolvedValue(null);
+      jest.spyOn(service, 'recordFailedLoginAttempt').mockResolvedValue(null);
 
       // hash of 'therightpassword'
       jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue({
@@ -418,7 +420,7 @@ describe('AuthService', () => {
       } as Users);
 
       await expect(
-        service.loginUser({
+        service.login({
           email: 'some@email.com',
           password: 'thewrongpassword',
         }),
@@ -428,9 +430,13 @@ describe('AuthService', () => {
 
     it('returns a token and role when credentials are valid', async () => {
       // is already tested.
-      jest.spyOn(service, 'util_isIn24h').mockImplementation(() => {});
-      jest.spyOn(service, 'loginAttemptFailed').mockResolvedValue(null);
-      jest.spyOn(service, 'loginAttemptSuccess').mockResolvedValue(null);
+      jest
+        .spyOn(service, 'checkIfAttemptsInLast24h')
+        .mockImplementation(() => {});
+      jest.spyOn(service, 'recordFailedLoginAttempt').mockResolvedValue(null);
+      jest
+        .spyOn(service, 'recordSuccessfulLoginAttempt')
+        .mockResolvedValue(null);
       jest.spyOn(jwtService, 'signAsync').mockResolvedValue('my_token');
 
       jest.spyOn(usersService, 'findOneByEmail').mockResolvedValue({
@@ -441,7 +447,7 @@ describe('AuthService', () => {
       } as Users);
 
       await expect(
-        service.loginUser({
+        service.login({
           email: 'some@email.com',
           password: 'therightpassword',
         }),
@@ -452,8 +458,10 @@ describe('AuthService', () => {
   describe('forgotPassword', () => {
     it('returns a status message with a reset token', async () => {
       // is already tested.
-      jest.spyOn(service, 'util_isIn24h').mockImplementation(() => {});
-      jest.spyOn(service, 'forgotPasswordRequest').mockResolvedValue({
+      jest
+        .spyOn(service, 'checkIfAttemptsInLast24h')
+        .mockImplementation(() => {});
+      jest.spyOn(service, 'recordPasswordResetRequest').mockResolvedValue({
         password_reset_requests: 1,
         password_reset_requests_timestamps: [
           new Date(2020, 12, 12, 12, 12, 12),
@@ -533,7 +541,7 @@ describe('AuthService', () => {
       jest.spyOn(usersService, 'findOneByID').mockResolvedValue({
         password_reset_token: 'my_token',
       } as Users);
-      jest.spyOn(service, 'resetPassword').mockResolvedValue({
+      jest.spyOn(service, 'resetPasswordWithToken').mockResolvedValue({
         password_last_updated: new Date(2020, 12, 12, 12, 12, 12),
       } as Users);
 

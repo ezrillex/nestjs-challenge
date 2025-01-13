@@ -63,6 +63,6 @@ export class ProductVariationResolver {
     @Parent() product_variation: ProductVariations,
   ): Promise<Images[]> {
     const { id } = product_variation;
-    return await this.imagesService.ResolveImagesField(id);
+    return await this.imagesService.getImagesByProductVariation(id);
   }
 }

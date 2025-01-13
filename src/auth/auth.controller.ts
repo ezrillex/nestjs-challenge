@@ -25,21 +25,21 @@ export class AuthController {
   @Public()
   @Post('signup')
   async signup(@Body() data: SignupUserDto): Promise<Users> {
-    return await this.authService.registerUser(data);
+    return await this.authService.register(data);
   }
 
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async login(@Body() data: LoginUserDto): Promise<Users & { token: string }> {
-    return this.authService.loginUser(data);
+    return this.authService.login(data);
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
   async logout(@Request() request: Request): Promise<void> {
     const userId = request['user'].id;
-    await this.authService.logoutUser(userId);
+    await this.authService.logout(userId);
   }
 
   @Public()

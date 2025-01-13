@@ -32,7 +32,7 @@ export class AuthService {
    @param message customize the error message
    @param status customize the http status code
    */
-  util_isIn24h(
+  checkIfAttemptsInLast24h(
     timestamps: Date[],
     message: string = 'Too many attempts in 24 hour period.',
     status: HttpStatus = HttpStatus.FORBIDDEN,
@@ -53,7 +53,7 @@ export class AuthService {
     }
   }
 
-  async registerUser(data: SignupUserDto): Promise<Users> {
+  async register(data: SignupUserDto): Promise<Users> {
     if (data.password !== data.repeat_password) {
       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
     }
@@ -104,7 +104,10 @@ export class AuthService {
     return user;
   }
 
-  async loginAttemptFailed(id: string, timestamps: Date[]): Promise<Users> {
+  async recordFailedLoginAttempt(
+    id: string,
+    timestamps: Date[],
+  ): Promise<Users> {
     const ts_length = timestamps.push(new Date());
     if (ts_length > 3) {
       timestamps.shift();
@@ -119,7 +122,10 @@ export class AuthService {
     });
   }
 
-  async loginAttemptSuccess(id: string, token: string): Promise<Users> {
+  async recordSuccessfulLoginAttempt(
+    id: string,
+    token: string,
+  ): Promise<Users> {
     const now = new Date().toISOString();
     return this.prisma.users.update({
       where: { id: id },
@@ -127,7 +133,7 @@ export class AuthService {
     });
   }
 
-  async forgotPasswordRequest(
+  async recordPasswordResetRequest(
     id: string,
     timestamps: Date[],
     resetToken: string,
@@ -153,7 +159,7 @@ export class AuthService {
     const user = await this.usersService.findOneByEmail(data.email);
 
     // too many reset attempts check
-    this.util_isIn24h(
+    this.checkIfAttemptsInLast24h(
       user.password_reset_requests_timestamps,
       'Too many password reset requests in a 24 hour period. Try again later.',
     );
@@ -162,7 +168,7 @@ export class AuthService {
       user: user.id,
     });
 
-    const forgotPasswordData = await this.forgotPasswordRequest(
+    const forgotPasswordData = await this.recordPasswordResetRequest(
       user.id,
       user.password_reset_requests_timestamps,
       token,
@@ -180,7 +186,10 @@ export class AuthService {
     };
   }
 
-  async resetPassword(id: string, new_password: string): Promise<Users> {
+  async resetPasswordWithToken(
+    id: string,
+    new_password: string,
+  ): Promise<Users> {
     const hashed = await bcrypt.hash(new_password, 10);
 
     return this.prisma.users.update({
@@ -199,7 +208,7 @@ export class AuthService {
     });
   }
 
-  async logoutUser(id: string): Promise<Users> {
+  async logout(id: string): Promise<Users> {
     const now = new Date().toISOString();
     return this.prisma.users.update({
       where: { id: id },
@@ -210,11 +219,11 @@ export class AuthService {
     });
   }
 
-  async loginUser(data: LoginUserDto): Promise<Users & { token: string }> {
+  async login(data: LoginUserDto): Promise<Users & { token: string }> {
     const user = await this.usersService.findOneByEmail(data.email);
 
     // account locked check
-    this.util_isIn24h(
+    this.checkIfAttemptsInLast24h(
       user.failed_login_attempts_timestamps,
       'Too many failed login attempts, account is locked. Try again later.',
     );
@@ -228,7 +237,7 @@ export class AuthService {
         role: user.role,
       });
 
-      await this.loginAttemptSuccess(user.id, token);
+      await this.recordSuccessfulLoginAttempt(user.id, token);
       await this.emailsService.sendEmail(EMAIL_TEMPLATE.LOGIN_SUCCESSFUL);
       return {
         id: user.id,
@@ -242,7 +251,7 @@ export class AuthService {
         password_last_updated: user.password_last_updated,
       };
     } else {
-      await this.loginAttemptFailed(
+      await this.recordFailedLoginAttempt(
         user.id,
         user.failed_login_attempts_timestamps,
       );
@@ -274,7 +283,7 @@ export class AuthService {
     );
 
     if (password_reset_token === data.reset_token) {
-      const { password_last_updated } = await this.resetPassword(
+      const { password_last_updated } = await this.resetPasswordWithToken(
         id,
         data.password,
       );
