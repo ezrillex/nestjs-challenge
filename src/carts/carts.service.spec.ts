@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CartsService } from './carts.service';
 import { CartItems } from '@prisma/client';
 
-describe('Carts Service', () => {
+describe('CartsService', () => {
   let service: CartsService;
   let prismaService: PrismaService;
 
@@ -16,24 +16,28 @@ describe('Carts Service', () => {
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  it('should be defined', () => {
+  it('CartsService should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should have method add to cart', () => {
+  it('PrismaService should be defined', () => {
+    expect(prismaService).toBeDefined();
+  });
+
+  it('AddToCart should be defined', () => {
     expect(service.AddToCart).toBeDefined();
   });
 
-  it('should have method Remove cart item', () => {
+  it('RemoveCartItem should be defined', () => {
     expect(service.RemoveCartItem).toBeDefined();
   });
 
-  it('should have method Get cart items', () => {
+  it('GetCartItems should be defined', () => {
     expect(service.GetCartItems).toBeDefined();
   });
 
-  describe('Add a Product to cart Tests', () => {
-    it('Should error if nonexistent uuid of product variation is passed.', async () => {
+  describe('AddToCart', () => {
+    it('throws an error when the product variation ID does not exist', async () => {
       await expect(
         service.AddToCart(
           '2730fc05-6f87-49e5-8a41-559208048ebe',
@@ -43,7 +47,7 @@ describe('Carts Service', () => {
       ).rejects.toThrowErrorMatchingSnapshot('product variation 404');
     });
 
-    it('Should if given an id update an existing element', async () => {
+    it('updates an existing cart item when a matching entry is found', async () => {
       jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(1);
       jest
         .spyOn(prismaService.cartItems, 'findUnique')
@@ -63,7 +67,7 @@ describe('Carts Service', () => {
       expect(updated).toEqual(true);
     });
 
-    it('Should if no id provided create a new element', async () => {
+    it('creates a new cart item when no existing entry is found for the provided data', async () => {
       jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(1);
       jest.spyOn(prismaService.cartItems, 'findFirst').mockResolvedValue(null);
 
@@ -82,8 +86,8 @@ describe('Carts Service', () => {
     });
   });
 
-  describe('Remove a Product from cart Tests', () => {
-    it('Should error if a cart item id is invalid', async () => {
+  describe('RemoveCartItem', () => {
+    it('throws an error when attempting to remove a cart item that does not exist', async () => {
       await expect(
         service.RemoveCartItem(
           '2730fc05-6f87-49e5-8a41-559208048ebe',
@@ -94,7 +98,7 @@ describe('Carts Service', () => {
       );
     });
 
-    it('Should error if deletions fails.', async () => {
+    it('throws an error if the database delete operation fails without returning a deleted object', async () => {
       jest
         .spyOn(prismaService.cartItems, 'delete')
         .mockRejectedValue(new Error('testing'));
@@ -110,7 +114,7 @@ describe('Carts Service', () => {
       );
     });
 
-    it('Should return a specific message when successful', async () => {
+    it('returns "Cart Item deleted successfully." upon successful deletion of the cart item', async () => {
       jest.spyOn(prismaService.cartItems, 'delete').mockResolvedValue({
         id: 'testing',
         user_id: 'testing',
@@ -130,8 +134,8 @@ describe('Carts Service', () => {
     });
   });
 
-  describe('Get Cart Items', () => {
-    it('Should perform a well formed request to prisma', async () => {
+  describe('GetCartItems', () => {
+    it('should call the database with the correct query for retrieving cart items', async () => {
       const spy = jest
         .spyOn(prismaService.cartItems, 'findMany')
         .mockResolvedValue(null);
