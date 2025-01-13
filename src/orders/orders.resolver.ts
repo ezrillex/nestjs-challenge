@@ -74,6 +74,6 @@ export class OrdersResolver {
   @ResolveField()
   async payments(@Parent() cart_items: Orders): Promise<PaymentIntents[]> {
     const { id } = cart_items;
-    return this.stripeService.ResolvePaymentsOnOrdersField(id);
+    return this.stripeService.getPaymentsByOrder(id);
   }
 }

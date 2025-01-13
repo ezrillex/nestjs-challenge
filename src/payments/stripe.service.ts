@@ -24,7 +24,7 @@ export class StripeService {
     });
   }
 
-  async ResolvePaymentsOnOrdersField(id: string): Promise<PaymentIntents[]> {
+  async getPaymentsByOrder(id: string): Promise<PaymentIntents[]> {
     const { PaymentIntents } = await this.prisma.orders.findUnique({
       where: {
         id: id,
@@ -205,11 +205,15 @@ export class StripeService {
     });
   }
 
-  // DEBUG ONLY METHOD --------------------------------------------------
+  // For debugging purposes only
   async updatePaymentIntent(
     payment_id: string,
     payment_method: string,
   ): Promise<Stripe.PaymentIntent> {
+    // eslint-disable-next-line no-console
+    console.warn(
+      'For debugging purposes only method called. updatePaymentIntent',
+    );
     // check if order exists
     const record = await this.prisma.paymentIntents.findUnique({
       where: { id: payment_id },
