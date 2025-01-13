@@ -51,51 +51,96 @@ describe('AuthService', () => {
     jwtService = module.get(JwtService);
     usersService = module.get(UsersService);
   });
-  it('should be defined', () => {
+
+  it('AuthService should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('should be defined util 24 hours', () => {
-    expect(service.util_isIn24h).toBeDefined();
-  });
-
-  it('should be defined', () => {
+  it('ConfigService should be defined', () => {
     expect(configService).toBeDefined();
   });
 
-  it('should be defined', () => {
+  it('PrismaService should be defined', () => {
     expect(prismaService).toBeDefined();
   });
 
-  describe('is in 24 hour period utility', () => {
-    it('Should not error if no timestamps are provided', () => {
+  it('UsersService should be defined', () => {
+    expect(usersService).toBeDefined();
+  });
+
+  it('JwtService should be defined', () => {
+    expect(jwtService).toBeDefined();
+  });
+
+  it('util_isIn24h should be defined', () => {
+    expect(service.util_isIn24h).toBeDefined();
+  });
+
+  it('registerUser should be defined', () => {
+    expect(service.registerUser).toBeDefined();
+  });
+
+  it('loginAttemptFailed should be defined', () => {
+    expect(service.loginAttemptFailed).toBeDefined();
+  });
+
+  it('loginAttemptSuccess should be defined', () => {
+    expect(service.loginAttemptSuccess).toBeDefined();
+  });
+
+  it('forgotPasswordRequest should be defined', () => {
+    expect(service.forgotPasswordRequest).toBeDefined();
+  });
+
+  it('forgotPassword should be defined', () => {
+    expect(service.forgotPassword).toBeDefined();
+  });
+
+  it('resetPassword should be defined', () => {
+    expect(service.resetPassword).toBeDefined();
+  });
+
+  it('logoutUser should be defined', () => {
+    expect(service.logoutUser).toBeDefined();
+  });
+
+  it('loginUser should be defined', () => {
+    expect(service.loginUser).toBeDefined();
+  });
+
+  it('changePassword should be defined', () => {
+    expect(service.changePassword).toBeDefined();
+  });
+
+  describe('util_isIn24h', () => {
+    it('does not throw an error when no timestamps are provided', () => {
       expect(() => service.util_isIn24h([])).not.toThrow();
     });
 
-    it('Should error if 3 timestamps are in 24 hours', () => {
+    it('throws an error when more than two timestamps fall within a 24-hour period', () => {
       const now = new Date();
       expect(() =>
         service.util_isIn24h([now, now, now]),
       ).toThrowErrorMatchingSnapshot('too many in 24 h');
     });
 
-    it('Should not error if 2 timestamps are in 24 hours', () => {
+    it('does not throw an error when exactly two timestamps fall within a 24-hour period', () => {
       const now = new Date();
       expect(() => service.util_isIn24h([now, now])).not.toThrow();
     });
 
-    it('Should not error if not passed an array', () => {
+    it('does not throw an error when input is undefined', () => {
       expect(() => service.util_isIn24h(undefined)).not.toThrow();
     });
 
-    it('Should not error if times are in the past', () => {
+    it('does not throw an error when all timestamps are in the past', () => {
       const past = new Date(1999, 2, 20, 1, 50, 20);
       expect(() => service.util_isIn24h([past, past, past])).not.toThrow();
     });
   });
 
-  describe('create user', () => {
-    it('should error if password is different', async () => {
+  describe('registerUser', () => {
+    it('throws an error when password and repeat_password do not match', async () => {
       await expect(
         service.registerUser({
           email: 'some@email.com',
@@ -107,7 +152,7 @@ describe('AuthService', () => {
       ).rejects.toThrowErrorMatchingSnapshot('password mismatch');
     });
 
-    it('should error if email is already in use', async () => {
+    it('throws an error when email is already registered', async () => {
       jest.spyOn(prismaService.users, 'count').mockResolvedValue(1);
 
       await expect(
@@ -121,7 +166,7 @@ describe('AuthService', () => {
       ).rejects.toThrowErrorMatchingSnapshot('email is already in use');
     });
 
-    it('should create if checks are ok', async () => {
+    it('successfully creates a user when all validations pass', async () => {
       let result;
       jest
         .spyOn(prismaService.users, 'create')
@@ -147,7 +192,7 @@ describe('AuthService', () => {
       });
     });
 
-    it('should role be customer even if email is admin when env auto role is off ', async () => {
+    it('assigns role as customer even when email ends with +admin when auto-role is disabled', async () => {
       let result;
       jest
         .spyOn(prismaService.users, 'create')
@@ -176,7 +221,7 @@ describe('AuthService', () => {
       });
     });
 
-    it('should role be admin if email is admin when env auto role is on ', async () => {
+    it('assigns role as admin when email ends with +admin and auto-role is enabled', async () => {
       let result;
       jest
         .spyOn(prismaService.users, 'create')
@@ -204,7 +249,7 @@ describe('AuthService', () => {
       });
     });
 
-    it('should role be manager if email is manager when env auto role is on ', async () => {
+    it('assigns role as manager when email ends with +manager and auto-role is enabled', async () => {
       let result;
       jest
         .spyOn(prismaService.users, 'create')
@@ -233,8 +278,8 @@ describe('AuthService', () => {
     });
   });
 
-  describe('Login attempt failed ', () => {
-    it('should modify the db to append timestamp and shift it to 3', async () => {
+  describe('loginAttemptFailed', () => {
+    it('updates the database to append the current timestamp and retain only the latest three timestamps', async () => {
       let result;
 
       jest
@@ -256,8 +301,8 @@ describe('AuthService', () => {
     });
   });
 
-  describe('login attempt successfully', () => {
-    it('passes a well formed query to db update', async () => {
+  describe('loginAttemptSuccess', () => {
+    it('sends a correctly structured update query to the database with the current timestamp and session token', async () => {
       let result;
       jest.spyOn(prismaService.users, 'update').mockImplementation((data) => {
         result = data;
@@ -277,8 +322,8 @@ describe('AuthService', () => {
     });
   });
 
-  describe('forgot password requested', () => {
-    it('should modify the db to append timestamp and shift it to 3', async () => {
+  describe('forgotPasswordRequest', () => {
+    it('updates the database to append a new timestamp and retain only the latest three timestamps', async () => {
       let result;
 
       jest.spyOn(prismaService.users, 'update').mockImplementation((data) => {
@@ -298,8 +343,8 @@ describe('AuthService', () => {
     });
   });
 
-  describe('reset password', () => {
-    it('should update the database', async () => {
+  describe('resetPassword', () => {
+    it('updates the database with the new password', async () => {
       let result;
 
       jest.spyOn(prismaService.users, 'update').mockImplementation((data) => {
@@ -314,7 +359,7 @@ describe('AuthService', () => {
       expect(result).toMatchSnapshot('the expected database update');
     });
 
-    it('should hash the password', async () => {
+    it('ensures the password is hashed before being saved in the database', async () => {
       let result;
 
       jest.spyOn(prismaService.users, 'update').mockImplementation((data) => {
@@ -329,8 +374,8 @@ describe('AuthService', () => {
     });
   });
 
-  describe('logout user', () => {
-    it('should update db with valid logout user request', async () => {
+  describe('logoutUser', () => {
+    it('updates the database with a valid logout request for the user', async () => {
       let result;
 
       jest.spyOn(prismaService.users, 'update').mockImplementation((data) => {
@@ -345,8 +390,8 @@ describe('AuthService', () => {
     });
   });
 
-  describe('login user', () => {
-    it('should error if credentials email doesnt exist', async () => {
+  describe('loginUser', () => {
+    it('throws an error when the email does not exist in the database', async () => {
       jest.spyOn(prismaService.users, 'findUnique').mockReset();
       await expect(
         service.loginUser({
@@ -356,7 +401,7 @@ describe('AuthService', () => {
       ).rejects.toThrowErrorMatchingSnapshot('email not found response');
     });
 
-    it('should error if password is incorrect', async () => {
+    it('throws an error when the password is incorrect', async () => {
       // util is tested already.
       const util = jest
         .spyOn(service, 'util_isIn24h')
@@ -381,7 +426,7 @@ describe('AuthService', () => {
       expect(util).toHaveBeenCalled();
     });
 
-    it('should return token and role if all ok', async () => {
+    it('returns a token and role when credentials are valid', async () => {
       // is already tested.
       jest.spyOn(service, 'util_isIn24h').mockImplementation(() => {});
       jest.spyOn(service, 'loginAttemptFailed').mockResolvedValue(null);
@@ -404,8 +449,8 @@ describe('AuthService', () => {
     });
   });
 
-  describe('forgot password ', () => {
-    it('should return status string with token', async () => {
+  describe('forgotPassword', () => {
+    it('returns a status message with a reset token', async () => {
       // is already tested.
       jest.spyOn(service, 'util_isIn24h').mockImplementation(() => {});
       jest.spyOn(service, 'forgotPasswordRequest').mockResolvedValue({
@@ -431,8 +476,8 @@ describe('AuthService', () => {
     });
   });
 
-  describe('change password ', () => {
-    it('should throw if password mismatch', async () => {
+  describe('changePassword', () => {
+    it('throws an error when the password and repeat password do not match', async () => {
       await expect(
         service.changePassword({
           password: 'a',
@@ -442,7 +487,7 @@ describe('AuthService', () => {
       ).rejects.toThrowErrorMatchingSnapshot('mismatch password response');
     });
 
-    it('should throw if token is malformed', async () => {
+    it('throws an error when the token is malformed', async () => {
       await expect(
         service.changePassword({
           password: 'a',
@@ -452,7 +497,7 @@ describe('AuthService', () => {
       ).rejects.toThrowErrorMatchingSnapshot('token is malformed');
     });
 
-    it('should throw if token is invalid', async () => {
+    it('throws an error when the token is invalid', async () => {
       await expect(
         service.changePassword({
           password: 'a',
@@ -463,7 +508,7 @@ describe('AuthService', () => {
       ).rejects.toThrowErrorMatchingSnapshot('token is invalid');
     });
 
-    it('should throw if payload user token mismatch (requested again, or already used and tried to use link again)', async () => {
+    it("throws an error when the token payload does not match the user's current token (e.g., token reused or invalidated)", async () => {
       jest
         .spyOn(jwtService, 'verifyAsync')
         .mockResolvedValue({ user: 'some_user_id' });
@@ -480,7 +525,7 @@ describe('AuthService', () => {
       ).rejects.toThrowErrorMatchingSnapshot('token mismatch, invalidated');
     });
 
-    it('should return message password was reset', async () => {
+    it('returns a success message when the password is successfully reset', async () => {
       // is already tested.
       jest
         .spyOn(jwtService, 'verifyAsync')
