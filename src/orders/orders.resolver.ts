@@ -31,7 +31,7 @@ export class OrdersResolver {
   @Mutation(() => Orders, { nullable: true })
   async createOrder(@Context('req') request: Request): Promise<Orders> {
     // let's assume the customer is buying the entire cart.
-    return this.ordersService.CreateOrder(request['user'].id);
+    return this.ordersService.createOrder(request['user'].id);
   }
 
   @Query(() => [Orders], { nullable: true })
@@ -39,7 +39,7 @@ export class OrdersResolver {
     @Args('GetOrdersInput') getOrdersInput: GetOrdersInput,
     @Context('req') request: Request,
   ): Promise<Orders[]> {
-    return this.ordersService.GetOrders(
+    return this.ordersService.getOrders(
       request['user'].id,
       request['user'].role,
       getOrdersInput,
@@ -52,7 +52,7 @@ export class OrdersResolver {
     order_id: string,
     @Context('req') request: Request,
   ): Promise<Orders> {
-    return this.ordersService.GetOrder(
+    return this.ordersService.getOrder(
       order_id,
       request['user'].id,
       request['user'].role,
@@ -68,7 +68,7 @@ export class OrdersResolver {
   @ResolveField()
   async order_items(@Parent() cart_items: Orders): Promise<OrderItems[]> {
     const { id } = cart_items;
-    return this.ordersService.ResolveOrderItemsField(id);
+    return this.ordersService.getOrderItemsByOrder(id);
   }
 
   @ResolveField()

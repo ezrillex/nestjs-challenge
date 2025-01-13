@@ -10,7 +10,7 @@ import {
 } from '@prisma/client';
 import { ProductsService } from '../products/products.service';
 
-describe('Orders Service', () => {
+describe('OrdersService', () => {
   let service: OrdersService;
   let prismaService: PrismaService;
 
@@ -27,20 +27,28 @@ describe('Orders Service', () => {
     expect(service).toBeDefined();
   });
 
-  it('should have method CreateOrder', () => {
-    expect(service.CreateOrder).toBeDefined();
+  it('PrismaService should be defined', () => {
+    expect(prismaService).toBeDefined();
   });
 
-  it('should have method GetOrders', () => {
-    expect(service.GetOrders).toBeDefined();
+  it('createOrder should be defined', () => {
+    expect(service.createOrder).toBeDefined();
   });
 
-  it('should have method GetOrder', () => {
-    expect(service.GetOrder).toBeDefined();
+  it('getOrders should be defined', () => {
+    expect(service.getOrders).toBeDefined();
   });
 
-  describe('Get Orders', () => {
-    it('should query the user id if role customer', async () => {
+  it('getOrder should be defined', () => {
+    expect(service.getOrder).toBeDefined();
+  });
+
+  it('getOrderItemsByOrder should be defined', () => {
+    expect(service.getOrderItemsByOrder).toBeDefined();
+  });
+
+  describe('getOrders', () => {
+    it('should query orders for the user if the role is customer', async () => {
       let data;
       const spy = jest
         .spyOn(prismaService.orders, 'findMany')
@@ -50,7 +58,7 @@ describe('Orders Service', () => {
         });
 
       await expect(
-        service.GetOrders('the_user_id', roles.customer, null),
+        service.getOrders('the_user_id', roles.customer, null),
       ).resolves.not.toThrow();
 
       expect(data).toMatchSnapshot('role customer result');
@@ -59,7 +67,7 @@ describe('Orders Service', () => {
       );
     });
 
-    it('should query all orders w/pagination if role manager', async () => {
+    it('should query all orders with pagination if the role is manager', async () => {
       let data;
       const spy = jest
         .spyOn(prismaService.orders, 'findMany')
@@ -68,13 +76,13 @@ describe('Orders Service', () => {
           return null;
         });
 
-      await service.GetOrders('the_user_id', roles.manager, null);
+      await service.getOrders('the_user_id', roles.manager, null);
 
       expect(data).toMatchSnapshot('role manager result');
       expect(spy.mock.calls).toMatchSnapshot('called with manager query');
     });
 
-    it('should query all orders w/pagination if role manager and filter by client id if provided', async () => {
+    it('should query all orders with pagination and filter by client id if role is manager and client id is provided', async () => {
       let data;
       const spy = jest
         .spyOn(prismaService.orders, 'findMany')
@@ -83,7 +91,7 @@ describe('Orders Service', () => {
           return null;
         });
 
-      await service.GetOrders('the_user_id', roles.manager, {
+      await service.getOrders('the_user_id', roles.manager, {
         client_id: '2730fc05-6f87-49e5-8a41-559208048ebe',
       });
 
@@ -94,8 +102,8 @@ describe('Orders Service', () => {
     });
   });
 
-  describe('Get One Order', () => {
-    it('should include order id and client in query', async () => {
+  describe('getOrder', () => {
+    it('should include order ID and client in the query', async () => {
       let data;
       jest
         .spyOn(prismaService.orders, 'findUnique')
@@ -104,22 +112,22 @@ describe('Orders Service', () => {
           return null;
         });
 
-      await service.GetOrder('testing_user_id', 'testing_client_id', null);
+      await service.getOrder('testing_user_id', 'testing_client_id', null);
 
       expect(data).toMatchSnapshot('get one order result');
     });
   });
 
-  describe('Create an order', () => {
-    it('should throw if no cart items', async () => {
+  describe('createOrder', () => {
+    it('should throw an error if there are no items in the cart', async () => {
       jest.spyOn(prismaService.cartItems, 'findMany').mockResolvedValue([]);
 
       await expect(
-        service.CreateOrder('testing_user_id'),
+        service.createOrder('testing_user_id'),
       ).rejects.toThrowErrorMatchingSnapshot('error no items in the cart');
     });
 
-    it('should unroll nested product info and send a valid query', async () => {
+    it('should unroll nested product info and send a valid order creation query', async () => {
       type QueryType = CartItems & {
         product_variation: ProductVariations;
       };
@@ -159,14 +167,14 @@ describe('Orders Service', () => {
         return null;
       });
       await expect(
-        service.CreateOrder('testing_user_id'),
+        service.createOrder('testing_user_id'),
       ).rejects.toThrowErrorMatchingSnapshot(
         'error ocurred when creating order',
       );
       expect(result).toMatchSnapshot('query of order creation test');
     });
 
-    it('should unroll cart ids and send a valid query', async () => {
+    it('should unroll cart item IDs and send a valid query for order creation', async () => {
       type QueryType = CartItems & {
         product_variation: ProductVariations;
       };
@@ -210,14 +218,15 @@ describe('Orders Service', () => {
           count: 1,
         });
 
-      const returned = await service.CreateOrder('testing_user_id');
+      const returned = await service.createOrder('testing_user_id');
 
       const input = spy.mock.calls[0];
 
       expect(input).toMatchSnapshot('query of delete many test');
       expect(returned).toMatchSnapshot('create order return');
     });
-    it('throws error if delete count is 0, error', async () => {
+
+    it('should throw an error if deletion count is 0', async () => {
       type QueryType = CartItems & {
         product_variation: ProductVariations;
       };
@@ -260,8 +269,10 @@ describe('Orders Service', () => {
       });
 
       await expect(
-        service.CreateOrder('testing_user_id'),
+        service.createOrder('testing_user_id'),
       ).rejects.toThrowErrorMatchingSnapshot('error unexpected when deleting');
     });
   });
+
+  describe('getOrderItemsByOrder', () => {});
 });

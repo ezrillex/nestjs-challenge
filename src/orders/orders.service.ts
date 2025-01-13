@@ -13,7 +13,7 @@ import { OrderItems } from './order-items/order_items.model';
 export class OrdersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async CreateOrder(user_id: string): Promise<Orders> {
+  async createOrder(user_id: string): Promise<Orders> {
     const cart_items = await this.prisma.cartItems.findMany({
       select: {
         id: true,
@@ -81,7 +81,7 @@ export class OrdersService {
     }
   }
 
-  async GetOrders(
+  async getOrders(
     user_id: string,
     role: roles,
     inputs: GetOrdersInput,
@@ -116,7 +116,7 @@ export class OrdersService {
     });
   }
 
-  async GetOrder(
+  async getOrder(
     order_id: string,
     client_id: string,
     role: roles,
@@ -136,7 +136,7 @@ export class OrdersService {
     return this.prisma.orders.findUnique(find_parameters);
   }
 
-  async ResolveOrderItemsField(order_id: string): Promise<OrderItems[]> {
+  async getOrderItemsByOrder(order_id: string): Promise<OrderItems[]> {
     const { order_items } = await this.prisma.orders.findUnique({
       where: {
         id: order_id,
