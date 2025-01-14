@@ -20,8 +20,7 @@ import { TasksService } from './common/tasks/tasks.service';
 import { UsersResolver } from './users/users.resolver';
 import { PrismaService } from './prisma/prisma.service';
 import { UsersModule } from './users/users.module';
-import { ProductVariationResolver } from './products/product_variation/product_variation.resolver';
-import { ProductsResolver } from './products/products.resolver';
+import { CommonController } from './common/common.controller';
 
 @Module({
   imports: [
@@ -85,5 +84,6 @@ import { ProductsResolver } from './products/products.resolver';
     UsersModule,
   ],
   providers: [TasksService, PrismaService, UsersResolver],
+  controllers: [CommonController],
 })
 export class AppModule {}
