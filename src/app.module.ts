@@ -7,7 +7,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ImagesModule } from './images/images.module';
-import Joi from 'joi';
+import * as Joi from 'joi';
 import { GraphQLFormattedError } from 'graphql/error';
 import { PaymentsModule } from './payments/payments.module';
 import { CategoriesModule } from './categories/categories.module';

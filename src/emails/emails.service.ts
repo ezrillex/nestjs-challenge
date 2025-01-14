@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import sgMail from '@sendgrid/mail';
+import * as sgMail from '@sendgrid/mail';
 
 export enum EMAIL_TEMPLATE {
   LOGIN_SUCCESSFUL,
@@ -12,8 +12,8 @@ export enum EMAIL_TEMPLATE {
 
 @Injectable()
 export class EmailsService {
-  constructor(configService: ConfigService) {
-    sgMail.setApiKey(configService.get<string>('SENDGRID_API_KEY'));
+  constructor(private readonly configService: ConfigService) {
+    sgMail.setApiKey(this.configService.get<string>('SENDGRID_API_KEY'));
   }
 
   async sendEmail(
