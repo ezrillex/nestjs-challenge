@@ -164,7 +164,7 @@ export class AuthService {
       'Too many password reset requests in a 24 hour period. Try again later.',
     );
 
-    const token = this.jwtService.sign({
+    const token = await this.jwtService.signAsync({
       user: user.id,
     });
 
@@ -233,7 +233,6 @@ export class AuthService {
         user: user.id,
         role: user.role,
       });
-
       await this.recordSuccessfulLoginAttempt(user.id, token);
       await this.emailsService.sendEmail(EMAIL_TEMPLATE.LOGIN_SUCCESSFUL);
       return {

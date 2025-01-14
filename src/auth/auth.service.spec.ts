@@ -196,7 +196,7 @@ describe('AuthService', () => {
 
       const cryptoSpy = jest
         .spyOn(bcrypt, 'hash')
-        .mockImplementation(async () => testUser.password);
+        .mockImplementationOnce(async () => testUser.password);
 
       const spy = jest
         .spyOn(prismaService.users, 'create')
@@ -242,7 +242,7 @@ describe('AuthService', () => {
 
       const cryptoSpy = jest
         .spyOn(bcrypt, 'hash')
-        .mockImplementation(async () => testUser.password);
+        .mockImplementationOnce(async () => testUser.password);
 
       const spy = jest
         .spyOn(prismaService.users, 'create')
@@ -290,7 +290,7 @@ describe('AuthService', () => {
 
         const cryptoSpy = jest
           .spyOn(bcrypt, 'hash')
-          .mockImplementation(async () => testUser.password);
+          .mockImplementationOnce(async () => testUser.password);
 
         const spy = jest
           .spyOn(prismaService.users, 'create')
@@ -414,9 +414,11 @@ describe('AuthService', () => {
       const updateSpy = jest
         .spyOn(prismaService.users, 'update')
         .mockResolvedValue(testUser);
-      const cryptoSpy = jest.spyOn(bcrypt, 'hash').mockImplementation(() => {
-        return testUser.password;
-      });
+      const cryptoSpy = jest
+        .spyOn(bcrypt, 'hash')
+        .mockImplementationOnce(async () => {
+          return testUser.password;
+        });
       const now = new Date(2020, 12, 30, 1, 45, 50);
       jest.useFakeTimers().setSystemTime(now);
 
@@ -487,11 +489,8 @@ describe('AuthService', () => {
       );
       expect(emailSpy).toHaveBeenCalledWith(testUser.email);
     });
-
+    // todo EXAMPLE OF SIDE EFFECTS ASSERTION FIRST WHEN ERROR
     it('throws an error when the password is incorrect', async () => {
-      // hash of 'therightpassword'
-      testUser.password =
-        '$2y$10$Xzx25dxZ/cq0xn7toLj1HuZ1ZMfId8gRuR3VBGvX9fWdboh9xZrMa';
       const emailSpy = jest
         .spyOn(usersService, 'getUserByEmail')
         .mockResolvedValue(testUser);
@@ -508,17 +507,16 @@ describe('AuthService', () => {
         .mockResolvedValue();
 
       const password = faker.internet.password();
-      await expect(
-        service.login({
+      let error;
+      try {
+        await service.login({
           email: testUser.email,
           password,
-        }),
-      ).rejects.toThrow(
-        new HttpException(
-          'Wrong password. Try again or use the forgot password api to reset it.',
-          HttpStatus.UNAUTHORIZED,
-        ),
-      );
+        });
+      } catch (e) {
+        error = e;
+      }
+
       expect(emailSpy).toHaveBeenCalledWith(testUser.email);
       expect(utilSpy).toHaveBeenCalledWith(
         testUser.failed_login_attempts_timestamps,
@@ -531,32 +529,67 @@ describe('AuthService', () => {
         testUser.failed_login_attempts_timestamps,
       );
       expect(mailerSpy).toHaveBeenCalledWith(EMAIL_TEMPLATE.LOGIN_FAIL);
+      expect(error).toEqual(
+        new HttpException(
+          'Wrong password. Try again or use the forgot password api to reset it.',
+          HttpStatus.UNAUTHORIZED,
+        ),
+      );
     });
-    // todo continiue here
+    // todo SAMPLE OF SIDE EFFECTS FIRST
     it('returns a token and role when credentials are valid', async () => {
-      // is already tested.
-      jest
-        .spyOn(service, 'checkIfAttemptsInLast24h')
-        .mockImplementation(() => {});
-      jest.spyOn(service, 'recordFailedLoginAttempt').mockResolvedValue(null);
-      jest
+      testUser.password = await bcrypt.hash('therightpassword', 10);
+      const emailSpy = jest
+        .spyOn(usersService, 'getUserByEmail')
+        .mockResolvedValue(testUser);
+
+      const utilSpy = jest.spyOn(service, 'checkIfAttemptsInLast24h');
+      const cryptoSpy = jest.spyOn(bcrypt, 'compare');
+
+      const jwtSpy = jest
+        .spyOn(jwtService, 'signAsync')
+        .mockResolvedValue(testUser.session_token);
+
+      const recordSpy = jest
         .spyOn(service, 'recordSuccessfulLoginAttempt')
-        .mockResolvedValue(null);
-      jest.spyOn(jwtService, 'signAsync').mockResolvedValue('my_token');
+        .mockResolvedValue(testUser);
 
-      jest.spyOn(usersService, 'getUserByEmail').mockResolvedValue({
-        id: 'test id',
-        role: roles.customer,
-        password:
-          '$2b$10$fhpIpbwfaJlbiOZPDKlKxuV71lFjOk3EeX9npe.LSF0fIyiouR2i2',
-      } as Users);
+      const mailerSpy = jest
+        .spyOn(emailsService, 'sendEmail')
+        .mockResolvedValue();
 
-      await expect(
-        service.login({
-          email: 'some@email.com',
-          password: 'therightpassword',
-        }),
-      ).resolves.toMatchSnapshot('ok response');
+      const password = 'therightpassword';
+      const test = await service.login({
+        email: testUser.email,
+        password,
+      });
+      expect(jwtSpy).toHaveBeenCalledWith({
+        user: testUser.id,
+        role: testUser.role,
+      });
+      expect(emailSpy).toHaveBeenCalledWith(testUser.email);
+      expect(utilSpy).toHaveBeenCalledWith(
+        testUser.failed_login_attempts_timestamps,
+        'Too many failed login attempts, account is locked. Try again later.',
+      );
+      expect(cryptoSpy).toHaveBeenCalledWith(password, testUser.password);
+      await expect(cryptoSpy.mock.results[0].value).resolves.toBe(true);
+      expect(recordSpy).toHaveBeenCalledWith(
+        testUser.id,
+        testUser.session_token,
+      );
+      expect(mailerSpy).toHaveBeenCalledWith(EMAIL_TEMPLATE.LOGIN_SUCCESSFUL);
+      expect(test).toEqual({
+        id: testUser.id,
+        token: testUser.session_token,
+        first_name: testUser.first_name,
+        last_name: testUser.last_name,
+        email: testUser.email,
+        created_at: testUser.created_at,
+        role: testUser.role,
+        login_at: testUser.login_at,
+        password_last_updated: testUser.password_last_updated,
+      });
     });
   });
 
@@ -564,30 +597,52 @@ describe('AuthService', () => {
     it('forgotPassword should be defined', () => {
       expect(service.forgotPassword).toBeDefined();
     });
+
     it('returns a status message with a reset token', async () => {
-      // is already tested.
-      jest
+      const mailSpy = jest
+        .spyOn(usersService, 'getUserByEmail')
+        .mockResolvedValue(testUser);
+      const utilSpy = jest
         .spyOn(service, 'checkIfAttemptsInLast24h')
         .mockImplementation(() => {});
-      jest.spyOn(service, 'recordPasswordResetRequest').mockResolvedValue({
-        password_reset_requests: 1,
-        password_reset_requests_timestamps: [
-          new Date(2020, 12, 12, 12, 12, 12),
-        ],
-      } as Users);
-      jest.spyOn(jwtService, 'sign').mockReturnValue('my_token');
 
-      jest.spyOn(usersService, 'getUserByEmail').mockResolvedValue({} as Users);
+      const resetToken = faker.internet.jwt();
+      const jwtSpy = jest
+        .spyOn(jwtService, 'signAsync')
+        .mockResolvedValue(resetToken);
 
-      await expect(
-        service.forgotPassword({
-          email: 'some@email.com',
-        }),
-      ).resolves.toEqual({
+      const recordspy = jest
+        .spyOn(service, 'recordPasswordResetRequest')
+        .mockResolvedValue(testUser);
+
+      const mailerSpy = jest
+        .spyOn(emailsService, 'sendEmail')
+        .mockResolvedValue();
+
+      const test = await service.forgotPassword({
+        email: testUser.email,
+      });
+
+      expect(mailSpy).toHaveBeenCalledWith(testUser.email);
+      expect(utilSpy).toHaveBeenCalledWith(
+        testUser.password_reset_requests_timestamps,
+        'Too many password reset requests in a 24 hour period. Try again later.',
+      );
+      expect(jwtSpy).toHaveBeenCalledWith({ user: testUser.id });
+      expect(recordspy).toHaveBeenCalledWith(
+        testUser.id,
+        testUser.password_reset_requests_timestamps,
+        resetToken,
+      );
+      expect(mailerSpy).toHaveBeenCalledWith(EMAIL_TEMPLATE.FORGOT_PASSWORD, {
+        reset_token: resetToken,
+      });
+
+      expect(test).toEqual({
         message:
           'An email has been sent with a link to reset the password. Check your email.',
-        request_count: 1,
-        request_timestamps: [new Date(2020, 12, 12, 12, 12, 12)],
+        request_count: testUser.password_reset_requests,
+        request_timestamps: testUser.password_reset_requests_timestamps,
       });
     });
   });
@@ -596,76 +651,99 @@ describe('AuthService', () => {
     it('changePassword should be defined', () => {
       expect(service.changePassword).toBeDefined();
     });
+
     it('throws an error when the password and repeat password do not match', async () => {
       await expect(
         service.changePassword({
-          password: 'a',
-          repeat_password: 'b',
-          reset_token: 'my_token',
+          password: faker.internet.password(),
+          repeat_password: faker.internet.password(),
+          reset_token: faker.internet.jwt(),
         }),
-      ).rejects.toThrowErrorMatchingSnapshot('mismatch password response');
+      ).rejects.toThrow(
+        new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST),
+      );
     });
 
     it('throws an error when the token is malformed', async () => {
+      const password = faker.internet.password();
+
       await expect(
         service.changePassword({
-          password: 'a',
-          repeat_password: 'a',
-          reset_token: 'my_token',
+          password: password,
+          repeat_password: password,
+          reset_token: faker.string.alphanumeric(60),
         }),
       ).rejects.toThrowErrorMatchingSnapshot('token is malformed');
     });
 
     it('throws an error when the token is invalid', async () => {
+      const password = faker.internet.password();
       await expect(
         service.changePassword({
-          password: 'a',
-          repeat_password: 'a',
+          password: password,
+          repeat_password: password,
           reset_token:
             'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE3MzU5NDAyMzYsImV4cCI6MTc2NzQ3NjIzNiwiYXVkIjoid3d3LmV4YW1wbGUuY29tIiwic3ViIjoianJvY2tldEBleGFtcGxlLmNvbSIsIkdpdmVuTmFtZSI6IkpvaG5ueSIsIlN1cm5hbWUiOiJSb2NrZXQiLCJFbWFpbCI6Impyb2NrZXRAZXhhbXBsZS5jb20iLCJSb2xlIjpbIk1hbmFnZXIiLCJQcm9qZWN0IEFkbWluaXN0cmF0b3IiXX0.vwn02EWxfKdm0bVyaLFQVpTWevnsEah5lRu_gU27vCk',
         }),
-      ).rejects.toThrowErrorMatchingSnapshot('token is invalid');
+      ).rejects.toThrow(
+        new HttpException(
+          `An error occurred when validating reset token: invalid signature`,
+          HttpStatus.UNAUTHORIZED,
+        ),
+      );
     });
 
     it("throws an error when the token payload does not match the user's current token (e.g., token reused or invalidated)", async () => {
-      jest
+      const jwtSpy = jest
         .spyOn(jwtService, 'verifyAsync')
-        .mockResolvedValue({ user: 'some_user_id' });
-      jest.spyOn(usersService, 'getUserById').mockResolvedValue({
-        password_reset_token: 'some_random_token',
-      } as Users);
+        .mockResolvedValue({ user: testUser.id, role: testUser.role });
 
+      const userSpy = jest
+        .spyOn(usersService, 'getUserById')
+        .mockResolvedValue(testUser);
+      const password = faker.internet.password();
+      const token = faker.internet.jwt();
       await expect(
         service.changePassword({
-          password: 'a',
-          repeat_password: 'a',
-          reset_token: 'my_token',
+          password: password,
+          repeat_password: password,
+          reset_token: token,
         }),
-      ).rejects.toThrowErrorMatchingSnapshot('token mismatch, invalidated');
+      ).rejects.toThrow(
+        new HttpException('The token is not valid.', HttpStatus.FORBIDDEN),
+      );
+
+      expect(jwtSpy).toHaveBeenCalledWith(token);
+      expect(userSpy).toHaveBeenCalledWith(testUser.id);
     });
 
     it('returns a success message when the password is successfully reset', async () => {
-      // is already tested.
-      jest
+      const jwtSpy = jest
         .spyOn(jwtService, 'verifyAsync')
-        .mockResolvedValue({ user: 'some_user_id' });
-      jest.spyOn(usersService, 'getUserById').mockResolvedValue({
-        password_reset_token: 'my_token',
-      } as Users);
-      jest.spyOn(service, 'resetPassword').mockResolvedValue({
-        password_last_updated: new Date(2020, 12, 12, 12, 12, 12),
-      } as Users);
+        .mockResolvedValue({ user: testUser.id, role: testUser.role });
 
+      const resetSpy = jest
+        .spyOn(service, 'resetPassword')
+        .mockResolvedValue(testUser);
+
+      const userSpy = jest
+        .spyOn(usersService, 'getUserById')
+        .mockResolvedValue(testUser);
+      const password = faker.internet.password();
       await expect(
         service.changePassword({
-          password: 'a',
-          repeat_password: 'a',
-          reset_token: 'my_token',
+          password: password,
+          repeat_password: password,
+          reset_token: testUser.password_reset_token,
         }),
       ).resolves.toEqual({
         message: 'The password has been reset successfully!',
-        password_last_updated: new Date(2020, 12, 12, 12, 12, 12),
+        password_last_updated: testUser.password_last_updated,
       });
+
+      expect(jwtSpy).toHaveBeenCalledWith(testUser.password_reset_token);
+      expect(userSpy).toHaveBeenCalledWith(testUser.id);
+      expect(resetSpy).toHaveBeenCalledWith(testUser.id, password);
     });
   });
 });
