@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/common/filters/global-exception.filter.ts</title>
+    <title>Code coverage report for src/common/tasks/tasks.service.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../../prettify.css" />
     <link rel="stylesheet" href="../../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/common/filters</a> global-exception.filter.ts</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">src/common/tasks</a> tasks.service.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">57.89% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>20/20</span>
+                <span class='fraction'>11/19</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>5/5</span>
+                <span class='fraction'>0/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>1/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">52.94% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>18/18</span>
+                <span class='fraction'>9/17</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -106,47 +106,7 @@
 <a name='L41'></a><a href='#L41'>41</a>
 <a name='L42'></a><a href='#L42'>42</a>
 <a name='L43'></a><a href='#L43'>43</a>
-<a name='L44'></a><a href='#L44'>44</a>
-<a name='L45'></a><a href='#L45'>45</a>
-<a name='L46'></a><a href='#L46'>46</a>
-<a name='L47'></a><a href='#L47'>47</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L44'></a><a href='#L44'>44</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -154,51 +114,82 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
-import { BaseExceptionFilter } from '@nestjs/core';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
+import { ProductsService } from '../../products/products.service';
+import { EMAIL_TEMPLATE, EmailsService } from '../../emails/emails.service';
 &nbsp;
-@Catch()
-export class GlobalExceptionFilter extends BaseExceptionFilter {
-  catch(exception: any, host: ArgumentsHost): any | void {
-    let code;
-    let message;
-    if (exception instanceof HttpException) {
-      code = exception.getStatus();
-      message = exception.message;
-    } else {
-      code = HttpStatus.INTERNAL_SERVER_ERROR;
-      message = 'An unkown error occurred';
-    }
+@Injectable()
+export class TasksService {
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly emailsService: EmailsService,
+  ) {}
 &nbsp;
-    let request;
-    let response;
-    let path;
-    // @ts-expect-error it does return graphql.
-    if (host.getType() === 'graphql') {
-      return exception;
-    } else {
-      request = host.switchToHttp().getRequest();
-      response = host.switchToHttp().getResponse();
-      path = request.url;
-    }
-    const responseBody = {
-      status_code: code,
-      message: message,
-      timestamp: new Date().toISOString(),
-      path: path,
-    };
-    const details = exception.response?.message;
-    if (details) {
-      responseBody['details'] = details;
-    }
+  @Cron('* * * * *')
+<span class="fstat-no" title="function not covered" >  async </span>randomCron(): Promise&lt;void&gt; {
+    // eslint-disable-next-line
+<span class="cstat-no" title="statement not covered" >    console.log(</span>
+      `Current Time: ${new Date().toLocaleString()}, random number: ${Math.random()}`,
+    );
+  }
 &nbsp;
-    this.applicationRef.reply(response, responseBody, code);
+  // Since I don't have any stock logic for now it is at 6pm. For now It doesn't check if purchased.
+  // When the stock of a product reaches 3, notify the last user that liked it and not purchased the product yet with an email.
+  // Use a background job and make sure to include the product's image in the email.
+  @Cron('0 18 * * *')
+<span class="fstat-no" title="function not covered" >  async </span>marketingLowStockProducts(): Promise&lt;void&gt; {
+    const subjects = <span class="cstat-no" title="statement not covered" >await this.productsService.getLowStockProducts();</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (subjects.length === 0) {</span>
+<span class="cstat-no" title="statement not covered" >      return;</span>
+    }
+    const emails = <span class="cstat-no" title="statement not covered" >subjects.reduce(<span class="fstat-no" title="function not covered" >(p</span>reviousValue, current) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >      previousValue.push({</span>
+        template: EMAIL_TEMPLATE.LOW_STOCK_REMINDER,
+        data: {
+          product_title: current.title,
+          product_image: current.images[0].url,
+        },
+      });
+<span class="cstat-no" title="statement not covered" >      return previousValue;</span>
+    }, []);
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    await this.emailsService.sendManyEmails(emails);</span>
   }
 }
 &nbsp;</pre></td></tr></table></pre>

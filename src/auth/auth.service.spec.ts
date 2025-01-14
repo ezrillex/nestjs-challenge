@@ -5,7 +5,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { roles, Users } from '@prisma/client';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { EmailsService } from '../emails/emails.service';
+import { EMAIL_TEMPLATE, EmailsService } from '../emails/emails.service';
+import { DateTime } from 'luxon';
+import { SignupUserDto } from './dto/signup-user.dto';
+import { faker } from '@faker-js/faker';
+import { HttpException, HttpStatus } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 jest.mock('@sendgrid/mail', () => {
   return {
@@ -23,6 +28,8 @@ describe('AuthService', () => {
   let prismaService: PrismaService;
   let usersService: UsersService;
   let jwtService: JwtService;
+  let emailsService: EmailsService;
+  let testUser: Users;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -50,9 +57,29 @@ describe('AuthService', () => {
     prismaService = module.get(PrismaService);
     jwtService = module.get(JwtService);
     usersService = module.get(UsersService);
+    emailsService = module.get(EmailsService);
+
+    testUser = {
+      id: faker.string.uuid(),
+      first_name: faker.person.firstName(),
+      last_name: faker.person.lastName(),
+      email: faker.internet.email(),
+      password: faker.string.alphanumeric(60),
+      created_at: new Date(),
+      role: roles.customer,
+      failed_login_attempts: 0,
+      failed_login_attempts_timestamps: [new Date()],
+      session_token: faker.internet.jwt(),
+      login_at: null,
+      logout_at: null,
+      password_reset_requests: 0,
+      password_reset_requests_timestamps: [],
+      password_reset_token: faker.string.alphanumeric(60),
+      password_last_updated: new Date(),
+    };
   });
 
-  it('AuthService should be defined', () => {
+  it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
@@ -72,47 +99,11 @@ describe('AuthService', () => {
     expect(jwtService).toBeDefined();
   });
 
-  it('checkIfAttemptsInLast24h should be defined', () => {
-    expect(service.checkIfAttemptsInLast24h).toBeDefined();
-  });
-
-  it('register should be defined', () => {
-    expect(service.register).toBeDefined();
-  });
-
-  it('recordFailedLoginAttempt should be defined', () => {
-    expect(service.recordFailedLoginAttempt).toBeDefined();
-  });
-
-  it('recordSuccessfulLoginAttempt should be defined', () => {
-    expect(service.recordSuccessfulLoginAttempt).toBeDefined();
-  });
-
-  it('recordPasswordResetRequest should be defined', () => {
-    expect(service.recordPasswordResetRequest).toBeDefined();
-  });
-
-  it('forgotPassword should be defined', () => {
-    expect(service.forgotPassword).toBeDefined();
-  });
-
-  it('resetPasswordWithToken should be defined', () => {
-    expect(service.resetPasswordWithToken).toBeDefined();
-  });
-
-  it('logout should be defined', () => {
-    expect(service.logout).toBeDefined();
-  });
-
-  it('login should be defined', () => {
-    expect(service.login).toBeDefined();
-  });
-
-  it('changePassword should be defined', () => {
-    expect(service.changePassword).toBeDefined();
-  });
-
   describe('checkIfAttemptsInLast24h', () => {
+    it('checkIfAttemptsInLast24h should be defined', () => {
+      expect(service.checkIfAttemptsInLast24h).toBeDefined();
+    });
+
     it('does not throw an error when no timestamps are provided', () => {
       expect(() => service.checkIfAttemptsInLast24h([])).not.toThrow();
     });
@@ -139,295 +130,409 @@ describe('AuthService', () => {
         service.checkIfAttemptsInLast24h([past, past, past]),
       ).not.toThrow();
     });
+
+    it('does not throw an error when timestamps are just outside the 24-hour window', () => {
+      const aDayAgoAndAMinute = DateTime.now()
+        .minus({ day: 1, minute: 1 })
+        .toJSDate();
+      expect(() =>
+        service.checkIfAttemptsInLast24h([
+          aDayAgoAndAMinute,
+          aDayAgoAndAMinute,
+          aDayAgoAndAMinute,
+        ]),
+      ).not.toThrow();
+    });
   });
 
-  describe('registerUser', () => {
+  describe('register', () => {
+    it('register should be defined', () => {
+      expect(service.register).toBeDefined();
+    });
+
     it('throws an error when password and repeat_password do not match', async () => {
-      await expect(
-        service.register({
-          email: 'some@email.com',
-          password: 'somepassword!',
-          last_name: 'smith',
-          first_name: 'john',
-          repeat_password: 'somepassword',
-        }),
-      ).rejects.toThrowErrorMatchingSnapshot('password mismatch');
+      const input: SignupUserDto = {
+        email: faker.internet.email(),
+        password: faker.internet.password(),
+        last_name: faker.person.lastName(),
+        first_name: faker.person.firstName(),
+        repeat_password: faker.internet.password(),
+      };
+
+      await expect(service.register(input)).rejects.toThrow(
+        new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST),
+      );
     });
 
     it('throws an error when email is already registered', async () => {
-      jest.spyOn(prismaService.users, 'count').mockResolvedValue(1);
+      const spy = jest.spyOn(prismaService.users, 'count').mockResolvedValue(1);
 
-      await expect(
-        service.register({
-          email: 'some@email.com',
-          password: 'somepassword',
-          last_name: 'smith',
-          first_name: 'john',
-          repeat_password: 'somepassword',
-        }),
-      ).rejects.toThrowErrorMatchingSnapshot('email is already in use');
+      const password = faker.internet.password();
+      const input: SignupUserDto = {
+        email: testUser.email,
+        password,
+        last_name: testUser.last_name,
+        first_name: testUser.first_name,
+        repeat_password: password,
+      };
+
+      await expect(service.register(input)).rejects.toThrow(
+        new HttpException('Email is already in use', HttpStatus.CONFLICT),
+      );
+      expect(spy).toHaveBeenCalledWith({
+        where: { email: input.email },
+      });
     });
 
     it('successfully creates a user when all validations pass', async () => {
-      let result;
-      jest
+      const password = faker.internet.password();
+      const input: SignupUserDto = {
+        email: faker.internet.email(),
+        password,
+        last_name: faker.person.lastName(),
+        first_name: faker.person.firstName(),
+        repeat_password: password,
+      };
+
+      const cryptoSpy = jest
+        .spyOn(bcrypt, 'hash')
+        .mockImplementation(async () => testUser.password);
+
+      const spy = jest
         .spyOn(prismaService.users, 'create')
-        .mockImplementation(({ data }) => {
-          result = data;
-          return null;
-        });
+        .mockResolvedValue(testUser);
 
-      await service.register({
-        email: 'some@email.com',
-        password: 'somepassword',
-        last_name: 'smith',
-        first_name: 'john',
-        repeat_password: 'somepassword',
-      });
+      await expect(service.register(input)).resolves.toEqual(testUser);
 
-      expect(result).toEqual({
-        email: 'some@email.com',
-        password: expect.any(String),
-        last_name: 'smith',
-        first_name: 'john',
-        role: roles.customer,
+      expect(spy).toHaveBeenCalledWith({
+        data: {
+          first_name: input.first_name,
+          last_name: input.last_name,
+          email: input.email,
+          password: testUser.password,
+          role: roles.customer,
+        },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          last_name: true,
+          first_name: true,
+          created_at: true,
+        },
       });
+      expect(cryptoSpy).toHaveBeenCalledWith(password, 10);
     });
 
     it('assigns role as customer even when email ends with +admin when auto-role is disabled', async () => {
-      let result;
-      jest
-        .spyOn(prismaService.users, 'create')
-        .mockImplementation(({ data }) => {
-          result = data;
-          return null;
-        });
+      const previous = faker.internet.email().split('@');
+      const email = `${previous[0]}+admin@${previous[1]}`;
+      const password = faker.internet.password();
+      const input: SignupUserDto = {
+        email,
+        password,
+        last_name: faker.person.lastName(),
+        first_name: faker.person.firstName(),
+        repeat_password: password,
+      };
+
       jest.spyOn(configService, 'get').mockImplementation(() => {
         return 'FALSE';
       });
 
-      await service.register({
-        email: 'name+admin@email.com',
-        password: 'somepassword',
-        last_name: 'smith',
-        first_name: 'john',
-        repeat_password: 'somepassword',
-      });
+      const cryptoSpy = jest
+        .spyOn(bcrypt, 'hash')
+        .mockImplementation(async () => testUser.password);
 
-      expect(result).toEqual({
-        email: 'name+admin@email.com',
-        password: expect.any(String),
-        last_name: 'smith',
-        first_name: 'john',
-        role: roles.customer,
+      const spy = jest
+        .spyOn(prismaService.users, 'create')
+        .mockResolvedValue(testUser);
+
+      await expect(service.register(input)).resolves.toEqual(testUser);
+
+      expect(spy).toHaveBeenCalledWith({
+        data: {
+          first_name: input.first_name,
+          last_name: input.last_name,
+          email: input.email,
+          password: testUser.password,
+          role: roles.customer,
+        },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          last_name: true,
+          first_name: true,
+          created_at: true,
+        },
       });
+      expect(cryptoSpy).toHaveBeenCalledWith(password, 10);
     });
 
-    it('assigns role as admin when email ends with +admin and auto-role is enabled', async () => {
-      let result;
-      jest
-        .spyOn(prismaService.users, 'create')
-        .mockImplementation(({ data }) => {
-          result = data;
-          return null;
+    it.each([roles.admin, roles.manager])(
+      'assigns role as [admin,manager] when email ends with +[admin,manager] and auto-role is enabled',
+      async (roleParameter) => {
+        const previous = faker.internet.email().split('@');
+        const email = `${previous[0]}+${roleParameter}@${previous[1]}`;
+        const password = faker.internet.password();
+        const input: SignupUserDto = {
+          email,
+          password,
+          last_name: faker.person.lastName(),
+          first_name: faker.person.firstName(),
+          repeat_password: password,
+        };
+
+        jest.spyOn(configService, 'get').mockImplementation(() => {
+          return 'TRUE';
         });
 
-      jest.spyOn(configService, 'get').mockReturnValue('TRUE');
+        const cryptoSpy = jest
+          .spyOn(bcrypt, 'hash')
+          .mockImplementation(async () => testUser.password);
 
-      await service.register({
-        email: 'name+admin@email.com',
-        password: 'somepassword',
-        last_name: 'smith',
-        first_name: 'john',
-        repeat_password: 'somepassword',
-      });
+        const spy = jest
+          .spyOn(prismaService.users, 'create')
+          .mockResolvedValue(testUser);
 
-      expect(result).toEqual({
-        email: 'name+admin@email.com',
-        password: expect.any(String),
-        last_name: 'smith',
-        first_name: 'john',
-        role: roles.admin,
-      });
-    });
+        await expect(service.register(input)).resolves.toEqual(testUser);
 
-    it('assigns role as manager when email ends with +manager and auto-role is enabled', async () => {
-      let result;
-      jest
-        .spyOn(prismaService.users, 'create')
-        .mockImplementation(({ data }) => {
-          result = data;
-          return null;
+        expect(spy).toHaveBeenCalledWith({
+          data: {
+            first_name: input.first_name,
+            last_name: input.last_name,
+            email: input.email,
+            password: testUser.password,
+            role: roleParameter,
+          },
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            last_name: true,
+            first_name: true,
+            created_at: true,
+          },
         });
-
-      jest.spyOn(configService, 'get').mockReturnValue('TRUE');
-
-      await service.register({
-        email: 'name+manager@email.com',
-        password: 'somepassword',
-        last_name: 'smith',
-        first_name: 'john',
-        repeat_password: 'somepassword',
-      });
-
-      expect(result).toEqual({
-        email: 'name+manager@email.com',
-        password: expect.any(String),
-        last_name: 'smith',
-        first_name: 'john',
-        role: roles.manager,
-      });
-    });
+        expect(cryptoSpy).toHaveBeenCalledWith(password, 10);
+      },
+    );
   });
 
   describe('recordFailedLoginAttempt', () => {
-    it('updates the database to append the current timestamp and retain only the latest three timestamps', async () => {
-      let result;
+    it('recordFailedLoginAttempt should be defined', () => {
+      expect(service.recordFailedLoginAttempt).toBeDefined();
+    });
 
-      jest
+    it('updates the database to append the current timestamp and retain only the latest three timestamps', async () => {
+      const spyUpdate = jest
         .spyOn(prismaService.users, 'update')
-        .mockImplementation(({ data }) => {
-          result = data;
-          return null;
-        });
+        .mockResolvedValue(testUser);
       const past = new Date(1999, 2, 20, 1, 50, 20);
       const now = new Date(2020, 12, 30, 1, 45, 50);
       jest.useFakeTimers().setSystemTime(now);
 
-      await service.recordFailedLoginAttempt('some id', [past, past, past]);
-      expect(result.failed_login_attempts_timestamps).toEqual([
-        past,
-        past,
-        now,
-      ]);
+      await expect(
+        service.recordFailedLoginAttempt(testUser.id, [past, past, past]),
+      ).resolves.toEqual(testUser);
+      expect(spyUpdate).toHaveBeenCalledWith({
+        where: { id: testUser.id },
+        data: {
+          failed_login_attempts: 3,
+          failed_login_attempts_timestamps: [past, past, now],
+        },
+      });
     });
   });
 
   describe('recordSuccessfulLoginAttempt', () => {
+    it('recordSuccessfulLoginAttempt should be defined', () => {
+      expect(service.recordSuccessfulLoginAttempt).toBeDefined();
+    });
+
     it('sends a correctly structured update query to the database with the current timestamp and session token', async () => {
-      let result;
-      jest.spyOn(prismaService.users, 'update').mockImplementation((data) => {
-        result = data;
-        return null;
-      });
+      const updateSpy = jest
+        .spyOn(prismaService.users, 'update')
+        .mockResolvedValue(testUser);
       const now = new Date();
       jest.useFakeTimers().setSystemTime(now);
 
-      await service.recordSuccessfulLoginAttempt('test_id', 'test_token');
-      expect(result).toEqual({
-        where: { id: 'test_id' },
+      await expect(
+        service.recordSuccessfulLoginAttempt(
+          testUser.id,
+          testUser.session_token,
+        ),
+      ).resolves.toEqual(testUser);
+      expect(updateSpy).toHaveBeenCalledWith({
+        where: { id: testUser.id },
         data: {
           login_at: now.toISOString(),
-          session_token: 'test_token',
+          session_token: testUser.session_token,
         },
       });
     });
   });
 
   describe('forgotPasswordRequest', () => {
-    it('updates the database to append a new timestamp and retain only the latest three timestamps', async () => {
-      let result;
+    it('recordPasswordResetRequest should be defined', () => {
+      expect(service.recordPasswordResetRequest).toBeDefined();
+    });
 
-      jest.spyOn(prismaService.users, 'update').mockImplementation((data) => {
-        result = data;
-        return null;
-      });
+    it('updates the database to append a new timestamp and retain only the latest three timestamps', async () => {
+      const updateSpy = jest
+        .spyOn(prismaService.users, 'update')
+        .mockResolvedValue(testUser);
       const past = new Date(1999, 2, 20, 1, 50, 20);
       const now = new Date(2020, 12, 30, 1, 45, 50);
       jest.useFakeTimers().setSystemTime(now);
 
-      await service.recordPasswordResetRequest(
-        'some id',
-        [past, past, past],
-        'made up token',
-      );
-      expect(result).toMatchSnapshot('expected database update');
+      await expect(
+        service.recordPasswordResetRequest(
+          testUser.id,
+          [past, past, past],
+          testUser.password_reset_token,
+        ),
+      ).resolves.toEqual(testUser);
+      expect(updateSpy).toHaveBeenCalledWith({
+        where: { id: testUser.id },
+        data: {
+          password_reset_requests: 3,
+          password_reset_requests_timestamps: [past, past, now],
+          password_reset_token: testUser.password_reset_token,
+        },
+      });
     });
   });
 
   describe('resetPassword', () => {
-    it('updates the database with the new password', async () => {
-      let result;
-
-      jest.spyOn(prismaService.users, 'update').mockImplementation((data) => {
-        data.data.password = expect.any(String);
-        result = data;
-        return null;
-      });
-      const now = new Date(2020, 12, 30, 1, 45, 50);
-      jest.useFakeTimers().setSystemTime(now);
-
-      await service.resetPasswordWithToken('some id', 'the new password');
-      expect(result).toMatchSnapshot('the expected database update');
+    it('resetPassword should be defined', () => {
+      expect(service.resetPassword).toBeDefined();
     });
 
-    it('ensures the password is hashed before being saved in the database', async () => {
-      let result;
-
-      jest.spyOn(prismaService.users, 'update').mockImplementation((data) => {
-        result = data;
-        return null;
+    it('updates the database with the new hashed password', async () => {
+      const updateSpy = jest
+        .spyOn(prismaService.users, 'update')
+        .mockResolvedValue(testUser);
+      const cryptoSpy = jest.spyOn(bcrypt, 'hash').mockImplementation(() => {
+        return testUser.password;
       });
       const now = new Date(2020, 12, 30, 1, 45, 50);
       jest.useFakeTimers().setSystemTime(now);
 
-      await service.resetPasswordWithToken('some id', 'the new password');
-      expect(result.data.password).not.toEqual('the new password');
+      const newPassword = faker.internet.password();
+      await expect(
+        service.resetPassword(testUser.id, newPassword),
+      ).resolves.toEqual(testUser);
+      expect(updateSpy).toHaveBeenCalledWith({
+        where: { id: testUser.id },
+        data: {
+          password: testUser.password,
+          password_last_updated: new Date(),
+          password_reset_token: null,
+          // clear previous attempts
+          password_reset_requests: 0,
+          password_reset_requests_timestamps: [],
+          // unlocks account
+          failed_login_attempts: 0,
+          failed_login_attempts_timestamps: [],
+        },
+      });
+      expect(cryptoSpy).toHaveBeenCalledWith(newPassword, 10);
     });
   });
 
-  describe('logoutUser', () => {
+  describe('logout', () => {
+    it('logout should be defined', () => {
+      expect(service.logout).toBeDefined();
+    });
+
     it('updates the database with a valid logout request for the user', async () => {
-      let result;
-
-      jest.spyOn(prismaService.users, 'update').mockImplementation((data) => {
-        result = data;
-        return null;
-      });
+      const updateSpy = jest
+        .spyOn(prismaService.users, 'update')
+        .mockResolvedValue(testUser);
       const now = new Date(2020, 12, 30, 1, 45, 50);
       jest.useFakeTimers().setSystemTime(now);
 
-      await service.logout('some id');
-      expect(result).toMatchSnapshot('the expected database update');
+      await expect(service.logout(testUser.id)).resolves.toEqual(testUser);
+      expect(updateSpy).toHaveBeenCalledWith({
+        where: { id: testUser.id },
+        data: {
+          session_token: null,
+          logout_at: now.toISOString(),
+        },
+      });
     });
   });
 
-  describe('loginUser', () => {
+  describe('login', () => {
+    it('login should be defined', () => {
+      expect(service.login).toBeDefined();
+    });
+
     it('throws an error when the email does not exist in the database', async () => {
       jest.spyOn(prismaService.users, 'findUnique').mockReset();
+      const emailSpy = jest.spyOn(usersService, 'getUserByEmail');
+      const password = faker.internet.password();
       await expect(
         service.login({
-          email: 'some@email.com',
-          password: 'some password',
+          email: testUser.email,
+          password,
         }),
-      ).rejects.toThrowErrorMatchingSnapshot('email not found response');
+      ).rejects.toThrow(
+        new HttpException(
+          "Couldn't find your account. Make sure this is the right email.",
+          HttpStatus.NOT_FOUND,
+        ),
+      );
+      expect(emailSpy).toHaveBeenCalledWith(testUser.email);
     });
 
     it('throws an error when the password is incorrect', async () => {
-      // util is tested already.
-      const util = jest
-        .spyOn(service, 'checkIfAttemptsInLast24h')
-        .mockImplementation(() => {});
-
-      // tested already
-      jest.spyOn(service, 'recordFailedLoginAttempt').mockResolvedValue(null);
-
       // hash of 'therightpassword'
-      jest.spyOn(usersService, 'getUserByEmail').mockResolvedValue({
-        id: 'test id',
-        password:
-          '$2y$10$Xzx25dxZ/cq0xn7toLj1HuZ1ZMfId8gRuR3VBGvX9fWdboh9xZrMa',
-      } as Users);
+      testUser.password =
+        '$2y$10$Xzx25dxZ/cq0xn7toLj1HuZ1ZMfId8gRuR3VBGvX9fWdboh9xZrMa';
+      const emailSpy = jest
+        .spyOn(usersService, 'getUserByEmail')
+        .mockResolvedValue(testUser);
 
+      const utilSpy = jest.spyOn(service, 'checkIfAttemptsInLast24h');
+      const cryptoSpy = jest.spyOn(bcrypt, 'compare');
+
+      const recordSpy = jest
+        .spyOn(service, 'recordFailedLoginAttempt')
+        .mockResolvedValue(testUser);
+
+      const mailerSpy = jest
+        .spyOn(emailsService, 'sendEmail')
+        .mockResolvedValue();
+
+      const password = faker.internet.password();
       await expect(
         service.login({
-          email: 'some@email.com',
-          password: 'thewrongpassword',
+          email: testUser.email,
+          password,
         }),
-      ).rejects.toThrowErrorMatchingSnapshot('wrong password response');
-      expect(util).toHaveBeenCalled();
+      ).rejects.toThrow(
+        new HttpException(
+          'Wrong password. Try again or use the forgot password api to reset it.',
+          HttpStatus.UNAUTHORIZED,
+        ),
+      );
+      expect(emailSpy).toHaveBeenCalledWith(testUser.email);
+      expect(utilSpy).toHaveBeenCalledWith(
+        testUser.failed_login_attempts_timestamps,
+        'Too many failed login attempts, account is locked. Try again later.',
+      );
+      expect(cryptoSpy).toHaveBeenCalledWith(password, testUser.password);
+      await expect(cryptoSpy.mock.results[0].value).resolves.toBe(false);
+      expect(recordSpy).toHaveBeenCalledWith(
+        testUser.id,
+        testUser.failed_login_attempts_timestamps,
+      );
+      expect(mailerSpy).toHaveBeenCalledWith(EMAIL_TEMPLATE.LOGIN_FAIL);
     });
-
+    // todo continiue here
     it('returns a token and role when credentials are valid', async () => {
       // is already tested.
       jest
@@ -456,6 +561,9 @@ describe('AuthService', () => {
   });
 
   describe('forgotPassword', () => {
+    it('forgotPassword should be defined', () => {
+      expect(service.forgotPassword).toBeDefined();
+    });
     it('returns a status message with a reset token', async () => {
       // is already tested.
       jest
@@ -485,6 +593,9 @@ describe('AuthService', () => {
   });
 
   describe('changePassword', () => {
+    it('changePassword should be defined', () => {
+      expect(service.changePassword).toBeDefined();
+    });
     it('throws an error when the password and repeat password do not match', async () => {
       await expect(
         service.changePassword({
@@ -541,7 +652,7 @@ describe('AuthService', () => {
       jest.spyOn(usersService, 'getUserById').mockResolvedValue({
         password_reset_token: 'my_token',
       } as Users);
-      jest.spyOn(service, 'resetPasswordWithToken').mockResolvedValue({
+      jest.spyOn(service, 'resetPassword').mockResolvedValue({
         password_last_updated: new Date(2020, 12, 12, 12, 12, 12),
       } as Users);
 

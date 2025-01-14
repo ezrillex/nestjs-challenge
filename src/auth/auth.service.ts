@@ -43,7 +43,7 @@ export class AuthService {
 
       const isIn24h = timestamps.reduce((accumulator, current) => {
         const value = DateTime.fromISO(current.toISOString());
-        accumulator = accumulator === value >= aDayAgo; // basically an AND of whole array to check if is past 24 hours.
+        accumulator &&= value >= aDayAgo; // basically an AND of whole array to check if is past 24 hours.
         return accumulator;
       }, true);
 
@@ -186,10 +186,7 @@ export class AuthService {
     };
   }
 
-  async resetPasswordWithToken(
-    id: string,
-    new_password: string,
-  ): Promise<Users> {
+  async resetPassword(id: string, new_password: string): Promise<Users> {
     const hashed = await bcrypt.hash(new_password, 10);
 
     return this.prisma.users.update({
@@ -283,7 +280,7 @@ export class AuthService {
     );
 
     if (password_reset_token === data.reset_token) {
-      const { password_last_updated } = await this.resetPasswordWithToken(
+      const { password_last_updated } = await this.resetPassword(
         id,
         data.password,
       );
