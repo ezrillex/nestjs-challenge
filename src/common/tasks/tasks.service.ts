@@ -9,7 +9,6 @@ export class TasksService {
     private readonly productsService: ProductsService,
     private readonly emailsService: EmailsService,
   ) {}
-
   @Cron('* * * * *')
   async randomCron(): Promise<void> {
     // eslint-disable-next-line
@@ -27,6 +26,7 @@ export class TasksService {
     if (subjects.length === 0) {
       return;
     }
+
     const emails = subjects.reduce((previousValue, current) => {
       previousValue.push({
         template: EMAIL_TEMPLATE.LOW_STOCK_REMINDER,
