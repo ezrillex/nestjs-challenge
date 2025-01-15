@@ -5,10 +5,20 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 
 @Catch()
 export class GlobalExceptionFilter extends BaseExceptionFilter {
+  constructor(private readonly configService: ConfigService) {
+    super();
+  }
+
   catch(exception: any, host: ArgumentsHost): any | void {
+    if (this.configService.get<boolean>('LOG_ERRORS')) {
+      // eslint-disable-next-line
+      console.log(exception);
+    }
+
     let code;
     let message;
     if (exception instanceof HttpException) {

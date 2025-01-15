@@ -37,6 +37,7 @@ import { CommonController } from './common/common.controller';
         STRIPE_WEBHOOK_SIGNING_SECRET: Joi.string().required(),
         AUTO_ROLE: Joi.string().required(),
         SENDGRID_API_KEY: Joi.string().required(),
+        LOG_ERRORS: Joi.boolean().default(false),
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
