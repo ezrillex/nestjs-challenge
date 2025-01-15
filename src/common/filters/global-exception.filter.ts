@@ -3,15 +3,15 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
+  Injectable,
 } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 
 @Catch()
+@Injectable()
 export class GlobalExceptionFilter extends BaseExceptionFilter {
-  constructor(private readonly configService: ConfigService) {
-    super();
-  }
+  private readonly configService: ConfigService;
 
   catch(exception: any, host: ArgumentsHost): any | void {
     if (this.configService.get<boolean>('LOG_ERRORS')) {
