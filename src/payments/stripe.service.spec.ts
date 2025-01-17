@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { StripeService } from './stripe.service';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { PaymentIntents } from '@prisma/client';
+import { PaymentIntents, PaymentStatus } from '@prisma/client';
 
 jest.mock('stripe');
 
@@ -26,23 +26,35 @@ describe('Stripe Service', () => {
     expect(service).toBeDefined();
   });
 
-  it('should be defined', () => {
+  it('ConfigService should be defined', () => {
+    expect(configService).toBeDefined();
+  });
+
+  it('prismaService should be defined', () => {
+    expect(prismaService).toBeDefined();
+  });
+
+  it('webhook should be defined', () => {
     expect(service.webhook).toBeDefined();
   });
 
-  it('should be defined', () => {
+  it('createPaymentIntent should be defined', () => {
     expect(service.createPaymentIntent).toBeDefined();
   });
 
-  it('should be defined', () => {
+  it('updatePaymentIntent should be defined', () => {
     expect(service.updatePaymentIntent).toBeDefined();
   });
 
-  it('should be defined', () => {
+  it('getOrderPayments should be defined', () => {
     expect(service.getOrderPayments).toBeDefined();
   });
 
-  it('should be initialized with key and version, we want to break the test if a version is upgraded', () => {
+  it('getPaymentsByOrder should be defined', () => {
+    expect(service.getPaymentsByOrder).toBeDefined();
+  });
+
+  it('should initialize with correct key and apiVersion, and fail if version is upgraded', () => {
     expect(stripeMock).toHaveBeenCalledWith(
       expect.stringMatching(/^sk_(test|live)_[A-Za-z0-9]+$/),
       {
@@ -51,8 +63,8 @@ describe('Stripe Service', () => {
     );
   });
 
-  describe('create payment intent', () => {
-    it('should throw if amount is not positive', async () => {
+  describe('createPaymentIntent', () => {
+    it('should throw an error if the amount is negative', async () => {
       await expect(
         service.createPaymentIntent(
           -1,
@@ -61,7 +73,8 @@ describe('Stripe Service', () => {
         ),
       ).rejects.toMatchSnapshot('error amount is negative');
     });
-    it('should throw if amount is zero', async () => {
+
+    it('should throw an error if the amount is zero', async () => {
       await expect(
         service.createPaymentIntent(
           0,
@@ -71,7 +84,7 @@ describe('Stripe Service', () => {
       ).rejects.toMatchSnapshot('error amount is zero');
     });
 
-    it('should throw if order is not found', async () => {
+    it('should throw an error if the order does not exist', async () => {
       await expect(
         service.createPaymentIntent(
           30,
@@ -81,7 +94,7 @@ describe('Stripe Service', () => {
       ).rejects.toMatchSnapshot('error order not found');
     });
 
-    it('should pass request to prisma intents table', async () => {
+    it('should pass the request to the Prisma payment intents table', async () => {
       const mockEventFunction = jest.fn(() => {
         throw new Error('mock');
       });
@@ -106,7 +119,7 @@ describe('Stripe Service', () => {
       expect(spy.mock.calls).toMatchSnapshot('query to create intent ok');
     });
 
-    it('should pass request to stripe service', async () => {
+    it('should pass the request to the Stripe service', async () => {
       const mockEventFunction = jest.fn(() => {
         throw new Error('mock');
       });
@@ -133,7 +146,7 @@ describe('Stripe Service', () => {
       );
     });
 
-    it('should update prisma with response of service and return key data', async () => {
+    it('should update Prisma with the Stripe response and return the key data', async () => {
       const mockEventFunction = jest.fn(() => {
         return {
           id: 'payment intent id',
@@ -151,7 +164,11 @@ describe('Stripe Service', () => {
         .mockResolvedValue({ id: 'some id' } as PaymentIntents);
 
       jest.spyOn(prismaService.paymentIntents, 'update').mockResolvedValue({
-        id: 'updated intent prisma id',
+        id: '8b3ae683-0626-44be-b591-9271e288388f',
+        status: PaymentStatus.requires_payment_method,
+        order_id: '8b3ae683-0626-44be-b591-9271e288388f',
+        created_at: new Date(2020, 12, 12, 12, 12, 12),
+        stripe_event_id: '8b3ae683-0626-44be-b591-9271e288388f',
       } as PaymentIntents);
 
       await expect(
@@ -169,7 +186,7 @@ describe('Stripe Service', () => {
   });
 
   describe('webhook', () => {
-    it('should throw if no headers for signature', async () => {
+    it('should throw an error if signature header is missing', async () => {
       await expect(
         service.webhook({ headers: {} } as Request, null),
       ).rejects.toThrowErrorMatchingSnapshot(
@@ -177,7 +194,7 @@ describe('Stripe Service', () => {
       );
     });
 
-    it('should error if empty body', async () => {
+    it('should throw an error if the body is empty', async () => {
       await expect(
         service.webhook(
           {
@@ -189,7 +206,7 @@ describe('Stripe Service', () => {
       ).rejects.toThrowErrorMatchingSnapshot('missing body in request error');
     });
 
-    it('should pass data from request and body to sign stripe function', async () => {
+    it('should pass request data and body to Stripe sign function', async () => {
       const mockEventFunction = jest.fn(() => {
         throw new Error('mock event');
       });
@@ -215,7 +232,7 @@ describe('Stripe Service', () => {
       );
     });
 
-    it('should get data from stripe and try to form a request to prisma and throws if prisma returns nothing', async () => {
+    it('should fetch data from Stripe, form a request to Prisma, and throw an error if no data is found', async () => {
       const spy = jest
         .spyOn(prismaService.orders, 'count')
         .mockResolvedValue(0);
@@ -250,7 +267,7 @@ describe('Stripe Service', () => {
       expect(spy.mock.calls).toMatchSnapshot('prisma find payment query');
     });
 
-    it('should throw if event type unkown', async () => {
+    it('should throw an error if the event type is unknown and unhandled', async () => {
       jest.spyOn(prismaService.orders, 'count').mockResolvedValue(1);
 
       const mockEventFunction = jest.fn(() => {
@@ -283,7 +300,7 @@ describe('Stripe Service', () => {
       ).rejects.toThrow('Unknown event type.');
     });
 
-    it('should form an update request to prisma with success and return received true for stripe', async () => {
+    it('should update Prisma with success status and return received: true for Stripe', async () => {
       jest.useFakeTimers();
       jest.setSystemTime(new Date(2020, 12, 1, 10, 10, 59));
       jest.spyOn(prismaService.orders, 'count').mockResolvedValue(1);
@@ -326,7 +343,7 @@ describe('Stripe Service', () => {
       expect(spy.mock.calls).toMatchSnapshot('update status ok order');
     });
 
-    it('should form an update request to prisma with failed and return received true for stripe', async () => {
+    it('should update Prisma with failed status and return received: true for Stripe', async () => {
       jest.useFakeTimers();
       jest.setSystemTime(new Date(2020, 12, 1, 10, 10, 59));
       jest.spyOn(prismaService.orders, 'count').mockResolvedValue(1);
@@ -372,8 +389,8 @@ describe('Stripe Service', () => {
     });
   });
 
-  describe('debug method, update payment intent', () => {
-    it('throws if cant find the payment intent', async () => {
+  describe('updatePaymentIntent', () => {
+    it('should throw an error if the payment intent is not found', async () => {
       jest
         .spyOn(prismaService.paymentIntents, 'findUnique')
         .mockResolvedValue(null);
@@ -383,7 +400,7 @@ describe('Stripe Service', () => {
       ).rejects.toThrowErrorMatchingSnapshot('intent not found error');
     });
 
-    it('throws if status is already completed', async () => {
+    it('should throw an error if the payment intent status is already completed', async () => {
       jest.spyOn(prismaService.paymentIntents, 'findUnique').mockResolvedValue({
         status: 'succeeded',
       } as PaymentIntents);
@@ -393,7 +410,7 @@ describe('Stripe Service', () => {
       ).rejects.toThrowErrorMatchingSnapshot('intent already completed error');
     });
 
-    it('passes a query to update to prisma', async () => {
+    it('should pass an update query to Prisma for the payment intent', async () => {
       jest.spyOn(prismaService.paymentIntents, 'findUnique').mockResolvedValue({
         stripe_event_id: 'test_id',
         status: 'requires_payment_method',
@@ -414,8 +431,8 @@ describe('Stripe Service', () => {
     });
   });
 
-  describe('get order payments', () => {
-    it('throws if cant find order with user', async () => {
+  describe('getOrderPayments', () => {
+    it('should throw an error if the order with the user is not found', async () => {
       await expect(
         service.getOrderPayments(
           '076b5b00-c719-40c3-a8f2-d1a11c17b75c',
@@ -424,7 +441,7 @@ describe('Stripe Service', () => {
       ).rejects.toThrowErrorMatchingSnapshot('order user combo not found');
     });
 
-    it('if valid queries for a list with all the payment intents associated', async () => {
+    it('should return all payment intents associated with the order', async () => {
       jest.spyOn(prismaService.orders, 'count').mockResolvedValue(1);
 
       const spy = jest
@@ -443,4 +460,6 @@ describe('Stripe Service', () => {
       );
     });
   });
+
+  describe('getPaymentsByOrder', () => {});
 });

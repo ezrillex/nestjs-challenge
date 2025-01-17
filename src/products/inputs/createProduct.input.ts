@@ -6,7 +6,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { CreateVariationInput } from '../product_variation/createVariation.input';
+import { CreateVariationInput } from '../product_variation/inputs/createVariation.input';
 import { Field, ID, InputType } from '@nestjs/graphql';
 
 @InputType()

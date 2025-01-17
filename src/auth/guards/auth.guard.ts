@@ -7,19 +7,19 @@ import {
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../../common/decorators/public.decorator';
 import { JwtService } from '@nestjs/jwt';
-import { AuthService } from '../auth.service';
 import { DateTime } from 'luxon';
 import { IS_PUBLIC_PRIVATE_KEY } from '../../common/decorators/public_and_private.decorator';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     private jwtService: JwtService,
-    private authService: AuthService,
+    private readonly usersService: UsersService,
   ) {}
-  async canActivate(context: ExecutionContext) {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -67,7 +67,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Bearer token is invalid.');
     }
 
-    const user = await this.authService.findOneByID(payload.user);
+    const user = await this.usersService.getUserById(payload.user);
 
     if (!user.session_token) {
       throw new UnauthorizedException('User has no active sessions.');

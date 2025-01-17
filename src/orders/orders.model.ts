@@ -1,7 +1,8 @@
 import { OrderStatus, PaymentStatus } from '@prisma/client';
-import { OrderItems } from './order_items.model';
+import { OrderItems } from './order-items/order_items.model';
 import { Field, ID, ObjectType } from '@nestjs/graphql';
-import { Users } from '../auth/users.model';
+import { Users } from '../users/users.model';
+import { PaymentIntents } from '../payments/payments.model';
 
 @ObjectType()
 export class Orders {
@@ -9,11 +10,10 @@ export class Orders {
   id: string;
 
   @Field(() => Users)
-  user: Users;
+  user?: Users;
 
-  // todo when implementing resolve field maybe add this
-  //payments: [PaymentIntents!]
-  //webhooks: [IncomingPaymentWebhooks!]
+  @Field(() => [PaymentIntents])
+  payments?: [PaymentIntents];
 
   @Field(() => String)
   paymentStatus: PaymentStatus;
@@ -21,8 +21,6 @@ export class Orders {
   @Field(() => String)
   orderStatus: OrderStatus;
 
-  //orderStatusHistory: [OrderAudit!]!
-
   @Field(() => [OrderItems])
-  order_items: OrderItems[];
+  order_items?: OrderItems[];
 }

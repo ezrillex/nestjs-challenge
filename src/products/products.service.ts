@@ -1,22 +1,60 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { roles } from '@prisma/client';
+import { Products, ProductVariations, roles } from '@prisma/client';
 import { CreateProductInput } from './inputs/createProduct.input';
 import { GetProductsInput } from './inputs/get-products.input';
 import { UpdateProductInput } from './inputs/update-product.input';
-import { UpdateProductVariationInput } from './product_variation/update-product-variation.input';
-import { CreateProductVariationInput } from './product_variation/create_product_variation.input';
+import { UpdateProductVariationInput } from './product_variation/inputs/update-product-variation.input';
+import { CreateProductVariationInput } from './product_variation/inputs/create_product_variation.input';
+import { DateTime } from 'luxon';
+import { Images } from '../images/images.model';
 
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  async CreateProduct(data: CreateProductInput, userId: string) {
+  async getProductVariationByCartItem(id: string): Promise<ProductVariations> {
+    const { product_variation } = await this.prisma.cartItems.findUnique({
+      where: { id: id },
+      select: {
+        product_variation: true,
+      },
+    });
+    return product_variation;
+  }
+
+  async getProductVariationByOrderItem(
+    id: string,
+  ): Promise<ProductVariations | null> {
+    const result = await this.prisma.orderItems.findUnique({
+      where: { id, product_variation: { product: { is_deleted: false } } },
+      select: {
+        product_variation: true,
+      },
+    });
+    return result.product_variation ?? null;
+  }
+
+  async getProductVariationsByProduct(
+    id: string,
+  ): Promise<ProductVariations[]> {
+    const { variations } = await this.prisma.products.findUnique({
+      where: { id: id },
+      select: {
+        variations: true,
+      },
+    });
+    return variations;
+  }
+
+  async createProduct(
+    data: CreateProductInput,
+    userId: string,
+  ): Promise<Products> {
     return this.prisma.products.create({
       data: {
         name: data.name,
@@ -35,7 +73,10 @@ export class ProductsService {
     });
   }
 
-  async UpdateProduct(data: UpdateProductInput, userId: string) {
+  async updateProduct(
+    data: UpdateProductInput,
+    userId: string,
+  ): Promise<Products> {
     // todo you could in theory update a deleted product if you have the uuid...
     const countProducts = await this.prisma.products.count({
       where: { id: data.id },
@@ -80,7 +121,10 @@ export class ProductsService {
     });
   }
 
-  async GetProducts(role: roles, params: GetProductsInput) {
+  async getProducts(
+    role: roles,
+    params: GetProductsInput,
+  ): Promise<Products[]> {
     const filter = {};
     const pagination = { skip: 0, take: 10 };
 
@@ -119,18 +163,12 @@ export class ProductsService {
     }
     // todo should we do RBAC of queryable fields? like a select for one and a select for the other
     return this.prisma.products.findMany({
-      include: {
-        variations: {
-          include: { images: true },
-        },
-        categories: true,
-      },
       where: filter,
       ...pagination,
     });
   }
 
-  async GetProductById(role: roles, id: string) {
+  async getProductById(role: roles, id: string): Promise<Products> {
     const filter = { id: id };
 
     if (role === roles.manager) {
@@ -140,14 +178,7 @@ export class ProductsService {
       filter['is_published'] = true;
       filter['is_deleted'] = false;
     }
-
     const result = await this.prisma.products.findUnique({
-      include: {
-        variations: {
-          include: { images: true },
-        },
-        categories: true,
-      },
       where: filter,
     });
     if (!result) {
@@ -156,7 +187,10 @@ export class ProductsService {
     return result;
   }
 
-  async GetProductVariationById(id: string, count_only: boolean = false) {
+  async getProductVariationById(
+    id: string,
+    count_only: boolean = false,
+  ): Promise<ProductVariations | number> {
     if (count_only) {
       return this.prisma.productVariations.count({
         where: { id: id },
@@ -177,10 +211,10 @@ export class ProductsService {
     }
   }
 
-  async UpdateProductVariation(
+  async updateProductVariation(
     data: UpdateProductVariationInput,
     userId: string,
-  ) {
+  ): Promise<ProductVariations> {
     // todo you could in theory update a deleted product variation if you have the uuid...
     const count = await this.prisma.productVariations.count({
       where: { id: data.id },
@@ -214,10 +248,10 @@ export class ProductsService {
     });
   }
 
-  async CreateProductVariation(
+  async createProductVariation(
     data: CreateProductVariationInput,
     userId: string,
-  ) {
+  ): Promise<ProductVariations> {
     const count = await this.prisma.products.count({
       where: { id: data.product_id },
     });
@@ -236,44 +270,44 @@ export class ProductsService {
     });
   }
 
-  async DeleteProductVariation(id: string) {
+  // todo future refactor, dont actually delete the variations.
+  async deleteProductVariation(id: string): Promise<string> {
     const record = await this.prisma.productVariations.findUnique({
       where: { id: id },
-      include: {
-        product: true,
+      select: {
+        product: {
+          select: {
+            _count: {
+              select: {
+                variations: true,
+              },
+            },
+          },
+        },
       },
     });
+
     if (!record) {
       throw new NotFoundException('Product Variation not found.');
     }
 
-    const variations_of_product = await this.prisma.productVariations.count({
-      where: { product_id: record.product_id },
-    });
-
-    if (variations_of_product === 1) {
+    if (record.product._count.variations === 1) {
       throw new BadRequestException(
         'Can not delete the product variation if it is the last one.',
       );
     }
 
-    const result = await this.prisma.productVariations.delete({
+    await this.prisma.productVariations.delete({
       where: { id: id },
     });
-
-    if (result) {
-      return 'Product Variation deleted.';
-    } else
-      throw new InternalServerErrorException(
-        'Something went wrong when deleting the product variation.',
-      );
+    return 'Product Variation deleted.';
   }
 
-  async DeleteProduct(product_id: string, user_id: string) {
+  async deleteProduct(product_id: string, user_id: string): Promise<Products> {
     const count = await this.prisma.products.count({
       where: { id: product_id },
     });
-    if (count === 0) {
+    if (!count) {
       throw new NotFoundException('Product not found.');
     }
 
@@ -283,6 +317,40 @@ export class ProductsService {
         is_deleted: true,
         last_updated_by: user_id,
         last_updated_at: new Date().toISOString(),
+      },
+    });
+  }
+
+  // todo figure out how to check if already purchased
+  // once we do handle stock it could be done by doing more queries but since we
+  // do multiple products at once we are too nested to do such a thing.
+  async getLowStockProducts(): Promise<
+    (ProductVariations & { images: Images[] })[]
+  > {
+    const twoDaysAgo = DateTime.now().minus({ days: 2 });
+
+    return this.prisma.productVariations.findMany({
+      include: {
+        images: true,
+        LikesOfProducts: {
+          where: {
+            created_at: {
+              gte: twoDaysAgo.toISO(),
+            },
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+          take: 1,
+        },
+      },
+      where: {
+        stock: {
+          lte: 3,
+        },
+        LikesOfProducts: {
+          some: {},
+        },
       },
     });
   }

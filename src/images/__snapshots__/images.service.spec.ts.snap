@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ImagesService delete image method if image creation is ok, should return deleted images like pop: request sent to prisma 1`] = `
+exports[`ImagesService deleteImageById should return successfully deleted image when CDN response is ok: request sent to prisma 1`] = `
 [
   [
     {
@@ -12,19 +12,11 @@ exports[`ImagesService delete image method if image creation is ok, should retur
 ]
 `;
 
-exports[`ImagesService delete image method should error if cdn failed and response was not successful : CDN result was not successful 1`] = `"An error occurred when deleting the image."`;
+exports[`ImagesService deleteImageById should throw an error for invalid image id: image not found 1`] = `"Image not found"`;
 
-exports[`ImagesService delete image method should error if invalid image id: image not found 1`] = `"Image not found"`;
+exports[`ImagesService deleteImageById should throw an error when CDN fails and returns unsuccessful response: CDN result was not successful 1`] = `"An error occurred when deleting the image."`;
 
-exports[`ImagesService upload image method should accept image mime type: product variation not found 1`] = `"Product Variation not found"`;
-
-exports[`ImagesService upload image method should error if cdn didnt provide a public id for the uploaded image. : CDN didnt provide the required id 1`] = `"There was an issue with the CDN, please try again later."`;
-
-exports[`ImagesService upload image method should error if invalid product id: product variation not found 1`] = `"Product Variation not found"`;
-
-exports[`ImagesService upload image method should error if not image mime type: image must be valid mime type 1`] = `"Image must have a valid image mime type"`;
-
-exports[`ImagesService upload image method should query prisma for creation. : query all ok 1`] = `
+exports[`ImagesService uploadImage should create a record in the database after successful upload: query all ok 1`] = `
 [
   [
     {
@@ -39,10 +31,20 @@ exports[`ImagesService upload image method should query prisma for creation. : q
         "url": "https://www.cloudinary.com/",
       },
       "select": {
+        "created_at": true,
         "id": true,
+        "product_variation_id": true,
         "url": true,
       },
     },
   ],
 ]
 `;
+
+exports[`ImagesService uploadImage should successfully accept valid image mime type: product variation not found 1`] = `"Product Variation not found"`;
+
+exports[`ImagesService uploadImage should throw an error for invalid image mime type: image must be valid mime type 1`] = `"Image must have a valid image mime type"`;
+
+exports[`ImagesService uploadImage should throw an error if CDN didn’t provide the required public id: CDN didnt provide the required id 1`] = `"There was an issue with the CDN, please try again later."`;
+
+exports[`ImagesService uploadImage should throw an error if product variation id is invalid: product variation not found 1`] = `"Product Variation not found"`;

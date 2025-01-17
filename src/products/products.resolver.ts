@@ -1,32 +1,42 @@
-import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
-import { roles } from '@prisma/client';
+import {
+  Args,
+  Context,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
+import { Categories, ProductVariations, roles } from '@prisma/client';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { CreateProductInput } from './inputs/createProduct.input';
 import { ProductsService } from './products.service';
 import { Products } from './products.model';
 import { GetProductsInput } from './inputs/get-products.input';
 import { UpdateProductInput } from './inputs/update-product.input';
-import { UpdateProductVariationInput } from './product_variation/update-product-variation.input';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { PublicPrivate } from '../common/decorators/public_and_private.decorator';
-import { CreateProductVariationInput } from './product_variation/create_product_variation.input';
+import { CategoriesService } from '../categories/categories.service';
 
-@Resolver()
+@Resolver(() => Products)
 export class ProductsResolver {
-  constructor(private productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly categoriesService: CategoriesService,
+  ) {}
 
   @PublicPrivate()
   @Query(() => [Products], { nullable: true })
   async getProducts(
     @Args('GetProductsInput') getProductsInput: GetProductsInput,
     @Context('req') request: Request,
-  ) {
+  ): Promise<Products[]> {
     // todo on auth guard we set a value to know what mode we are in...
     let role: roles = roles.public;
     if (request['user'] && request['user'].role) {
       role = request['user'].role;
     }
-    return this.productsService.GetProducts(role, getProductsInput);
+    return this.productsService.getProducts(role, getProductsInput);
   }
 
   @PublicPrivate()
@@ -34,76 +44,37 @@ export class ProductsResolver {
   async getProductById(
     @Args('id', { type: () => String }, ParseUUIDPipe) id: string,
     @Context('req') request: Request,
-  ) {
+  ): Promise<Products> {
     // todo on auth guard we set a value to know what mode we are in...
     let role: roles = roles.public;
     if (request['user'] && request['user'].role) {
       role = request['user'].role;
     }
-    return this.productsService.GetProductById(role, id);
+    return this.productsService.getProductById(role, id);
   }
 
   @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
+  @Mutation(() => Products, { nullable: true })
   async createProduct(
     @Args('CreateProductInput') createProductInput: CreateProductInput,
     @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.CreateProduct(
+  ): Promise<Products> {
+    return await this.productsService.createProduct(
       createProductInput,
       request['user'].id,
     );
-    return result.id;
   }
 
   @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
+  @Mutation(() => Products, { nullable: true })
   async updateProduct(
     @Args('UpdateProductInput') updateProductInput: UpdateProductInput,
     @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.UpdateProduct(
+  ): Promise<Products> {
+    return await this.productsService.updateProduct(
       updateProductInput,
       request['user'].id,
     );
-    return result.id;
-  }
-
-  @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
-  async updateProductVariation(
-    @Args('UpdateProductVariationInput')
-    updateProductVariationInput: UpdateProductVariationInput,
-    @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.UpdateProductVariation(
-      updateProductVariationInput,
-      request['user'].id,
-    );
-    return result.id;
-  }
-
-  @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
-  async createProductVariation(
-    @Args('CreateProductVariationInput')
-    createProductVariationInput: CreateProductVariationInput,
-    @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.CreateProductVariation(
-      createProductVariationInput,
-      request['user'].id,
-    );
-    return result.id;
-  }
-
-  @RequiresRole(roles.manager)
-  @Mutation(() => String, { nullable: true })
-  async deleteProductVariation(
-    @Args('variation_id', { type: () => String }, ParseUUIDPipe)
-    variation_id: string,
-  ) {
-    return this.productsService.DeleteProductVariation(variation_id);
   }
 
   @RequiresRole(roles.manager)
@@ -112,11 +83,20 @@ export class ProductsResolver {
     @Args('product_id', { type: () => String }, ParseUUIDPipe)
     product_id: string,
     @Context('req') request: Request,
-  ) {
-    const result = await this.productsService.DeleteProduct(
-      product_id,
-      request['user'].id,
-    );
-    return result.id;
+  ): Promise<string> {
+    await this.productsService.deleteProduct(product_id, request['user'].id);
+    return 'Product successfully deleted!';
+  }
+
+  @ResolveField()
+  async variations(@Parent() product: Products): Promise<ProductVariations[]> {
+    const { id } = product;
+    return this.productsService.getProductVariationsByProduct(id);
+  }
+
+  @ResolveField()
+  async categories(@Parent() product: Products): Promise<Categories[]> {
+    const { id } = product;
+    return this.categoriesService.getCategoriesByProduct(id);
   }
 }

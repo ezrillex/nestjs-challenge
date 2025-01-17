@@ -12,6 +12,7 @@ import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { roles } from '@prisma/client';
 import { CreateImageDto } from './create-image.dto';
 import { ImagesService } from './images.service';
+import { Images } from './images.model';
 
 @Controller('images')
 export class ImagesController {
@@ -19,7 +20,7 @@ export class ImagesController {
 
   @RequiresRole(roles.manager)
   @Post()
-  async createImage(@Body() data: CreateImageDto) {
+  async createImage(@Body() data: CreateImageDto): Promise<Images> {
     return this.imageService.uploadImage(
       data.image,
       data.image_mime_type,
@@ -30,7 +31,7 @@ export class ImagesController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @RequiresRole(roles.manager)
   @Delete(':id')
-  async deleteImage(@Param('id', ParseUUIDPipe) id: string) {
+  async deleteImage(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     await this.imageService.deleteImageById(id);
   }
 }

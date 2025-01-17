@@ -3,8 +3,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ProductsService } from './products.service';
 import { UpdateProductInput } from './inputs/update-product.input';
 import { Products, ProductVariations, roles } from '@prisma/client';
-import { UpdateProductVariationInput } from './product_variation/update-product-variation.input';
-import { CreateProductVariationInput } from './product_variation/create_product_variation.input';
+import { UpdateProductVariationInput } from './product_variation/inputs/update-product-variation.input';
+import { CreateProductVariationInput } from './product_variation/inputs/create_product_variation.input';
+import { InternalServerErrorException } from '@nestjs/common';
 
 describe('Products Service', () => {
   let service: ProductsService;
@@ -23,43 +24,10 @@ describe('Products Service', () => {
     expect(service).toBeDefined();
   });
 
-  it('create product should be defined', () => {
-    expect(service.CreateProduct).toBeDefined();
-  });
-
-  it('update product should be defined', () => {
-    expect(service.UpdateProduct).toBeDefined();
-  });
-
-  it('get products should be defined', () => {
-    expect(service.GetProducts).toBeDefined();
-  });
-
-  it('get products by id should be defined', () => {
-    expect(service.GetProductById).toBeDefined();
-  });
-
-  it('get products variation should be defined', () => {
-    expect(service.GetProductVariationById).toBeDefined();
-  });
-
-  it('update products variation should be defined', () => {
-    expect(service.UpdateProductVariation).toBeDefined();
-  });
-
-  it('create product variation should be defined', () => {
-    expect(service.CreateProductVariation).toBeDefined();
-  });
-
-  it('delete product variation should be defined', () => {
-    expect(service.DeleteProductVariation).toBeDefined();
-  });
-
-  it('delete product should be defined', () => {
-    expect(service.DeleteProduct).toBeDefined();
-  });
-
-  describe('create product', () => {
+  describe('createProduct', () => {
+    it('should be defined', () => {
+      expect(service.createProduct).toBeDefined();
+    });
     it('passes data to prisma query correctly', async () => {
       jest.useFakeTimers();
       jest.setSystemTime(new Date(2020, 12, 12, 12, 12));
@@ -67,7 +35,7 @@ describe('Products Service', () => {
         .spyOn(prismaService.products, 'create')
         .mockResolvedValue(null);
 
-      await service.CreateProduct(
+      await service.createProduct(
         {
           name: 'test name',
           description: 'test description',
@@ -84,10 +52,13 @@ describe('Products Service', () => {
     });
   });
 
-  describe('update product', () => {
+  describe('updateProduct', () => {
+    it('update product should be defined', () => {
+      expect(service.updateProduct).toBeDefined();
+    });
     it('throws if product is not found', async () => {
       await expect(
-        service.UpdateProduct(
+        service.updateProduct(
           { id: '076b5b00-c719-40c3-a8f2-d1a11c17b75c' } as UpdateProductInput,
           '076b5b00-c719-40c3-a8f2-d1a11c17b75c',
         ),
@@ -98,7 +69,7 @@ describe('Products Service', () => {
       jest.spyOn(prismaService.products, 'count').mockResolvedValue(1);
 
       await expect(
-        service.UpdateProduct(
+        service.updateProduct(
           { id: '076b5b00-c719-40c3-a8f2-d1a11c17b75c' } as UpdateProductInput,
           '076b5b00-c719-40c3-a8f2-d1a11c17b75c',
         ),
@@ -114,7 +85,7 @@ describe('Products Service', () => {
         .mockResolvedValue(null);
 
       await expect(
-        service.UpdateProduct(
+        service.updateProduct(
           {
             id: '076b5b00-c719-40c3-a8f2-d1a11c17b75c',
             name: 'test name',
@@ -130,13 +101,16 @@ describe('Products Service', () => {
     });
   });
 
-  describe('Get products', () => {
+  describe('getProducts', () => {
+    it('get products should be defined', () => {
+      expect(service.getProducts).toBeDefined();
+    });
     it('passes data to prisma query with defaults.', async () => {
       const spy = jest
         .spyOn(prismaService.products, 'findMany')
         .mockResolvedValue(null);
 
-      await service.GetProducts(roles.customer, {
+      await service.getProducts(roles.customer, {
         categoryFilter: [],
         search: '',
         first: 0,
@@ -156,7 +130,7 @@ describe('Products Service', () => {
         .spyOn(prismaService.products, 'findMany')
         .mockResolvedValue(null);
 
-      await service.GetProducts(roles.manager, {
+      await service.getProducts(roles.manager, {
         categoryFilter: [],
         search: '',
         first: 0,
@@ -176,7 +150,7 @@ describe('Products Service', () => {
         .spyOn(prismaService.products, 'findMany')
         .mockResolvedValue(null);
 
-      await service.GetProducts(roles.manager, {
+      await service.getProducts(roles.manager, {
         categoryFilter: [],
         search: 'test search',
         first: 0,
@@ -194,7 +168,7 @@ describe('Products Service', () => {
         .spyOn(prismaService.products, 'findMany')
         .mockResolvedValue(null);
 
-      await service.GetProducts(roles.manager, {
+      await service.getProducts(roles.manager, {
         categoryFilter: ['id 1', 'id 2'],
         search: 'test search',
         first: 0,
@@ -212,7 +186,7 @@ describe('Products Service', () => {
         .spyOn(prismaService.products, 'findMany')
         .mockResolvedValue(null);
 
-      await service.GetProducts(roles.manager, {
+      await service.getProducts(roles.manager, {
         categoryFilter: ['id 1', 'id 2'],
         search: 'test search',
         first: 10,
@@ -226,14 +200,17 @@ describe('Products Service', () => {
     });
   });
 
-  describe('Get one product by id', () => {
+  describe('getProductById', () => {
+    it('should be defined', () => {
+      expect(service.getProductById).toBeDefined();
+    });
     it('passes data to prisma query role manager.', async () => {
       const spy = jest
         .spyOn(prismaService.products, 'findUnique')
         .mockResolvedValue(null);
 
       await expect(
-        service.GetProductById(
+        service.getProductById(
           roles.manager,
           '5c0532dc-2174-46f5-b97e-b4b297e9e699',
         ),
@@ -248,7 +225,7 @@ describe('Products Service', () => {
         .mockResolvedValue(null);
 
       await expect(
-        service.GetProductById(
+        service.getProductById(
           roles.customer,
           '5c0532dc-2174-46f5-b97e-b4b297e9e699',
         ),
@@ -260,7 +237,7 @@ describe('Products Service', () => {
     it('throws if not found', async () => {
       jest.spyOn(prismaService.products, 'findUnique').mockReset();
       await expect(
-        service.GetProductById(
+        service.getProductById(
           roles.manager,
           '5c0532dc-2174-46f5-b97e-b4b297e9e699',
         ),
@@ -273,15 +250,18 @@ describe('Products Service', () => {
         .mockResolvedValue({ id: 'testing' } as Products);
 
       await expect(
-        service.GetProductById(roles.customer, 'test id'),
+        service.getProductById(roles.customer, 'test id'),
       ).resolves.toMatchSnapshot('all ok get one prod by id');
     });
   });
 
-  describe('Get product variation by id', () => {
+  describe('getProductVariationById', () => {
+    it('get products variation should be defined', () => {
+      expect(service.getProductVariationById).toBeDefined();
+    });
     it('count 0 if not found and count mode on', async () => {
       await expect(
-        service.GetProductVariationById(
+        service.getProductVariationById(
           '5c0532dc-2174-46f5-b97e-b4b297e9e699',
           true,
         ),
@@ -292,7 +272,7 @@ describe('Products Service', () => {
       jest.spyOn(prismaService.productVariations, 'findUnique').mockReset();
 
       await expect(
-        service.GetProductVariationById('5c0532dc-2174-46f5-b97e-b4b297e9e699'),
+        service.getProductVariationById('5c0532dc-2174-46f5-b97e-b4b297e9e699'),
       ).rejects.toThrow();
     });
 
@@ -301,7 +281,7 @@ describe('Products Service', () => {
         .spyOn(prismaService.productVariations, 'findUnique')
         .mockResolvedValue({ id: 'testing' } as ProductVariations);
 
-      await service.GetProductVariationById(
+      await service.getProductVariationById(
         '5c0532dc-2174-46f5-b97e-b4b297e9e699',
       );
 
@@ -309,10 +289,13 @@ describe('Products Service', () => {
     });
   });
 
-  describe('Update product variation', () => {
+  describe('updateProductVariation', () => {
+    it('update products variation should be defined', () => {
+      expect(service.updateProductVariation).toBeDefined();
+    });
     it('throws if not found', async () => {
       await expect(
-        service.UpdateProductVariation(
+        service.updateProductVariation(
           {
             id: '5c0532dc-2174-46f5-b97e-b4b297e9e699',
           } as UpdateProductVariationInput,
@@ -325,7 +308,7 @@ describe('Products Service', () => {
     it('throws if no arguments to update are passed', async () => {
       jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(1);
       await expect(
-        service.UpdateProductVariation(
+        service.updateProductVariation(
           {
             id: '5c0532dc-2174-46f5-b97e-b4b297e9e699',
           } as UpdateProductVariationInput,
@@ -341,7 +324,7 @@ describe('Products Service', () => {
         .spyOn(prismaService.productVariations, 'update')
         .mockResolvedValue(null);
       await expect(
-        service.UpdateProductVariation(
+        service.updateProductVariation(
           {
             id: '5c0532dc-2174-46f5-b97e-b4b297e9e699',
             price: 30.45,
@@ -356,10 +339,13 @@ describe('Products Service', () => {
     });
   });
 
-  describe('create product variation', () => {
+  describe('createProductVariation', () => {
+    it('create product variation should be defined', () => {
+      expect(service.createProductVariation).toBeDefined();
+    });
     it('throws if not found', async () => {
       await expect(
-        service.CreateProductVariation(
+        service.createProductVariation(
           {
             product_id: '5c0532dc-2174-46f5-b97e-b4b297e9e699',
           } as CreateProductVariationInput,
@@ -378,7 +364,7 @@ describe('Products Service', () => {
       jest.spyOn(prismaService.products, 'count').mockResolvedValue(1);
 
       await expect(
-        service.CreateProductVariation(
+        service.createProductVariation(
           {
             product_id: '5c0532dc-2174-46f5-b97e-b4b297e9e699',
             stock: 58,
@@ -394,11 +380,14 @@ describe('Products Service', () => {
     });
   });
 
-  describe('delete product variation', () => {
+  describe('deleteProductVariation', () => {
+    it('delete product variation should be defined', () => {
+      expect(service.deleteProductVariation).toBeDefined();
+    });
     it('throws if not found', async () => {
       jest.spyOn(prismaService.productVariations, 'findUnique').mockReset();
       await expect(
-        service.DeleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
+        service.deleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
       ).rejects.toThrowErrorMatchingSnapshot('not found product variation');
     });
 
@@ -406,12 +395,16 @@ describe('Products Service', () => {
       jest
         .spyOn(prismaService.productVariations, 'findUnique')
         .mockResolvedValue({
-          product_id: '3d13dcec-6894-4de0-b980-688b897ad7ac',
-        } as ProductVariations);
+          product: {
+            _count: {
+              variations: 1,
+            },
+          },
+        } as any);
       jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(1);
 
       await expect(
-        service.DeleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
+        service.deleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
       ).rejects.toThrowErrorMatchingSnapshot('cant delete last one');
     });
 
@@ -419,16 +412,20 @@ describe('Products Service', () => {
       jest
         .spyOn(prismaService.productVariations, 'findUnique')
         .mockResolvedValue({
-          product_id: '3d13dcec-6894-4de0-b980-688b897ad7ac',
-        } as ProductVariations);
+          product: {
+            _count: {
+              variations: 3,
+            },
+          },
+        } as any);
       jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(2);
 
       jest
         .spyOn(prismaService.productVariations, 'delete')
-        .mockResolvedValue(null);
+        .mockRejectedValue(new InternalServerErrorException('testing'));
 
       await expect(
-        service.DeleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
+        service.deleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
       ).rejects.toThrowErrorMatchingSnapshot('error when deleting no result');
     });
 
@@ -436,8 +433,12 @@ describe('Products Service', () => {
       jest
         .spyOn(prismaService.productVariations, 'findUnique')
         .mockResolvedValue({
-          product_id: '3d13dcec-6894-4de0-b980-688b897ad7ac',
-        } as ProductVariations);
+          product: {
+            _count: {
+              variations: 3,
+            },
+          },
+        } as any);
       jest.spyOn(prismaService.productVariations, 'count').mockResolvedValue(2);
 
       const spy = jest
@@ -447,16 +448,19 @@ describe('Products Service', () => {
         } as ProductVariations);
 
       await expect(
-        service.DeleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
+        service.deleteProductVariation('3d13dcec-6894-4de0-b980-688b897ad7ac'),
       ).resolves.toEqual('Product Variation deleted.');
       expect(spy.mock.calls).toMatchSnapshot('deletion query ok');
     });
   });
 
-  describe('delete product', () => {
+  describe('deleteProduct', () => {
+    it('delete product should be defined', () => {
+      expect(service.deleteProduct).toBeDefined();
+    });
     it('throws if not found', async () => {
       await expect(
-        service.DeleteProduct(
+        service.deleteProduct(
           '3d13dcec-6894-4de0-b980-688b897ad7ac',
           '3d13dcec-6894-4de0-b980-688b897ad7ac',
         ),
@@ -472,12 +476,36 @@ describe('Products Service', () => {
         .spyOn(prismaService.products, 'update')
         .mockResolvedValue(null);
       await expect(
-        service.DeleteProduct(
+        service.deleteProduct(
           '3d13dcec-6894-4de0-b980-688b897ad7ac',
           '3d13dcec-6894-4de0-b980-688b897ad7ac',
         ),
       ).resolves.toEqual(null);
       expect(spy.mock.calls).toMatchSnapshot('query update delete flags');
+    });
+  });
+
+  describe('getLowStockProducts', () => {
+    it('should be defined', () => {
+      expect(service.getLowStockProducts).toBeDefined();
+    });
+  });
+
+  describe('getProductVariationByCartItem', () => {
+    it('should be defined', () => {
+      expect(service.getProductVariationByCartItem).toBeDefined();
+    });
+  });
+
+  describe('getProductVariationByOrderItem', () => {
+    it('should be defined', () => {
+      expect(service.getProductVariationByOrderItem).toBeDefined();
+    });
+  });
+
+  describe('getProductVariationsByProduct', () => {
+    it('should be defined', () => {
+      expect(service.getProductVariationsByProduct).toBeDefined();
     });
   });
 });

@@ -7,8 +7,8 @@ export class Images {
   @Field(() => String)
   url: string;
 
-  @Field(() => String)
-  created_at: string;
+  @Field(() => Date)
+  created_at: Date;
 
   @Field(() => String, { nullable: true })
   product_variation_id: string;

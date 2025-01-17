@@ -8,6 +8,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProductsService } from '../products/products.service';
+import { Images } from './images.model';
 
 @Injectable()
 export class ImagesService {
@@ -27,12 +28,12 @@ export class ImagesService {
     imageBase64: string,
     mime_type: string,
     product_variation_id: string,
-  ) {
+  ): Promise<Images> {
     if (!mime_type.startsWith('image/')) {
       throw new BadRequestException('Image must have a valid image mime type');
     }
 
-    const record = await this.productsService.GetProductVariationById(
+    const record = await this.productsService.getProductVariationById(
       product_variation_id,
       true,
     );
@@ -53,6 +54,8 @@ export class ImagesService {
       select: {
         id: true,
         url: true,
+        created_at: true,
+        product_variation_id: true,
       },
       data: {
         cdn_id: image.public_id,
@@ -65,7 +68,7 @@ export class ImagesService {
     });
   }
 
-  async deleteImageById(id: string) {
+  async deleteImageById(id: string): Promise<Images> {
     const record = await this.prisma.images.findUnique({
       where: { id: id },
     });
@@ -84,5 +87,17 @@ export class ImagesService {
         `An error occurred when deleting the image.`,
       );
     }
+  }
+
+  async getImagesByProductVariation(
+    product_variation_id: string,
+  ): Promise<Images[]> {
+    const { images } = await this.prisma.productVariations.findUnique({
+      where: { id: product_variation_id },
+      select: {
+        images: true,
+      },
+    });
+    return images;
   }
 }

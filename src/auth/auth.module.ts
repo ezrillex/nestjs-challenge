@@ -8,6 +8,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { EmailsModule } from '../emails/emails.module';
+import { UsersService } from '../users/users.service';
 
 @Module({
   controllers: [AuthController],
@@ -22,6 +24,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    UsersService,
   ],
   imports: [
     JwtModule.registerAsync({
@@ -34,6 +37,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       inject: [ConfigService],
     }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
+    EmailsModule,
   ],
 })
 export class AuthModule {}

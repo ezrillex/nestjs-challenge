@@ -18,6 +18,12 @@ export class GetProductsInput {
     sort?: Nullable<string>;
 }
 
+export class GetOrdersInput {
+    first?: Nullable<number>;
+    offset?: Nullable<number>;
+    client_id?: Nullable<string>;
+}
+
 export class CreateProductInput {
     name: string;
     description: string;
@@ -57,6 +63,12 @@ export class Categories {
     __typename?: 'Categories';
     id: string;
     name: string;
+}
+
+export class GetCategoriesResponse {
+    __typename?: 'GetCategoriesResponse';
+    id: string;
+    name: string;
     products: Products[];
 }
 
@@ -64,7 +76,7 @@ export class Images {
     __typename?: 'Images';
     id: string;
     url: string;
-    created_at: string;
+    created_at: DateTime;
     product_variation_id?: Nullable<string>;
 }
 
@@ -77,22 +89,6 @@ export class ProductVariations {
     images?: Nullable<Images[]>;
 }
 
-export class Users {
-    __typename?: 'Users';
-    id: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    likes_products: LikesOfProducts[];
-}
-
-export class LikesOfProducts {
-    __typename?: 'LikesOfProducts';
-    id: string;
-    liked_by: Users;
-    likes_product_variation: ProductVariations;
-}
-
 export class Products {
     __typename?: 'Products';
     id: string;
@@ -100,13 +96,32 @@ export class Products {
     is_deleted: boolean;
     name: string;
     description: string;
-    likes: LikesOfProducts[];
     variations: ProductVariations[];
     categories: Categories[];
     created_by: string;
     created_at: DateTime;
     last_updated_by?: Nullable<string>;
-    last_updated_at?: Nullable<string>;
+    last_updated_at?: Nullable<DateTime>;
+}
+
+export class LikesOfProducts {
+    __typename?: 'LikesOfProducts';
+    user_id: string;
+    product_variation_id: string;
+    state: boolean;
+}
+
+export class Users {
+    __typename?: 'Users';
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    role: string;
+    created_at: DateTime;
+    login_at: DateTime;
+    password_last_updated: DateTime;
+    likes_products: LikesOfProducts[];
 }
 
 export class CartItems {
@@ -120,15 +135,24 @@ export class CartItems {
 export class OrderItems {
     __typename?: 'OrderItems';
     id: string;
-    product_variation: ProductVariations;
+    product_variation?: Nullable<ProductVariations>;
     quantity: number;
     price_purchased_at: number;
+}
+
+export class PaymentIntents {
+    __typename?: 'PaymentIntents';
+    id: string;
+    status?: Nullable<string>;
+    created_at: DateTime;
+    stripe_event_id: string;
 }
 
 export class Orders {
     __typename?: 'Orders';
     id: string;
     user: Users;
+    payments: PaymentIntents[];
     paymentStatus: string;
     orderStatus: string;
     order_items: OrderItems[];
@@ -137,49 +161,49 @@ export class Orders {
 export abstract class IQuery {
     __typename?: 'IQuery';
 
+    abstract user(id: string): Users | Promise<Users>;
+
+    abstract getLikes(): Nullable<ProductVariations[]> | Promise<Nullable<ProductVariations[]>>;
+
     abstract getProducts(GetProductsInput: GetProductsInput): Nullable<Products[]> | Promise<Nullable<Products[]>>;
 
     abstract getProductById(id: string): Nullable<Products> | Promise<Nullable<Products>>;
 
+    abstract getCategories(): Nullable<GetCategoriesResponse[]> | Promise<Nullable<GetCategoriesResponse[]>>;
+
     abstract getCartItems(): Nullable<CartItems[]> | Promise<Nullable<CartItems[]>>;
 
-    abstract getOrders(): Nullable<Orders[]> | Promise<Nullable<Orders[]>>;
+    abstract getOrders(GetOrdersInput: GetOrdersInput): Nullable<Orders[]> | Promise<Nullable<Orders[]>>;
 
     abstract getOrder(order_id: string): Nullable<Orders> | Promise<Nullable<Orders>>;
-
-    abstract getClientOrders(client_id?: Nullable<string>): Nullable<Orders[]> | Promise<Nullable<Orders[]>>;
-
-    abstract getLikes(): Nullable<LikesOfProducts[]> | Promise<Nullable<LikesOfProducts[]>>;
 }
 
 export abstract class IMutation {
     __typename?: 'IMutation';
 
-    abstract createProduct(CreateProductInput: CreateProductInput): Nullable<string> | Promise<Nullable<string>>;
+    abstract toggleLike(product_variation_id: string): Nullable<LikesOfProducts> | Promise<Nullable<LikesOfProducts>>;
 
-    abstract updateProduct(UpdateProductInput: UpdateProductInput): Nullable<string> | Promise<Nullable<string>>;
+    abstract createProduct(CreateProductInput: CreateProductInput): Nullable<Products> | Promise<Nullable<Products>>;
 
-    abstract updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput): Nullable<string> | Promise<Nullable<string>>;
-
-    abstract createProductVariation(CreateProductVariationInput: CreateProductVariationInput): Nullable<string> | Promise<Nullable<string>>;
-
-    abstract deleteProductVariation(variation_id: string): Nullable<string> | Promise<Nullable<string>>;
+    abstract updateProduct(UpdateProductInput: UpdateProductInput): Nullable<Products> | Promise<Nullable<Products>>;
 
     abstract deleteProduct(product_id: string): Nullable<string> | Promise<Nullable<string>>;
 
-    abstract createCategory(name: string): Nullable<string> | Promise<Nullable<string>>;
+    abstract updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput): Nullable<ProductVariations> | Promise<Nullable<ProductVariations>>;
+
+    abstract createProductVariation(CreateProductVariationInput: CreateProductVariationInput): Nullable<ProductVariations> | Promise<Nullable<ProductVariations>>;
+
+    abstract deleteProductVariation(variation_id: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract createCategory(name: string): Nullable<Categories> | Promise<Nullable<Categories>>;
 
     abstract deleteCategory(id: string): Nullable<string> | Promise<Nullable<string>>;
 
-    abstract addToCart(variation_id: string, quantity: number): Nullable<string> | Promise<Nullable<string>>;
+    abstract addToCart(variation_id: string, quantity: number): Nullable<CartItems> | Promise<Nullable<CartItems>>;
 
-    abstract removeFromCart(cart_item_id: string): Nullable<string> | Promise<Nullable<string>>;
+    abstract removeFromCart(product_variation_id: string): Nullable<string> | Promise<Nullable<string>>;
 
-    abstract createOrder(): Nullable<string> | Promise<Nullable<string>>;
-
-    abstract likeProduct(variation_id: string): Nullable<string> | Promise<Nullable<string>>;
-
-    abstract removeLikeProduct(like_id: string): Nullable<string> | Promise<Nullable<string>>;
+    abstract createOrder(): Nullable<Orders> | Promise<Nullable<Orders>>;
 }
 
 export type DateTime = any;

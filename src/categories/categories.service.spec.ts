@@ -16,24 +16,40 @@ describe('CategoriesService', () => {
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  it('Should be defined', async () => {
+  it('CategoriesService should be defined', async () => {
     expect(service).toBeDefined();
   });
 
-  it('Should be defined', async () => {
-    expect(service.CreateCategory).toBeDefined();
+  it('PrismaService should be defined', async () => {
+    expect(prismaService).toBeDefined();
   });
 
-  it('Should be defined', async () => {
-    expect(service.DeleteCategory).toBeDefined();
+  it('createCategory Should be defined', async () => {
+    expect(service.createCategory).toBeDefined();
   });
 
-  describe('add categories tests', () => {
+  it('getProductsByCategory Should be defined', async () => {
+    expect(service.getProductsByCategory).toBeDefined();
+  });
+
+  it('getAllCategories Should be defined', async () => {
+    expect(service.getAllCategories).toBeDefined();
+  });
+
+  it('getCategoriesByProduct Should be defined', async () => {
+    expect(service.getCategoriesByProduct).toBeDefined();
+  });
+
+  it('deleteCategoryById should be defined', async () => {
+    expect(service.deleteCategoryById).toBeDefined();
+  });
+
+  describe('createCategory', () => {
     it('should throw if category name already exists', async () => {
       jest.spyOn(prismaService.categories, 'count').mockResolvedValue(1);
 
       await expect(
-        service.CreateCategory('some name that definitely is not duped'),
+        service.createCategory('some name that definitely is not duped'),
       ).rejects.toThrowErrorMatchingSnapshot('category already exists error');
     });
 
@@ -44,15 +60,21 @@ describe('CategoriesService', () => {
         created = true;
         return null;
       });
-      await service.CreateCategory('some name that definitely is not duped');
+      await service.createCategory('some name that definitely is not duped');
       expect(created).toEqual(true);
     });
   });
 
-  describe('delete categories tests', () => {
+  describe('getProductsByCategory', () => {});
+
+  describe('getAllCategories', () => {});
+
+  describe('getCategoriesByProduct', () => {});
+
+  describe('deleteCategoryById', () => {
     it('should throw if category name already exists', async () => {
       await expect(
-        service.DeleteCategory('2730fc05-6f87-49e5-8a41-559208048ebe'),
+        service.deleteCategoryById('2730fc05-6f87-49e5-8a41-559208048ebe'),
       ).rejects.toThrowErrorMatchingSnapshot('category does not exist');
     });
 
@@ -62,15 +84,17 @@ describe('CategoriesService', () => {
         id: '2730fc05-6f87-49e5-8a41-559208048ebe',
       } as Categories);
       await expect(
-        service.DeleteCategory('2730fc05-6f87-49e5-8a41-559208048ebe'),
+        service.deleteCategoryById('2730fc05-6f87-49e5-8a41-559208048ebe'),
       ).resolves.toEqual('Record Deleted');
     });
 
-    it('should throw if nothing is returned from prisma', async () => {
+    it('should throw if prisma fails', async () => {
       jest.spyOn(prismaService.categories, 'count').mockResolvedValue(1);
-      jest.spyOn(prismaService.categories, 'delete').mockResolvedValue(null);
+      jest
+        .spyOn(prismaService.categories, 'delete')
+        .mockRejectedValue(new Error('testing'));
       await expect(
-        service.DeleteCategory('2730fc05-6f87-49e5-8a41-559208048ebe'),
+        service.deleteCategoryById('2730fc05-6f87-49e5-8a41-559208048ebe'),
       ).rejects.toThrowErrorMatchingSnapshot('error when deleting');
     });
   });

@@ -1,44 +1,78 @@
-import { Args, Context, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  ID,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { roles } from '@prisma/client';
 import { ParseIntPipe, ParseUUIDPipe } from '@nestjs/common';
 import { CartItems } from './cart_items.model';
 import { CartsService } from './carts.service';
+import { ProductsService } from '../products/products.service';
+import { UsersService } from '../users/users.service';
+import { ProductVariations } from '../products/product_variation/product-variations.model';
+import { Users } from '../users/users.model';
 
-@Resolver()
+@Resolver(() => CartItems)
 export class CartItemsResolver {
-  constructor(private readonly cartsService: CartsService) {}
+  constructor(
+    private readonly cartsService: CartsService,
+    private readonly productsService: ProductsService,
+    private readonly usersService: UsersService,
+  ) {}
 
   // create or update
   @RequiresRole(roles.customer)
-  @Mutation(() => String, { nullable: true })
+  @Mutation(() => CartItems, { nullable: true })
   async addToCart(
-    @Args('variation_id', { type: () => String }, ParseUUIDPipe)
+    @Args('variation_id', { type: () => ID }, ParseUUIDPipe)
     variation_id: string,
     @Args('quantity', { type: () => Int }, ParseIntPipe) quantity: number,
     @Context('req') request: Request,
-  ) {
-    const result = await this.cartsService.AddToCart(
+  ): Promise<CartItems> {
+    return await this.cartsService.addToCart(
       variation_id,
       request['user'].id,
       quantity,
     );
-
-    return result.id;
   }
 
   @RequiresRole(roles.customer)
   @Mutation(() => String, { nullable: true })
   async removeFromCart(
-    @Args('cart_item_id', { type: () => String }, ParseUUIDPipe)
-    cart_item_id: string,
-  ) {
-    return this.cartsService.RemoveCartItem(cart_item_id);
+    @Args('product_variation_id', { type: () => String }, ParseUUIDPipe)
+    product_variation_id: string,
+    @Context('req') request: Request,
+  ): Promise<string> {
+    return this.cartsService.removeFromCart(
+      product_variation_id,
+      request['user'].id,
+    );
   }
 
   @RequiresRole(roles.customer)
   @Query(() => [CartItems], { nullable: true })
-  async getCartItems(@Context('req') request: Request) {
-    return this.cartsService.GetCartItems(request['user'].id);
+  async getCartItems(@Context('req') request: Request): Promise<CartItems[]> {
+    return this.cartsService.getCartItems(request['user'].id);
+  }
+
+  @ResolveField()
+  async cart_owner(@Parent() cart_items: CartItems): Promise<Users> {
+    const { id } = cart_items;
+    return this.usersService.getUserByCartItem(id);
+  }
+
+  @ResolveField()
+  async product_variation(
+    @Parent() cart_items: CartItems,
+  ): Promise<ProductVariations> {
+    const { id } = cart_items;
+    return this.productsService.getProductVariationByCartItem(id);
   }
 }

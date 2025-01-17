@@ -8,7 +8,10 @@ export class Categories {
 
   @Field(() => String)
   name: string;
+}
 
+@ObjectType()
+export class GetCategoriesResponse extends Categories {
   @Field(() => [Products])
-  products: Products[];
+  products?: Products[];
 }

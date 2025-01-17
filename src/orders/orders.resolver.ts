@@ -1,51 +1,79 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { RequiresRole } from '../common/decorators/requires-role.decorator';
 import { roles } from '@prisma/client';
 import { ParseUUIDPipe } from '@nestjs/common';
 import { Orders } from './orders.model';
 import { OrdersService } from './orders.service';
+import { UsersService } from '../users/users.service';
+import { StripeService } from '../payments/stripe.service';
+import { GetOrdersInput } from './inputs/get_orders.input';
+import { Users } from '../users/users.model';
+import { OrderItems } from './order-items/order_items.model';
+import { PaymentIntents } from '../payments/payments.model';
 
-@Resolver()
+@Resolver(() => Orders)
 export class OrdersResolver {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly usersService: UsersService,
+    private readonly stripeService: StripeService,
+  ) {}
 
   @RequiresRole(roles.customer)
-  @Mutation(() => String, { nullable: true })
-  async createOrder(@Context('req') request: Request) {
+  @Mutation(() => Orders, { nullable: true })
+  async createOrder(@Context('req') request: Request): Promise<Orders> {
     // let's assume the customer is buying the entire cart.
-    return this.ordersService.CreateOrder(request['user'].id);
+    return this.ordersService.createOrder(request['user'].id);
   }
 
-  @RequiresRole(roles.customer)
   @Query(() => [Orders], { nullable: true })
-  async getOrders(@Context('req') request: Request) {
-    return this.ordersService.GetOrders(
+  async getOrders(
+    @Args('GetOrdersInput') getOrdersInput: GetOrdersInput,
+    @Context('req') request: Request,
+  ): Promise<Orders[]> {
+    return this.ordersService.getOrders(
       request['user'].id,
       request['user'].role,
+      getOrdersInput,
     );
   }
 
-  @RequiresRole(roles.customer)
   @Query(() => Orders, { nullable: true })
   async getOrder(
     @Args('order_id', { type: () => String }, ParseUUIDPipe)
     order_id: string,
     @Context('req') request: Request,
-  ) {
-    return this.ordersService.GetOrder(order_id, request['user'].id);
-  }
-
-  @RequiresRole(roles.manager)
-  @Query(() => [Orders], { nullable: true })
-  async getClientOrders(
-    @Context('req') request: Request,
-    @Args('client_id', { type: () => String, nullable: true }, ParseUUIDPipe)
-    client_id: string,
-  ) {
-    return this.ordersService.GetOrders(
+  ): Promise<Orders> {
+    return this.ordersService.getOrder(
+      order_id,
       request['user'].id,
       request['user'].role,
-      client_id,
     );
+  }
+
+  @ResolveField()
+  async user(@Parent() orders: Orders): Promise<Users> {
+    const { id } = orders;
+    return this.usersService.getUserByOrder(id);
+  }
+
+  @ResolveField()
+  async order_items(@Parent() cart_items: Orders): Promise<OrderItems[]> {
+    const { id } = cart_items;
+    return this.ordersService.getOrderItemsByOrder(id);
+  }
+
+  @ResolveField()
+  async payments(@Parent() cart_items: Orders): Promise<PaymentIntents[]> {
+    const { id } = cart_items;
+    return this.stripeService.getPaymentsByOrder(id);
   }
 }

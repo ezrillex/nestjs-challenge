@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "LikesOfProducts" ADD COLUMN     "created_at" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;

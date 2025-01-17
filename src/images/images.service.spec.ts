@@ -22,24 +22,24 @@ describe('ImagesService', () => {
     productService = module.get(ProductsService);
   });
 
-  it('should be defined', () => {
+  it('ImagesService should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('config service should be defined', () => {
+  it('ConfigService should be defined', () => {
     expect(configService).toBeDefined();
   });
 
-  it('prisma service should be defined', () => {
+  it('PrismaService should be defined', () => {
     expect(prismaService).toBeDefined();
   });
 
-  it('prisma service should be defined', () => {
+  it('ProductsService should be defined', () => {
     expect(productService).toBeDefined();
   });
 
-  describe('upload image method', () => {
-    it('should error if not image mime type', async () => {
+  describe('uploadImage', () => {
+    it('should throw an error for invalid image mime type', async () => {
       await expect(
         service.uploadImage(
           'the_base_64',
@@ -49,7 +49,7 @@ describe('ImagesService', () => {
       ).rejects.toThrowErrorMatchingSnapshot('image must be valid mime type');
     });
 
-    it('should accept image mime type', async () => {
+    it('should successfully accept valid image mime type', async () => {
       await expect(
         service.uploadImage(
           'the_base_64',
@@ -59,7 +59,7 @@ describe('ImagesService', () => {
       ).rejects.toThrowErrorMatchingSnapshot('product variation not found');
     });
 
-    it('should error if invalid product id', async () => {
+    it('should throw an error if product variation id is invalid', async () => {
       await expect(
         service.uploadImage(
           'the_base_64',
@@ -69,7 +69,7 @@ describe('ImagesService', () => {
       ).rejects.toThrowErrorMatchingSnapshot('product variation not found');
     });
 
-    it('should error if cdn didnt provide a public id for the uploaded image. ', async () => {
+    it('should throw an error if CDN didn’t provide the required public id', async () => {
       const mock_cdn_response = {
         public_id: undefined,
       } as UploadApiResponse;
@@ -78,7 +78,7 @@ describe('ImagesService', () => {
         .mockResolvedValue(mock_cdn_response);
 
       jest
-        .spyOn(productService, 'GetProductVariationById')
+        .spyOn(productService, 'getProductVariationById')
         .mockResolvedValue(1);
 
       await expect(
@@ -92,7 +92,7 @@ describe('ImagesService', () => {
       );
     });
 
-    it('should query prisma for creation. ', async () => {
+    it('should create a record in the database after successful upload', async () => {
       jest.useFakeTimers();
       jest.setSystemTime(new Date(2020, 12, 12, 12, 12));
       const mock_cdn_response = {
@@ -104,7 +104,7 @@ describe('ImagesService', () => {
         .mockResolvedValue(mock_cdn_response);
 
       jest
-        .spyOn(productService, 'GetProductVariationById')
+        .spyOn(productService, 'getProductVariationById')
         .mockResolvedValue(1);
 
       const spy = jest
@@ -122,15 +122,15 @@ describe('ImagesService', () => {
     });
   });
 
-  describe('delete image method', () => {
-    it('should error if invalid image id', async () => {
+  describe('deleteImageById', () => {
+    it('should throw an error for invalid image id', async () => {
       jest.spyOn(prismaService.images, 'findUnique').mockReset();
       await expect(
         service.deleteImageById('2730fc05-6f87-49e5-8a41-559208048ebe'),
       ).rejects.toThrowErrorMatchingSnapshot('image not found');
     });
 
-    it('should error if cdn failed and response was not successful ', async () => {
+    it('should throw an error when CDN fails and returns unsuccessful response', async () => {
       const mock_cdn_response = {
         result: 'definitely not ok',
       };
@@ -154,7 +154,7 @@ describe('ImagesService', () => {
       ).rejects.toThrowErrorMatchingSnapshot('CDN result was not successful');
     });
 
-    it('if image creation is ok, should return deleted images like pop', async () => {
+    it('should return successfully deleted image when CDN response is ok', async () => {
       const mock_cdn_response = {
         result: 'ok',
       };
@@ -183,4 +183,6 @@ describe('ImagesService', () => {
       expect(spy.mock.calls).toMatchSnapshot('request sent to prisma');
     });
   });
+
+  describe('getImagesByProductVariation', () => {});
 });

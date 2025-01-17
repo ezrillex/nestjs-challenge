@@ -7,13 +7,20 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ImagesModule } from './images/images.module';
-import Joi from 'joi';
+import * as Joi from 'joi';
 import { GraphQLFormattedError } from 'graphql/error';
 import { PaymentsModule } from './payments/payments.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CartsModule } from './carts/carts.module';
 import { OrdersModule } from './orders/orders.module';
 import { LikesModule } from './likes/likes.module';
+import { EmailsModule } from './emails/emails.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksService } from './common/tasks/tasks.service';
+import { UsersResolver } from './users/users.resolver';
+import { PrismaService } from './prisma/prisma.service';
+import { UsersModule } from './users/users.module';
+import { CommonController } from './common/common.controller';
 
 @Module({
   imports: [
@@ -29,6 +36,8 @@ import { LikesModule } from './likes/likes.module';
         STRIPE_SECRET_KEY: Joi.string().required(),
         STRIPE_WEBHOOK_SIGNING_SECRET: Joi.string().required(),
         AUTO_ROLE: Joi.string().required(),
+        SENDGRID_API_KEY: Joi.string().required(),
+        LOG_ERRORS: Joi.boolean().default(false),
       }),
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -63,6 +72,7 @@ import { LikesModule } from './likes/likes.module';
       },
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
+    LikesModule,
     AuthModule,
     ProductsModule,
     ImagesModule,
@@ -70,7 +80,11 @@ import { LikesModule } from './likes/likes.module';
     CategoriesModule,
     CartsModule,
     OrdersModule,
-    LikesModule,
+    EmailsModule,
+    ScheduleModule.forRoot(),
+    UsersModule,
   ],
+  providers: [TasksService, PrismaService, UsersResolver],
+  controllers: [CommonController],
 })
 export class AppModule {}

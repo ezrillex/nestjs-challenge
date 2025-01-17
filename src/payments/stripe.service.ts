@@ -9,6 +9,7 @@ import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { PaymentStatus } from '@prisma/client';
+import { PaymentIntents } from './payments.model';
 
 @Injectable()
 export class StripeService {
@@ -23,7 +24,19 @@ export class StripeService {
     });
   }
 
-  async webhook(req: Request, raw: Buffer) {
+  async getPaymentsByOrder(id: string): Promise<PaymentIntents[]> {
+    const { PaymentIntents } = await this.prisma.orders.findUnique({
+      where: {
+        id: id,
+      },
+      select: {
+        PaymentIntents: true,
+      },
+    });
+    return PaymentIntents;
+  }
+
+  async webhook(req: Request, raw: Buffer): Promise<{ received: boolean }> {
     const sig = req.headers['stripe-signature'];
 
     if (!sig) {
@@ -102,7 +115,11 @@ export class StripeService {
     return { received: true };
   }
 
-  async createPaymentIntent(amount: number, order_id: string, user_id: string) {
+  async createPaymentIntent(
+    amount: number,
+    order_id: string,
+    user_id: string,
+  ): Promise<PaymentIntents & { client_secret: string }> {
     if (amount <= 0) {
       throw new BadRequestException('Amount cant be negative or zero!');
     }
@@ -140,6 +157,13 @@ export class StripeService {
     }
 
     const result = await this.prisma.paymentIntents.update({
+      select: {
+        id: true,
+        status: true,
+        order_id: true,
+        created_at: true,
+        stripe_event_id: true,
+      },
       where: { id: intent_record.id },
       data: {
         status: 'requires_payment_method',
@@ -149,13 +173,15 @@ export class StripeService {
     });
 
     return {
-      payment_intent_id: paymentIntent.id,
+      ...result,
       client_secret: paymentIntent.client_secret,
-      payment_id: result.id,
     };
   }
 
-  async getOrderPayments(order_id: string, user_id: string) {
+  async getOrderPayments(
+    order_id: string,
+    user_id: string,
+  ): Promise<PaymentIntents[]> {
     // checks if order exists and because filter of user checks if is of user.
     const record = await this.prisma.orders.count({
       where: { id: order_id, user_id: user_id },
@@ -179,8 +205,15 @@ export class StripeService {
     });
   }
 
-  // DEBUG ONLY METHOD --------------------------------------------------
-  async updatePaymentIntent(payment_id: string, payment_method: string) {
+  // For debugging purposes only
+  async updatePaymentIntent(
+    payment_id: string,
+    payment_method: string,
+  ): Promise<Stripe.PaymentIntent> {
+    // eslint-disable-next-line no-console
+    console.warn(
+      'For debugging purposes only method called. updatePaymentIntent',
+    );
     // check if order exists
     const record = await this.prisma.paymentIntents.findUnique({
       where: { id: payment_id },

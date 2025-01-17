@@ -5,15 +5,25 @@
 type Categories {
   id: String!
   name: String!
+}
+
+type GetCategoriesResponse {
+  id: String!
+  name: String!
   products: [Products!]!
 }
 
 type Images {
   id: String!
   url: String!
-  created_at: String!
+  created_at: DateTime!
   product_variation_id: String
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type ProductVariations {
   id: String!
@@ -23,39 +33,37 @@ type ProductVariations {
   images: [Images!]
 }
 
-type Users {
-  id: ID!
-  first_name: String!
-  last_name: String!
-  email: String!
-  likes_products: [LikesOfProducts!]!
-}
-
-type LikesOfProducts {
-  id: ID!
-  liked_by: Users!
-  likes_product_variation: ProductVariations!
-}
-
 type Products {
   id: ID!
   is_published: Boolean!
   is_deleted: Boolean!
   name: String!
   description: String!
-  likes: [LikesOfProducts!]!
   variations: [ProductVariations!]!
   categories: [Categories!]!
   created_by: String!
   created_at: DateTime!
   last_updated_by: String
-  last_updated_at: String
+  last_updated_at: DateTime
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
+type LikesOfProducts {
+  user_id: ID!
+  product_variation_id: ID!
+  state: Boolean!
+}
+
+type Users {
+  id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
+  role: String!
+  created_at: DateTime!
+  login_at: DateTime!
+  password_last_updated: DateTime!
+  likes_products: [LikesOfProducts!]!
+}
 
 type CartItems {
   id: ID!
@@ -66,27 +74,36 @@ type CartItems {
 
 type OrderItems {
   id: ID!
-  product_variation: ProductVariations!
+  product_variation: ProductVariations
   quantity: Int!
   price_purchased_at: Float!
+}
+
+type PaymentIntents {
+  id: ID!
+  status: String
+  created_at: DateTime!
+  stripe_event_id: ID!
 }
 
 type Orders {
   id: ID!
   user: Users!
+  payments: [PaymentIntents!]!
   paymentStatus: String!
   orderStatus: String!
   order_items: [OrderItems!]!
 }
 
 type Query {
+  user(id: ID!): Users!
+  getLikes: [ProductVariations!]
   getProducts(GetProductsInput: GetProductsInput!): [Products!]
   getProductById(id: String!): Products
+  getCategories: [GetCategoriesResponse!]
   getCartItems: [CartItems!]
-  getOrders: [Orders!]
+  getOrders(GetOrdersInput: GetOrdersInput!): [Orders!]
   getOrder(order_id: String!): Orders
-  getClientOrders(client_id: String): [Orders!]
-  getLikes: [LikesOfProducts!]
 }
 
 input GetProductsInput {
@@ -99,20 +116,25 @@ input GetProductsInput {
   sort: String
 }
 
+input GetOrdersInput {
+  first: Int
+  offset: Int
+  client_id: ID
+}
+
 type Mutation {
-  createProduct(CreateProductInput: CreateProductInput!): String
-  updateProduct(UpdateProductInput: UpdateProductInput!): String
-  updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput!): String
-  createProductVariation(CreateProductVariationInput: CreateProductVariationInput!): String
-  deleteProductVariation(variation_id: String!): String
+  toggleLike(product_variation_id: String!): LikesOfProducts
+  createProduct(CreateProductInput: CreateProductInput!): Products
+  updateProduct(UpdateProductInput: UpdateProductInput!): Products
   deleteProduct(product_id: String!): String
-  createCategory(name: String!): String
+  updateProductVariation(UpdateProductVariationInput: UpdateProductVariationInput!): ProductVariations
+  createProductVariation(CreateProductVariationInput: CreateProductVariationInput!): ProductVariations
+  deleteProductVariation(variation_id: String!): String
+  createCategory(name: String!): Categories
   deleteCategory(id: ID!): String
-  addToCart(variation_id: String!, quantity: Int!): String
-  removeFromCart(cart_item_id: String!): String
-  createOrder: String
-  likeProduct(variation_id: String!): String
-  removeLikeProduct(like_id: String!): String
+  addToCart(variation_id: ID!, quantity: Int!): CartItems
+  removeFromCart(product_variation_id: String!): String
+  createOrder: Orders
 }
 
 input CreateProductInput {
