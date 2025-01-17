@@ -1,8 +1,7 @@
 # nestjs-challenge
 ![](./pictures/ai-generated-logo.jpg)
 ### Build your tiny API store.
-You can choose the target of your business, be creative!.
-**Examples:** snack store, pet store, drug store.
+### Please note screenshots are out of date. 
 
 ## Technical Requirements
 * ✅ PostgreSql
@@ -177,12 +176,12 @@ Interactive Coverage Report : [https://ezrillex.github.io/nestjs-challenge/cover
       - @Throttle({ default: { limit: 3, ttl: 60000 } })
       - @UseGuards(ThrottlerGuard)
 
-## Extra points 😞
-* ❎ Implement resolve field in graphQL queries (if apply)
-* ❎ When the stock of a product reaches 3, notify the last user that liked it and not purchased the product yet with an email.
+## Extra points
+* ✅ Implement resolve field in graphQL queries (if apply)
+* ✅ When the stock of a product reaches 3, notify the last user that liked it and not purchased the product yet with an email.
   Use a background job and make sure to include the product's image in the email.
-* ❎ Send an email when the user changes the password
-* ❎ Deploy on Heroku
+* ✅ Send an email when the user changes the password
+* ✅ Deploy on Heroku (Deployed on Render.com)
 
 ## Notes:
 
