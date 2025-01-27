@@ -52,8 +52,8 @@ Interactive Coverage Report : [https://ezrillex.github.io/nestjs-challenge/cover
    - ✅forgot
      - To request a reset provide an email.
      - ![](./pictures/forgot.png)
-     - Next copy the token from the server console. (Sending it was extra points😅)
-     - ![](./pictures/forgot_token.png)
+     - Check your email for the token.
+     - ![image](https://github.com/user-attachments/assets/8d14f2f3-a89a-4953-a921-69217e1ed347)
    - ✅reset password
      - To reset provide the token we got in the previous step. With new passwords.
      - ![](./pictures/reset.png)
