@@ -13,7 +13,6 @@
 * ✅ Eslint
 
 Interactive Coverage Report : [https://ezrillex.github.io/nestjs-challenge/coverage/lcov-report/](https://ezrillex.github.io/nestjs-challenge/coverage/lcov-report/)
-![](./pictures/coverage.png)
 
 ## Requirements to Run
 1. The following constants on the .env file. A sample file is included.
