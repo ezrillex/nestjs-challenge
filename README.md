@@ -1,7 +1,9 @@
+### Note: screenshots are out of date. Full GraphQL objects are queryable in actual implementation, not only id.
+
 # nestjs-challenge
 ![](./pictures/ai-generated-logo.jpg)
 ### Build your tiny API store.
-### Please note screenshots are out of date. 
+
 
 ## Technical Requirements
 * ✅ PostgreSql
