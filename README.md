@@ -189,8 +189,6 @@ Interactive Coverage Report : [https://ezrillex.github.io/nestjs-challenge/cover
 Requirements to use Rest:
 * ✅ Authentication endpoints (sign up, sign in, sign out, forgot, reset password)
 * ✅ Stripe Integration for payment (including webhooks management)
-
-  * I understand this implies all payment related apis are REST. This is how I developed it. (Webhook, Create payment intent, and get order payments.)
   
 - Requirements to use Graph:
 * ✅ The ones not included in the block above
